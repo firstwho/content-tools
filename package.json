@@ -1,0 +1,39 @@
+{
+  "name": "content-tools",
+  "version": "0.0.0",
+  "type": "module",
+  "description": "Tools and utilities for working with FirstWho as a headless CMS",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/firstwho/content-tools"
+  },
+  "author": "Mission Focused Tech LLC",
+  "license": "MIT",
+  "homepage": "https:firstwho.co",
+  "keywords": [],
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "node_modules/@babel/cli/bin/babel.js src --out-dir ./dist",
+    "test": "node_modules/mocha/bin/mocha --require @babel/register"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.19.3",
+    "@babel/core": "^7.19.6",
+    "@babel/node": "^7.19.1",
+    "@babel/plugin-transform-runtime": "^7.19.6",
+    "@babel/preset-env": "^7.19.4",
+    "@babel/preset-react": "^7.18.6",
+    "@babel/register": "^7.18.9",
+    "assert": "^2.0.0",
+    "babel-plugin-transform-es2015-modules-simple-commonjs": "^0.3.0",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-watch": "^7.7.0",
+    "mocha": "^10.1.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "dependencies": {
+    "adm-zip": "^0.5.9",
+    "node-fetch": "^3.2.10"
+  }
+}
