@@ -13,7 +13,7 @@ var toBuffer = function toBuffer(ab) {
   }
   return buf;
 };
-var getContent = /*#__PURE__*/function () {
+var getContent = /*#__PURE__*/exports.getContent = function () {
   var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee() {
     var _process$env, _process$env2, _process$env3;
     var API_KEY, API_SERVER, WRITE_PATH, res, buffer, zip;
@@ -67,4 +67,3 @@ var getContent = /*#__PURE__*/function () {
     return _ref.apply(this, arguments);
   };
 }();
-module.exports = getContent;

@@ -1,6 +1,7 @@
 "use strict";
 
 var React = require("react");
+// .env should include NEXT_PUBLIC_LIFECYCLE=$npm_lifecycle_event
 var InternalLink = exports.InternalLink = function InternalLink(_ref) {
   var _process$env;
   var href = _ref.href,

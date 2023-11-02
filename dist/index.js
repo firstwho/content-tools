@@ -1,6 +1,7 @@
 "use strict";
 
-var getContent = require("./get-content");
+var _getContent = require("./get-content");
+var getContent = _getContent.getContent;
 var _componentsContentSections = require("./components/ContentSections");
 var DoContentSections = _componentsContentSections.DoContentSections;
 var ContentSections = _componentsContentSections.ContentSections;

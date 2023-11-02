@@ -11,7 +11,7 @@ const toBuffer = (ab) => {
   return buf;
 };
 
-const getContent = async () => {
+export const getContent = async () => {
   // get environment variables
   const API_KEY = process.env?.CONTENT_API_KEY;
   if (!API_KEY) {
@@ -46,5 +46,3 @@ const getContent = async () => {
   var zip = new AdmZip(`${WRITE_PATH}/content.zip`);
   zip.extractAllTo(`${WRITE_PATH}/content`, true);
 };
-
-export default getContent;

@@ -24,6 +24,9 @@ var CONTENT_TYPE_IMAGE_CENTER = exports.CONTENT_TYPE_IMAGE_CENTER = "image-only-
 var CONTENT_TYPE_IMAGE_FULL = exports.CONTENT_TYPE_IMAGE_FULL = "image-only-full";
 var CONTENT_TYPE_DIVIDER = exports.CONTENT_TYPE_DIVIDER = "divider";
 var CONTENT_TYPE_SIGN_UP = exports.CONTENT_TYPE_SIGN_UP = "sign-up";
+
+// NOTE localFont is NextJS font object
+
 var useScript = function useScript(url) {
   useEffect(function () {
     if (!url) return;

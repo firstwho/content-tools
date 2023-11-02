@@ -1,4 +1,4 @@
-import getContent from "./get-content";
+import { getContent } from "./get-content";
 import { DoContentSections, ContentSections } from "./components/ContentSections"
 import { InternalLink } from "./components/InternalLink"
 
