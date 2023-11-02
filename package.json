@@ -1,6 +1,6 @@
 {
   "name": "content-tools",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "description": "Tools and utilities for working with FirstWho as a headless CMS",
   "repository": {
@@ -34,6 +34,14 @@
   },
   "dependencies": {
     "adm-zip": "^0.5.10",
-    "node-fetch": "^3.3.2"
+    "copy-to-clipboard": "^3.3.3",
+    "node-fetch": "^3.3.2",
+    "react-hot-toast": "^2.4.1",
+    "react-icons": "^4.11.0",
+    "react-scroll-into-view": "^2.0.2"
+  },
+  "peerDependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
   }
 }
