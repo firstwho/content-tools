@@ -12,7 +12,6 @@ var FaLink = _reactIconsFa.FaLink;
 var copy = require("copy-to-clipboard");
 var toast = require("react-hot-toast");
 var ScrollTo = require("react-scroll-into-view");
-var CONTENT_TYPE_OPEN_GRAPH_IMAGE = exports.CONTENT_TYPE_OPEN_GRAPH_IMAGE = "image-only-opengraph";
 var CONTENT_TYPE_TEXT_LEFT = exports.CONTENT_TYPE_TEXT_LEFT = "text-only-left";
 var CONTENT_TYPE_TEXT_RIGHT = exports.CONTENT_TYPE_TEXT_RIGHT = "text-only-right";
 var CONTENT_TYPE_TEXT_CENTER = exports.CONTENT_TYPE_TEXT_CENTER = "text-only-center";
@@ -429,7 +428,7 @@ var ContentSections = exports.ContentSections = function ContentSections(_ref27)
         });
         break;
       case CONTENT_TYPE_TEXT_IMAGE_LEFT:
-        sectionOut = /*#__PURE__*/React.createElement("imgOnLeft", {
+        sectionOut = /*#__PURE__*/React.createElement(ImageOnLeft, {
           content: content,
           imageUrl: imageUrl,
           colSpanContent: colSpanContent,
@@ -437,7 +436,7 @@ var ContentSections = exports.ContentSections = function ContentSections(_ref27)
         });
         break;
       case CONTENT_TYPE_TEXT_IMAGE_RIGHT:
-        sectionOut = /*#__PURE__*/React.createElement("imgOnRight", {
+        sectionOut = /*#__PURE__*/React.createElement(ImageOnRight, {
           content: content,
           imageUrl: imageUrl,
           colSpanContent: colSpanContent,
@@ -445,28 +444,28 @@ var ContentSections = exports.ContentSections = function ContentSections(_ref27)
         });
         break;
       case CONTENT_TYPE_IMAGE_LEFT:
-        sectionOut = /*#__PURE__*/React.createElement("imgLeft", {
+        sectionOut = /*#__PURE__*/React.createElement(ImageLeft, {
           imageUrl: imageUrl,
           height: imageHeight,
           width: imageWidth
         });
         break;
       case CONTENT_TYPE_IMAGE_RIGHT:
-        sectionOut = /*#__PURE__*/React.createElement("imgRight", {
+        sectionOut = /*#__PURE__*/React.createElement(ImageRight, {
           imageUrl: imageUrl,
           height: imageHeight,
           width: imageWidth
         });
         break;
       case CONTENT_TYPE_IMAGE_CENTER:
-        sectionOut = /*#__PURE__*/React.createElement("imgCenter", {
+        sectionOut = /*#__PURE__*/React.createElement(ImageCenter, {
           imageUrl: imageUrl,
           height: imageHeight,
           width: imageWidth
         });
         break;
       case CONTENT_TYPE_IMAGE_FULL:
-        sectionOut = /*#__PURE__*/React.createElement("imgCenterFull", {
+        sectionOut = /*#__PURE__*/React.createElement(ImageCenterFull, {
           imageUrl: imageUrl
         });
         break;

@@ -6,7 +6,6 @@ import copy from "copy-to-clipboard";
 import toast from "react-hot-toast";
 import ScrollTo from "react-scroll-into-view";
 
-export const CONTENT_TYPE_OPEN_GRAPH_IMAGE = "image-only-opengraph";
 export const CONTENT_TYPE_TEXT_LEFT = "text-only-left";
 export const CONTENT_TYPE_TEXT_RIGHT = "text-only-right";
 export const CONTENT_TYPE_TEXT_CENTER = "text-only-center";
@@ -459,7 +458,7 @@ export const ContentSections = ({
           break;
         case CONTENT_TYPE_TEXT_IMAGE_LEFT:
           sectionOut = (
-            <imgOnLeft
+            <ImageOnLeft
               content={content}
               imageUrl={imageUrl}
               colSpanContent={colSpanContent}
@@ -469,7 +468,7 @@ export const ContentSections = ({
           break;
         case CONTENT_TYPE_TEXT_IMAGE_RIGHT:
           sectionOut = (
-            <imgOnRight
+            <ImageOnRight
               content={content}
               imageUrl={imageUrl}
               colSpanContent={colSpanContent}
@@ -479,7 +478,7 @@ export const ContentSections = ({
           break;
         case CONTENT_TYPE_IMAGE_LEFT:
           sectionOut = (
-            <imgLeft
+            <ImageLeft
               imageUrl={imageUrl}
               height={imageHeight}
               width={imageWidth}
@@ -488,7 +487,7 @@ export const ContentSections = ({
           break;
         case CONTENT_TYPE_IMAGE_RIGHT:
           sectionOut = (
-            <imgRight
+            <ImageRight
               imageUrl={imageUrl}
               height={imageHeight}
               width={imageWidth}
@@ -497,7 +496,7 @@ export const ContentSections = ({
           break;
         case CONTENT_TYPE_IMAGE_CENTER:
           sectionOut = (
-            <imgCenter
+            <ImageCenter
               imageUrl={imageUrl}
               height={imageHeight}
               width={imageWidth}
@@ -505,7 +504,7 @@ export const ContentSections = ({
           );
           break;
         case CONTENT_TYPE_IMAGE_FULL:
-          sectionOut = <imgCenterFull imageUrl={imageUrl} />;
+          sectionOut = <ImageCenterFull imageUrl={imageUrl} />;
           break;
 
         case CONTENT_TYPE_DIVIDER:
