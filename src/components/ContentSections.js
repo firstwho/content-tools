@@ -52,10 +52,108 @@ const useOnScreen = (ref, setActiveHeader, anchor) => {
   }, [ref, anchor, setActiveHeader]);
 };
 
-const TableOfContents = ({ sections, activeHeader, localFont }) => {
-  const visibleSections = sections.filter(
-    ({ show_heading: showHeading }) => showHeading === true
+const TocItem = ({
+  id,
+  heading,
+  showHeading,
+  editCallback,
+  deleteCallback,
+  buttonClasses,
+  offset,
+  activeUntil,
+  matched,
+  visibleSections,
+  localFont
+}) => {
+  const [isHovering, setIsHovering] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  return (
+    <li
+      className="flex items-center relative"
+      onMouseEnter={() => setIsHovering(true)}
+      onMouseLeave={() => setIsHovering(false)}
+    >
+      {offset === 0 && (
+        <div className="absolute h-1/2 w-4 top-0 -left-2 bg-white z-10"></div>
+      )}
+      {offset === visibleSections.length - 1 && (
+        <div className="absolute h-1/2 w-4 bottom-0 -left-2 bg-white z-10"></div>
+      )}
+      <div
+        className={`${
+          matched && offset <= activeUntil ? "bg-slate-700" : "bg-white"
+        } shrink-0 rounded-full w-3 h-3 border-slate-800 border-2 -ml-[7px] z-20`}
+      ></div>
+      <div className="flex flex-col">
+        <ScrollTo selector={`#heading-${id}`}>
+          <div
+            href={`#heading-${id}`}
+            className={`${
+              matched && offset <= activeUntil
+                ? "text-slate-800"
+                : "text-gray-500"
+            } ${
+              localFont.className
+            } grow pl-4 pr-2 space-x-2 hover:text-gray-900 text-lg cursor-pointer ${
+              showHeading ? "" : "opacity-50"
+            }`}
+          >
+            {heading}
+          </div>
+        </ScrollTo>
+        {isHovering && editCallback && (
+          <>
+            <div className="pl-4 pr-2 flex gap-x-4 mt-2">
+              <span onClick={() => editCallback(id)} className={buttonClasses}>
+                Edit
+              </span>
+              <span
+                onClick={() => setIsDeleting(!isDeleting)}
+                className={buttonClasses}
+              >
+                Delete
+              </span>
+            </div>
+            {isDeleting && (
+              <div className="bg-white p-4 flex flex-col gap-y-4">
+                <div className="font-semibold">
+                  Are you sure you want to delete this section?
+                </div>
+                <div className="flex gap-x-4">
+                  <span
+                    onClick={() => setIsDeleting(false)}
+                    className="cursor-pointer rounded-md bg-gray-200 px-3.5 py-2.5 text-base font-semibold text-gray-900 shadow-sm hover:bg-gray-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-200"
+                  >
+                    Cancel
+                  </span>
+                  <span
+                    onClick={async () => {
+                      await deleteCallback({ id });
+                    }}
+                    className="cursor-pointer rounded-md bg-red-600 px-3.5 py-2.5 text-base font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+                  >
+                    Delete
+                  </span>
+                </div>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    </li>
   );
+};
+
+const TableOfContents = ({
+  sections,
+  activeHeader,
+  localFont,
+  showInvisibleHeaders
+}) => {
+  const visibleSections = showInvisibleHeaders
+    ? sections
+    : sections.filter(({ show_heading: showHeading }) => showHeading === true);
   const [matched, activeUntil] =
     activeHeader === null
       ? [false, -1]
@@ -78,37 +176,34 @@ const TableOfContents = ({ sections, activeHeader, localFont }) => {
         </h3>
         <ul className="mt-2 border-l-2 lg:mt-4 lg:space-y-4 border-slate-700">
           {visibleSections.length > 0 &&
-            visibleSections.map(({ id, heading }, offset) => (
-              <li key={id} className="flex items-center relative">
-                {offset === 0 && (
-                  <div className="absolute h-1/2 w-4 top-0 -left-2 bg-white z-10"></div>
-                )}
-                {offset === visibleSections.length - 1 && (
-                  <div className="absolute h-1/2 w-4 bottom-0 -left-2 bg-white z-10"></div>
-                )}
-                <div
-                  className={`${
-                    matched && offset <= activeUntil
-                      ? "bg-slate-700"
-                      : "bg-white"
-                  } shrink-0 rounded-full w-3 h-3 border-slate-800 border-2 -ml-[7px] z-20`}
-                ></div>
-                <ScrollTo selector={`#heading-${id}`}>
-                  <div
-                    href={`#heading-${id}`}
-                    className={`${
-                      matched && offset <= activeUntil
-                        ? "text-slate-800"
-                        : "text-gray-500"
-                    } ${
-                      localFont.className
-                    } grow px-2 pl-4 pr-2 space-x-2 hover:text-gray-900 text-lg cursor-pointer`}
-                  >
-                    {heading}
-                  </div>
-                </ScrollTo>
-              </li>
-            ))}
+            visibleSections.map(
+              (
+                {
+                  id,
+                  heading,
+                  show_heading: showHeading,
+                  editCallback,
+                  deleteCallback,
+                  buttonClasses
+                },
+                offset
+              ) => (
+                <TocItem
+                  matched={matched}
+                  activeUntil={activeUntil}
+                  key={id}
+                  id={id}
+                  heading={heading}
+                  showHeading={showHeading}
+                  offset={offset}
+                  visibleSections={visibleSections}
+                  localFont={localFont}
+                  editCallback={editCallback}
+                  deleteCallback={deleteCallback}
+                  buttonClasses={buttonClasses}
+                />
+              )
+            )}
         </ul>
       </div>
     </div>
@@ -207,7 +302,7 @@ const ImageOnLeft = ({
 }) => (
   <div className="grid grid-cols-12 gap-4">
     <div className={colSpanImage}>
-      <img src={imageUrl} alt=""  />
+      <img src={imageUrl} alt="" />
     </div>
     <div
       className={`${colSpanContent} leading-loose prose lg:prose-lg max-w-max`}
@@ -228,7 +323,6 @@ const ImageOnRight = ({
       src={imageUrl}
       alt=""
       className={`${colSpanImage} float-none md:float-right ml-0 md:ml-8 mb-4`}
-      
     />
     <div
       className={`${colSpanContent} leading-loose prose lg:prose-lg max-w-max`}
@@ -240,13 +334,7 @@ const ImageOnRight = ({
 
 const ImageCenter = ({ imageUrl, height, width }) => (
   <div className="flex justify-center">
-    <img
-      src={imageUrl}
-      height={height}
-      width={width}
-      alt=""
-      
-    />
+    <img src={imageUrl} height={height} width={width} alt="" />
   </div>
 );
 
@@ -258,30 +346,18 @@ const ImageCenterFull = ({ imageUrl }) => (
 
 const ImageLeft = ({ imageUrl, height, width }) => (
   <div className="flex justify-start">
-    <img
-      src={imageUrl}
-      height={height}
-      width={width}
-      alt=""
-      
-    />
+    <img src={imageUrl} height={height} width={width} alt="" />
   </div>
 );
 
 const ImageRight = ({ imageUrl, height, width }) => (
   <div className="flex justify-end">
-    <img
-      src={imageUrl}
-      height={height}
-      width={width}
-      alt=""
-      
-    />
+    <img src={imageUrl} height={height} width={width} alt="" />
   </div>
 );
 
 const Section = ({ sectionOut, id, headingOut, scripts }) => {
-  useScript(scripts?.[0] || false );
+  useScript(scripts?.[0] || false);
 
   return (
     <section key={id} className="pt-0 pb-6">
@@ -543,12 +619,21 @@ export const ContentSections = ({
     }
   );
 
-export const DoContentSections = ({ sections, localFont }) => {
+export const DoContentSections = ({
+  sections,
+  localFont,
+  showInvisibleHeaders = false
+}) => {
   const [activeHeader, setActiveHeader] = useState(null);
 
   return (
     <div className="grid grid-cols-4 gap-0 lg:gap-6">
-      <TableOfContents sections={sections} activeHeader={activeHeader} localFont={localFont} />
+      <TableOfContents
+        sections={sections}
+        activeHeader={activeHeader}
+        localFont={localFont}
+        showInvisibleHeaders={showInvisibleHeaders}
+      />
       <div className="col-span-4 lg:col-span-3">
         <ContentSections
           sections={sections}
