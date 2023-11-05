@@ -69,7 +69,8 @@ var TocItem = function TocItem(_ref3) {
     activeUntil = _ref3.activeUntil,
     matched = _ref3.matched,
     visibleSections = _ref3.visibleSections,
-    localFont = _ref3.localFont;
+    localFont = _ref3.localFont,
+    showMeter = _ref3.showMeter;
   var _useState = (0, _react.useState)(false),
     _useState2 = (0, _slicedToArray2["default"])(_useState, 2),
     isHovering = _useState2[0],
@@ -79,18 +80,18 @@ var TocItem = function TocItem(_ref3) {
     isDeleting = _useState4[0],
     setIsDeleting = _useState4[1];
   return /*#__PURE__*/_react["default"].createElement("li", {
-    className: "flex items-center relative",
+    className: "flex items-center relative ".concat(isHovering && editCallback ? "bg-gray-100 rounded-md" : "", " ").concat(editCallback ? "-ml-2 px-2" : ""),
     onMouseEnter: function onMouseEnter() {
       return setIsHovering(true);
     },
     onMouseLeave: function onMouseLeave() {
       return setIsHovering(false);
     }
-  }, offset === 0 && /*#__PURE__*/_react["default"].createElement("div", {
+  }, showMeter && offset === 0 && /*#__PURE__*/_react["default"].createElement("div", {
     className: "absolute h-1/2 w-4 top-0 -left-2 bg-white z-10"
-  }), offset === visibleSections.length - 1 && /*#__PURE__*/_react["default"].createElement("div", {
+  }), showMeter && offset === visibleSections.length - 1 && /*#__PURE__*/_react["default"].createElement("div", {
     className: "absolute h-1/2 w-4 bottom-0 -left-2 bg-white z-10"
-  }), /*#__PURE__*/_react["default"].createElement("div", {
+  }), showMeter && /*#__PURE__*/_react["default"].createElement("div", {
     className: "".concat(matched && offset <= activeUntil ? "bg-slate-700" : "bg-white", " shrink-0 rounded-full w-3 h-3 border-slate-800 border-2 -ml-[7px] z-20")
   }), /*#__PURE__*/_react["default"].createElement("div", {
     className: "flex flex-col"
@@ -98,9 +99,9 @@ var TocItem = function TocItem(_ref3) {
     selector: "#heading-".concat(id)
   }, /*#__PURE__*/_react["default"].createElement("div", {
     href: "#heading-".concat(id),
-    className: "".concat(matched && offset <= activeUntil ? "text-slate-800" : "text-gray-500", " ").concat(localFont.className, " grow pl-4 pr-2 space-x-2 hover:text-gray-900 text-lg cursor-pointer ").concat(showHeading ? "" : "opacity-50")
+    className: "".concat(isHovering || matched && offset <= activeUntil ? "text-slate-800" : "text-gray-500", " ").concat(localFont.className, " grow ").concat(showMeter ? "pl-4" : "", " pr-2 space-x-2 hover:text-gray-900 text-lg cursor-pointer ").concat(showHeading ? "" : "opacity-50")
   }, heading)), isHovering && editCallback && /*#__PURE__*/_react["default"].createElement(_react["default"].Fragment, null, /*#__PURE__*/_react["default"].createElement("div", {
-    className: "pl-4 pr-2 flex gap-x-4 mt-2"
+    className: "".concat(showMeter ? "pl-4" : "", " pr-2 flex gap-x-2 mt-1 mb-2")
   }, /*#__PURE__*/_react["default"].createElement("span", {
     onClick: function onClick() {
       return editCallback(id);
@@ -108,11 +109,11 @@ var TocItem = function TocItem(_ref3) {
     className: buttonClasses
   }, "Edit"), /*#__PURE__*/_react["default"].createElement("span", {
     onClick: function onClick() {
-      return setIsDeleting(true);
+      return setIsDeleting(!isDeleting);
     },
     className: buttonClasses
   }, "Delete")), isDeleting && /*#__PURE__*/_react["default"].createElement("div", {
-    className: "bg-white p-4 flex flex-col gap-y-4"
+    className: "bg-white p-4 flex flex-col gap-y-4 rounded-md my-2"
   }, /*#__PURE__*/_react["default"].createElement("div", {
     className: "font-semibold"
   }, "Are you sure you want to delete this section?"), /*#__PURE__*/_react["default"].createElement("div", {
@@ -121,7 +122,7 @@ var TocItem = function TocItem(_ref3) {
     onClick: function onClick() {
       return setIsDeleting(false);
     },
-    className: "cursor-pointer rounded-md bg-gray-200 px-3.5 py-2.5 text-base font-semibold text-gray-900 shadow-sm hover:bg-gray-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-200"
+    className: "cursor-pointer rounded-md bg-gray-200 px-2.5 py-1.5 text-base font-semibold text-gray-900 shadow-sm hover:bg-gray-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-200"
   }, "Cancel"), /*#__PURE__*/_react["default"].createElement("span", {
     onClick: /*#__PURE__*/(0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee() {
       return _regenerator["default"].wrap(function _callee$(_context) {
@@ -137,14 +138,15 @@ var TocItem = function TocItem(_ref3) {
         }
       }, _callee);
     })),
-    className: "cursor-pointer rounded-md bg-red-600 px-3.5 py-2.5 text-base font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+    className: "cursor-pointer rounded-md bg-red-600 px-2.5 py-1.5 text-base font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
   }, "Delete"))))));
 };
 var TableOfContents = function TableOfContents(_ref5) {
   var sections = _ref5.sections,
     activeHeader = _ref5.activeHeader,
     localFont = _ref5.localFont,
-    showInvisibleHeaders = _ref5.showInvisibleHeaders;
+    showInvisibleHeaders = _ref5.showInvisibleHeaders,
+    showMeter = _ref5.showMeter;
   var visibleSections = showInvisibleHeaders ? sections : sections.filter(function (_ref6) {
     var showHeading = _ref6.show_heading;
     return showHeading === true;
@@ -168,7 +170,7 @@ var TableOfContents = function TableOfContents(_ref5) {
   }, /*#__PURE__*/_react["default"].createElement("h3", {
     className: "".concat(localFont.className, " -ml-1 mb-3 text-xl font-semibold text-slate-700")
   }, "Contents"), /*#__PURE__*/_react["default"].createElement("ul", {
-    className: "mt-2 border-l-2 lg:mt-4 lg:space-y-4 border-slate-700"
+    className: "mt-2 lg:mt-4 lg:space-y-4 ".concat(showMeter ? "border-l-2 border-slate-700" : "")
   }, visibleSections.length > 0 && visibleSections.map(function (_ref12, offset) {
     var id = _ref12.id,
       heading = _ref12.heading,
@@ -188,7 +190,8 @@ var TableOfContents = function TableOfContents(_ref5) {
       localFont: localFont,
       editCallback: editCallback,
       deleteCallback: deleteCallback,
-      buttonClasses: buttonClasses
+      buttonClasses: buttonClasses,
+      showMeter: showMeter
     });
   }))));
 };
@@ -593,7 +596,9 @@ var DoContentSections = exports.DoContentSections = function DoContentSections(_
   var sections = _ref31.sections,
     localFont = _ref31.localFont,
     _ref31$showInvisibleH = _ref31.showInvisibleHeaders,
-    showInvisibleHeaders = _ref31$showInvisibleH === void 0 ? false : _ref31$showInvisibleH;
+    showInvisibleHeaders = _ref31$showInvisibleH === void 0 ? false : _ref31$showInvisibleH,
+    _ref31$showMeter = _ref31.showMeter,
+    showMeter = _ref31$showMeter === void 0 ? true : _ref31$showMeter;
   var _useState5 = (0, _react.useState)(null),
     _useState6 = (0, _slicedToArray2["default"])(_useState5, 2),
     activeHeader = _useState6[0],
@@ -604,7 +609,8 @@ var DoContentSections = exports.DoContentSections = function DoContentSections(_
     sections: sections,
     activeHeader: activeHeader,
     localFont: localFont,
-    showInvisibleHeaders: showInvisibleHeaders
+    showInvisibleHeaders: showInvisibleHeaders,
+    showMeter: showMeter
   }), /*#__PURE__*/_react["default"].createElement("div", {
     className: "col-span-4 lg:col-span-3"
   }, /*#__PURE__*/_react["default"].createElement(ContentSections, {

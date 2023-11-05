@@ -63,39 +63,44 @@ const TocItem = ({
   activeUntil,
   matched,
   visibleSections,
-  localFont
+  localFont,
+  showMeter
 }) => {
   const [isHovering, setIsHovering] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
 
   return (
     <li
-      className="flex items-center relative"
+      className={`flex items-center relative ${
+        isHovering && editCallback ? "bg-gray-100 rounded-md" : ""
+      } ${editCallback ? "-ml-2 px-2" : ""}`}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
     >
-      {offset === 0 && (
+      {showMeter && offset === 0 && (
         <div className="absolute h-1/2 w-4 top-0 -left-2 bg-white z-10"></div>
       )}
-      {offset === visibleSections.length - 1 && (
+      {showMeter && offset === visibleSections.length - 1 && (
         <div className="absolute h-1/2 w-4 bottom-0 -left-2 bg-white z-10"></div>
       )}
-      <div
-        className={`${
-          matched && offset <= activeUntil ? "bg-slate-700" : "bg-white"
-        } shrink-0 rounded-full w-3 h-3 border-slate-800 border-2 -ml-[7px] z-20`}
-      ></div>
+      {showMeter && (
+        <div
+          className={`${
+            matched && offset <= activeUntil ? "bg-slate-700" : "bg-white"
+          } shrink-0 rounded-full w-3 h-3 border-slate-800 border-2 -ml-[7px] z-20`}
+        ></div>
+      )}
       <div className="flex flex-col">
         <ScrollTo selector={`#heading-${id}`}>
           <div
             href={`#heading-${id}`}
             className={`${
-              matched && offset <= activeUntil
+              isHovering || (matched && offset <= activeUntil)
                 ? "text-slate-800"
                 : "text-gray-500"
-            } ${
-              localFont.className
-            } grow pl-4 pr-2 space-x-2 hover:text-gray-900 text-lg cursor-pointer ${
+            } ${localFont.className} grow ${
+              showMeter ? "pl-4" : ""
+            } pr-2 space-x-2 hover:text-gray-900 text-lg cursor-pointer ${
               showHeading ? "" : "opacity-50"
             }`}
           >
@@ -104,7 +109,11 @@ const TocItem = ({
         </ScrollTo>
         {isHovering && editCallback && (
           <>
-            <div className="pl-4 pr-2 flex gap-x-4 mt-2">
+            <div
+              className={`${
+                showMeter ? "pl-4" : ""
+              } pr-2 flex gap-x-2 mt-1 mb-2`}
+            >
               <span onClick={() => editCallback(id)} className={buttonClasses}>
                 Edit
               </span>
@@ -116,14 +125,14 @@ const TocItem = ({
               </span>
             </div>
             {isDeleting && (
-              <div className="bg-white p-4 flex flex-col gap-y-4">
+              <div className="bg-white p-4 flex flex-col gap-y-4 rounded-md my-2">
                 <div className="font-semibold">
                   Are you sure you want to delete this section?
                 </div>
                 <div className="flex gap-x-4">
                   <span
                     onClick={() => setIsDeleting(false)}
-                    className="cursor-pointer rounded-md bg-gray-200 px-3.5 py-2.5 text-base font-semibold text-gray-900 shadow-sm hover:bg-gray-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-200"
+                    className="cursor-pointer rounded-md bg-gray-200 px-2.5 py-1.5 text-base font-semibold text-gray-900 shadow-sm hover:bg-gray-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-200"
                   >
                     Cancel
                   </span>
@@ -131,7 +140,7 @@ const TocItem = ({
                     onClick={async () => {
                       await deleteCallback({ id });
                     }}
-                    className="cursor-pointer rounded-md bg-red-600 px-3.5 py-2.5 text-base font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+                    className="cursor-pointer rounded-md bg-red-600 px-2.5 py-1.5 text-base font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
                   >
                     Delete
                   </span>
@@ -149,7 +158,8 @@ const TableOfContents = ({
   sections,
   activeHeader,
   localFont,
-  showInvisibleHeaders
+  showInvisibleHeaders,
+  showMeter
 }) => {
   const visibleSections = showInvisibleHeaders
     ? sections
@@ -174,7 +184,11 @@ const TableOfContents = ({
         >
           Contents
         </h3>
-        <ul className="mt-2 border-l-2 lg:mt-4 lg:space-y-4 border-slate-700">
+        <ul
+          className={`mt-2 lg:mt-4 lg:space-y-4 ${
+            showMeter ? "border-l-2 border-slate-700" : ""
+          }`}
+        >
           {visibleSections.length > 0 &&
             visibleSections.map(
               (
@@ -201,6 +215,7 @@ const TableOfContents = ({
                   editCallback={editCallback}
                   deleteCallback={deleteCallback}
                   buttonClasses={buttonClasses}
+                  showMeter={showMeter}
                 />
               )
             )}
@@ -622,7 +637,8 @@ export const ContentSections = ({
 export const DoContentSections = ({
   sections,
   localFont,
-  showInvisibleHeaders = false
+  showInvisibleHeaders = false,
+  showMeter = true
 }) => {
   const [activeHeader, setActiveHeader] = useState(null);
 
@@ -633,6 +649,7 @@ export const DoContentSections = ({
         activeHeader={activeHeader}
         localFont={localFont}
         showInvisibleHeaders={showInvisibleHeaders}
+        showMeter={showMeter}
       />
       <div className="col-span-4 lg:col-span-3">
         <ContentSections
