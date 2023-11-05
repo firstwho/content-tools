@@ -1,10 +1,15 @@
 "use strict";
 
-var _regeneratorRuntime = require("@babel/runtime/regenerator");
-var _asyncToGenerator = require("@babel/runtime/helpers/asyncToGenerator");
-var fetch = require("node-fetch");
-var fs = require("fs");
-var AdmZip = require("adm-zip");
+var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.getContent = void 0;
+var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"));
+var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/asyncToGenerator"));
+var _nodeFetch = _interopRequireDefault(require("node-fetch"));
+var _fs = _interopRequireDefault(require("fs"));
+var _admZip = _interopRequireDefault(require("adm-zip"));
 var toBuffer = function toBuffer(ab) {
   var buf = Buffer.alloc(ab.byteLength);
   var view = new Uint8Array(ab);
@@ -13,11 +18,11 @@ var toBuffer = function toBuffer(ab) {
   }
   return buf;
 };
-var getContent = /*#__PURE__*/exports.getContent = function () {
-  var _ref = _asyncToGenerator( /*#__PURE__*/_regeneratorRuntime.mark(function _callee() {
+var getContent = exports.getContent = /*#__PURE__*/function () {
+  var _ref = (0, _asyncToGenerator2["default"])( /*#__PURE__*/_regenerator["default"].mark(function _callee() {
     var _process$env, _process$env2, _process$env3;
     var API_KEY, API_SERVER, WRITE_PATH, res, buffer, zip;
-    return _regeneratorRuntime.wrap(function _callee$(_context) {
+    return _regenerator["default"].wrap(function _callee$(_context) {
       while (1) switch (_context.prev = _context.next) {
         case 0:
           // get environment variables
@@ -39,7 +44,7 @@ var getContent = /*#__PURE__*/exports.getContent = function () {
 
           // fetch zip file
           _context.next = 8;
-          return fetch("".concat(API_SERVER, "/marketing/api/get-all-content"), {
+          return (0, _nodeFetch["default"])("".concat(API_SERVER, "/marketing/api/get-all-content"), {
             method: "GET",
             headers: {
               "X-ContentApiKey": API_KEY
@@ -52,10 +57,10 @@ var getContent = /*#__PURE__*/exports.getContent = function () {
         case 11:
           buffer = _context.sent;
           // write zip file to disk
-          fs.writeFileSync("".concat(WRITE_PATH, "/content.zip"), toBuffer(buffer));
+          _fs["default"].writeFileSync("".concat(WRITE_PATH, "/content.zip"), toBuffer(buffer));
 
           // unzip file
-          zip = new AdmZip("".concat(WRITE_PATH, "/content.zip"));
+          zip = new _admZip["default"]("".concat(WRITE_PATH, "/content.zip"));
           zip.extractAllTo("".concat(WRITE_PATH, "/content"), true);
         case 15:
         case "end":

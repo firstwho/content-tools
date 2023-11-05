@@ -281,7 +281,7 @@ const ImageRight = ({ imageUrl, height, width }) => (
 );
 
 const Section = ({ sectionOut, id, headingOut, scripts }) => {
-  useScript(scripts[0]);
+  useScript(scripts?.[0] || false );
 
   return (
     <section key={id} className="pt-0 pb-6">
@@ -346,7 +346,7 @@ const CTAForm = ({ iframeUrl, type, formOrientation }) => {
   );
 };
 
-const CTASection = ({ id, image, ctaData, content }) => {
+const CTASection = ({ id, image, ctaData = {}, content }) => {
   const {
     cta_primary: primaryLabel,
     cta_primary_type: primaryType,
@@ -402,7 +402,7 @@ const CTASection = ({ id, image, ctaData, content }) => {
 
   if (imageUrl)
     return (
-      <imgOnRight
+      <ImageOnRight
         content={content}
         imageUrl={imageUrl}
         ctaContent={ctaContent}
