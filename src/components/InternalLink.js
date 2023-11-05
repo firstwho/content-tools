@@ -8,7 +8,7 @@ export const InternalLink = ({
   tabIndex = 0,
   children
 }) => {
-  if (process.env?.NEXT_PUBLIC_LIFECYCLE === "build") href = `${href}.html`;
+  if (process.env.NEXT_PUBLIC_LIFECYCLE === "build") href = `${href}.html`;
 
   return (
     <a href={href} target={target} className={className} tabIndex={tabIndex}>
