@@ -10,11 +10,13 @@ exports.DoContentSections = exports.ContentSections = exports.CONTENT_TYPE_TEXT_
 var _regenerator = _interopRequireDefault(require("@babel/runtime/regenerator"));
 var _asyncToGenerator2 = _interopRequireDefault(require("@babel/runtime/helpers/asyncToGenerator"));
 var _slicedToArray2 = _interopRequireDefault(require("@babel/runtime/helpers/slicedToArray"));
+var _defineProperty2 = _interopRequireDefault(require("@babel/runtime/helpers/defineProperty"));
 var _react = _interopRequireWildcard(require("react"));
 var _fa = require("react-icons/fa");
 var _copyToClipboard = _interopRequireDefault(require("copy-to-clipboard"));
 var _reactHotToast = _interopRequireDefault(require("react-hot-toast"));
 var _reactScrollIntoView = _interopRequireDefault(require("react-scroll-into-view"));
+var _backgroundColorTheme, _textColorThemes;
 function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(e) { return e ? t : r; })(e); }
 function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != _typeof(e) && "function" != typeof e) return { "default": e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && Object.prototype.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n["default"] = e, t && t.set(e, n), n; }
 var CONTENT_TYPE_TEXT_LEFT = exports.CONTENT_TYPE_TEXT_LEFT = "text-only-left";
@@ -28,6 +30,38 @@ var CONTENT_TYPE_IMAGE_CENTER = exports.CONTENT_TYPE_IMAGE_CENTER = "image-only-
 var CONTENT_TYPE_IMAGE_FULL = exports.CONTENT_TYPE_IMAGE_FULL = "image-only-full";
 var CONTENT_TYPE_DIVIDER = exports.CONTENT_TYPE_DIVIDER = "divider";
 var CONTENT_TYPE_SIGN_UP = exports.CONTENT_TYPE_SIGN_UP = "sign-up";
+
+/*
+Theme colors:
+  black
+  white
+  rose
+  pink
+  fuchsia
+  purple
+  violet
+  indigo
+  blue
+  sky
+  cyan
+  teal
+  emerald
+  green
+  lime
+  yellow
+  amber
+  orange
+  red
+  stone
+  neutral
+  gray
+  slate
+*/
+
+// color themes for buttons and backgrounds
+
+var backgroundColorThemes = (_backgroundColorTheme = {}, (0, _defineProperty2["default"])(_backgroundColorTheme, "none", "pt-0 mb-6"), (0, _defineProperty2["default"])(_backgroundColorTheme, "black", "bg-black border p-4 mb-6 rounded"), (0, _defineProperty2["default"])(_backgroundColorTheme, "white", "bg-white border border-gray-100 p-4 mb-6 rounded"), (0, _defineProperty2["default"])(_backgroundColorTheme, "rose", "bg-rose-100 border border-rose-200 p-4 mb-6 rounded"), (0, _defineProperty2["default"])(_backgroundColorTheme, "pink", "bg-pink-100 border border-pink-200 p-4 mb-6 rounded"), (0, _defineProperty2["default"])(_backgroundColorTheme, "fuchsia", "bg-fuchsia-100 border border-fuchsia-200 p-4 mb-6 rounded"), (0, _defineProperty2["default"])(_backgroundColorTheme, "purple", "bg-purple-100 border border-purple-200 p-4 mb-6 rounded"), (0, _defineProperty2["default"])(_backgroundColorTheme, "violet", "bg-violet-100 border border-violet-200 p-4 mb-6 rounded"), (0, _defineProperty2["default"])(_backgroundColorTheme, "indigo", "bg-indigo-100 border border-indigo-200 p-4 mb-6 rounded"), (0, _defineProperty2["default"])(_backgroundColorTheme, "blue", "bg-blue-100 border border-blue-200 p-4 mb-6 rounded"), (0, _defineProperty2["default"])(_backgroundColorTheme, "sky", "bg-sky-100 border border-sky-200 p-4 mb-6 rounded"), (0, _defineProperty2["default"])(_backgroundColorTheme, "cyan", "bg-cyan-100 border border-cyan-200 p-4 mb-6 rounded"), (0, _defineProperty2["default"])(_backgroundColorTheme, "teal", "bg-teal-100 border border-teal-200 p-4 mb-6 rounded"), (0, _defineProperty2["default"])(_backgroundColorTheme, "emerald", "bg-emerald-100 border border-emerald-200 p-4 mb-6 rounded"), (0, _defineProperty2["default"])(_backgroundColorTheme, "green", "bg-green-100 border border-green-200 p-4 mb-6 rounded"), (0, _defineProperty2["default"])(_backgroundColorTheme, "lime", "bg-lime-100 border border-lime-200 p-4 mb-6 rounded"), (0, _defineProperty2["default"])(_backgroundColorTheme, "yellow", "bg-yellow-100 border border-yellow-200 p-4 mb-6 rounded"), (0, _defineProperty2["default"])(_backgroundColorTheme, "amber", "bg-amber-100 border border-amber-200 p-4 mb-6 rounded"), (0, _defineProperty2["default"])(_backgroundColorTheme, "orange", "bg-orange-100 border border-orange-200 p-4 mb-6 rounded"), (0, _defineProperty2["default"])(_backgroundColorTheme, "red", "bg-red-100 border border-red-200 p-4 mb-6 rounded"), (0, _defineProperty2["default"])(_backgroundColorTheme, "stone", "bg-stone-100 border border-stone-200 p-4 mb-6 rounded"), (0, _defineProperty2["default"])(_backgroundColorTheme, "neutral", "bg-neutral-100 border border-neutral-200 p-4 mb-6 rounded"), (0, _defineProperty2["default"])(_backgroundColorTheme, "gray", "bg-gray-100 border border-gray-200 p-4 mb-6 rounded"), (0, _defineProperty2["default"])(_backgroundColorTheme, "slate", "bg-slate-100 border border-slate-200 p-4 mb-6 rounded"), _backgroundColorTheme);
+var textColorThemes = (_textColorThemes = {}, (0, _defineProperty2["default"])(_textColorThemes, "none", ""), (0, _defineProperty2["default"])(_textColorThemes, "black", "text-black"), (0, _defineProperty2["default"])(_textColorThemes, "white", "text-white"), (0, _defineProperty2["default"])(_textColorThemes, "rose", "text-rose-800"), (0, _defineProperty2["default"])(_textColorThemes, "pink", "text-pink-800"), (0, _defineProperty2["default"])(_textColorThemes, "fuchsia", "text-fuchsia-800"), (0, _defineProperty2["default"])(_textColorThemes, "purple", "text-purple-800"), (0, _defineProperty2["default"])(_textColorThemes, "violet", "text-violet-800"), (0, _defineProperty2["default"])(_textColorThemes, "indigo", "text-indigo-800"), (0, _defineProperty2["default"])(_textColorThemes, "blue", "text-blue-800"), (0, _defineProperty2["default"])(_textColorThemes, "sky", "text-sky-800"), (0, _defineProperty2["default"])(_textColorThemes, "cyan", "text-cyan-800"), (0, _defineProperty2["default"])(_textColorThemes, "teal", "text-teal-800"), (0, _defineProperty2["default"])(_textColorThemes, "emerald", "text-emerald-800"), (0, _defineProperty2["default"])(_textColorThemes, "green", "text-green-800"), (0, _defineProperty2["default"])(_textColorThemes, "lime", "text-lime-800"), (0, _defineProperty2["default"])(_textColorThemes, "yellow", "text-yellow-800"), (0, _defineProperty2["default"])(_textColorThemes, "amber", "text-amber-800"), (0, _defineProperty2["default"])(_textColorThemes, "orange", "text-orange-800"), (0, _defineProperty2["default"])(_textColorThemes, "red", "text-red-800"), (0, _defineProperty2["default"])(_textColorThemes, "stone", "text-stone-800"), (0, _defineProperty2["default"])(_textColorThemes, "neutral", "text-neutral-800"), (0, _defineProperty2["default"])(_textColorThemes, "gray", "text-gray-800"), (0, _defineProperty2["default"])(_textColorThemes, "slate", "text-slate-800"), _textColorThemes);
 
 // NOTE localFont is NextJS font object
 
@@ -201,12 +235,14 @@ var Heading = function Heading(_ref13) {
     level = _ref13$level === void 0 ? 2 : _ref13$level,
     anchor = _ref13.anchor,
     setActiveHeader = _ref13.setActiveHeader,
-    localFont = _ref13.localFont;
+    localFont = _ref13.localFont,
+    _ref13$textColorTheme = _ref13.textColorTheme,
+    textColorTheme = _ref13$textColorTheme === void 0 ? "none" : _ref13$textColorTheme;
   var ref = (0, _react.useRef)();
   useOnScreen(ref, setActiveHeader, anchor);
   if (level === 1) return /*#__PURE__*/_react["default"].createElement("h1", {
     ref: ref,
-    className: "".concat(localFont.className, " mb-2 text-base font-semibold xl:mb-4 xl:text-4xl")
+    className: "".concat(localFont.className, " ").concat(textColorThemes[textColorTheme], " mb-2 text-base font-semibold xl:mb-4 xl:text-4xl")
   }, title);
   if (level === 2) return /*#__PURE__*/_react["default"].createElement("h2", {
     onClick: function onClick() {
@@ -216,7 +252,7 @@ var Heading = function Heading(_ref13) {
       });
     },
     ref: ref,
-    className: "".concat(localFont.className, " cursor-pointer mt-4 text-2xl font-semibold xl:mb-2 xl:text-3xl flex items-center text-slate-700 hover:text-slate-900")
+    className: "".concat(localFont.className, " cursor-pointer text-2xl font-semibold xl:mb-2 xl:text-3xl flex items-center ").concat(textColorThemes[textColorTheme])
   }, /*#__PURE__*/_react["default"].createElement("div", null, title), /*#__PURE__*/_react["default"].createElement("div", {
     className: "rounded-full bg-gray-100 p-1 ml-2"
   }, /*#__PURE__*/_react["default"].createElement(_fa.FaLink, {
@@ -224,40 +260,46 @@ var Heading = function Heading(_ref13) {
   })));
   if (level === 3) return /*#__PURE__*/_react["default"].createElement("h3", {
     ref: ref,
-    className: "".concat(localFont.className, " mb-2 text-md font-semibold xl:mb-4 xl:text-2xl")
+    className: "".concat(localFont.className, " text-md font-semibold xl:mb-2 xl:text-2xl ").concat(textColorThemes[textColorTheme])
   }, title);
   if (level === 4) return /*#__PURE__*/_react["default"].createElement("h4", {
     ref: ref,
-    className: "".concat(localFont.className, " mb-2 text-base font-semibold xl:mb-4 xl:text-xl")
+    className: "".concat(localFont.className, " text-base font-semibold xl:mb-2 xl:text-xl ").concat(textColorThemes[textColorTheme])
   }, title);
   if (level === 5) return /*#__PURE__*/_react["default"].createElement("h5", {
     ref: ref,
-    className: "".concat(localFont.className, " mb-2 text-base font-semibold xl:mb-4")
+    className: "".concat(localFont.className, " text-base font-semibold xl:mb-2 ").concat(textColorThemes[textColorTheme])
   }, title);
   return null;
 };
 var TextLeft = function TextLeft(_ref14) {
-  var content = _ref14.content;
+  var content = _ref14.content,
+    _ref14$textColorTheme = _ref14.textColorTheme,
+    textColorTheme = _ref14$textColorTheme === void 0 ? "none" : _ref14$textColorTheme;
   return /*#__PURE__*/_react["default"].createElement("div", {
-    className: "leading-loose prose lg:prose-lg max-w-max",
+    className: "leading-loose prose lg:prose-lg max-w-max ".concat(textColorThemes[textColorTheme]),
     dangerouslySetInnerHTML: {
       __html: content
     }
   });
 };
 var TextRight = function TextRight(_ref15) {
-  var content = _ref15.content;
+  var content = _ref15.content,
+    _ref15$textColorTheme = _ref15.textColorTheme,
+    textColorTheme = _ref15$textColorTheme === void 0 ? "none" : _ref15$textColorTheme;
   return /*#__PURE__*/_react["default"].createElement("div", {
-    className: "text-right leading-loose prose lg:prose-lg max-w-max",
+    className: "text-right leading-loose prose lg:prose-lg max-w-max ".concat(textColorThemes[textColorTheme]),
     dangerouslySetInnerHTML: {
       __html: content
     }
   });
 };
 var TextCenter = function TextCenter(_ref16) {
-  var content = _ref16.content;
+  var content = _ref16.content,
+    _ref16$textColorTheme = _ref16.textColorTheme,
+    textColorTheme = _ref16$textColorTheme === void 0 ? "none" : _ref16$textColorTheme;
   return /*#__PURE__*/_react["default"].createElement("div", {
-    className: "text-center leading-loose prose lg:prose-lg max-w-max",
+    className: "text-center leading-loose prose lg:prose-lg max-w-max ".concat(textColorThemes[textColorTheme]),
     dangerouslySetInnerHTML: {
       __html: content
     }
@@ -355,11 +397,13 @@ var Section = function Section(_ref23) {
   var sectionOut = _ref23.sectionOut,
     id = _ref23.id,
     headingOut = _ref23.headingOut,
-    scripts = _ref23.scripts;
+    scripts = _ref23.scripts,
+    _ref23$backgroundColo = _ref23.backgroundColorTheme,
+    backgroundColorTheme = _ref23$backgroundColo === void 0 ? "none" : _ref23$backgroundColo;
   useScript((scripts === null || scripts === void 0 ? void 0 : scripts[0]) || false);
   return /*#__PURE__*/_react["default"].createElement("section", {
     key: id,
-    className: "pt-0 pb-6"
+    className: backgroundColorThemes[backgroundColorTheme]
   }, /*#__PURE__*/_react["default"].createElement("div", {
     className: "relative"
   }, /*#__PURE__*/_react["default"].createElement("a", {
@@ -370,10 +414,12 @@ var Section = function Section(_ref23) {
 };
 var CTAButton = function CTAButton(_ref24) {
   var label = _ref24.label,
-    url = _ref24.url;
+    url = _ref24.url,
+    _ref24$buttonColorThe = _ref24.buttonColorTheme,
+    buttonColorTheme = _ref24$buttonColorThe === void 0 ? "indigo" : _ref24$buttonColorThe;
   return /*#__PURE__*/_react["default"].createElement("a", {
     href: url,
-    className: "rounded-md bg-indigo-600 px-3.5 py-2.5 text-base font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+    className: "".concat(buttonColorThemes[buttonColorTheme], " rounded-md px-3.5 py-2.5 text-base font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2")
   }, label);
 };
 var CTALink = function CTALink(_ref25) {
@@ -381,7 +427,7 @@ var CTALink = function CTALink(_ref25) {
     url = _ref25.url;
   return /*#__PURE__*/_react["default"].createElement("a", {
     href: url,
-    className: "text-sm font-semibold leading-6 text-gray-900"
+    className: "text-base font-semibold leading-6 text-gray-900 hover:underline"
   }, label);
 };
 var CTAForm = function CTAForm(_ref26) {
@@ -420,7 +466,9 @@ var CTASection = function CTASection(_ref27) {
     image = _ref27.image,
     _ref27$ctaData = _ref27.ctaData,
     ctaData = _ref27$ctaData === void 0 ? {} : _ref27$ctaData,
-    content = _ref27.content;
+    content = _ref27.content,
+    buttonColorTheme = _ref27.buttonColorTheme,
+    textColorTheme = _ref27.textColorTheme;
   var primaryLabel = ctaData.cta_primary,
     primaryType = ctaData.cta_primary_type,
     primaryUrl = ctaData.cta_primary_url,
@@ -437,14 +485,17 @@ var CTASection = function CTASection(_ref27) {
     type: primaryType,
     label: primaryLabel,
     url: primaryUrl
-  }, {
+  }].concat(secondaryLabel ? [{
     id: "id-".concat(id, "-cta-secondary"),
     type: secondaryType,
     label: secondaryLabel,
     url: secondaryUrl
-  }];
-  var ctaContent = /*#__PURE__*/_react["default"].createElement("div", {
-    className: "mt-10 flex items-center gap-x-6 bg-amber-100 p-2 rounded-lg"
+  }] : []);
+  var ctaContent = /*#__PURE__*/_react["default"].createElement(_react["default"].Fragment, null, content && /*#__PURE__*/_react["default"].createElement(TextLeft, {
+    content: content,
+    textColorTheme: textColorTheme
+  }), /*#__PURE__*/_react["default"].createElement("div", {
+    className: "mt-4 flex items-center gap-x-6 rounded-lg"
   }, ctas.map(function (_ref28) {
     var id = _ref28.id,
       type = _ref28.type,
@@ -453,12 +504,14 @@ var CTASection = function CTASection(_ref27) {
     if (type === "button") return /*#__PURE__*/_react["default"].createElement(CTAButton, {
       key: id,
       label: label,
-      url: url
+      url: url,
+      buttonColorTheme: buttonColorTheme
     });
     if (type === "link") return /*#__PURE__*/_react["default"].createElement(CTALink, {
       key: id,
       label: label,
-      url: url
+      url: url,
+      textColorTheme: textColorTheme
     });
     return /*#__PURE__*/_react["default"].createElement(CTAForm, {
       type: type,
@@ -470,7 +523,7 @@ var CTASection = function CTASection(_ref27) {
       workflowStepId: workflowStepId,
       iframeUrl: iframeUrl
     });
-  }));
+  })));
   if (imageUrl) return /*#__PURE__*/_react["default"].createElement(ImageOnRight, {
     content: content,
     imageUrl: imageUrl,
@@ -494,7 +547,11 @@ var ContentSections = exports.ContentSections = function ContentSections(_ref29)
       image = _ref30.image,
       showHeading = _ref30.show_heading,
       ctaData = _ref30.ctaData,
-      scripts = _ref30.scripts;
+      scripts = _ref30.scripts,
+      backgroundColorTheme = _ref30.backgroundColorTheme,
+      textColorTheme = _ref30.textColorTheme,
+      headingColorTheme = _ref30.headingColorTheme,
+      buttonColorTheme = _ref30.buttonColorTheme;
     var imageUrl = image && "url" in image ? image["url"] : null;
     var imageHeight = image && "height" in image ? image["height"] : null;
     var imageWidth = image && "width" in image ? image["width"] : null;
@@ -503,23 +560,27 @@ var ContentSections = exports.ContentSections = function ContentSections(_ref29)
       level: headingLevel,
       anchor: "heading-".concat(id),
       setActiveHeader: setActiveHeader,
-      localFont: localFont
+      localFont: localFont,
+      textColorTheme: headingColorTheme
     });
     var sectionOut;
     switch (contentType) {
       case CONTENT_TYPE_TEXT_LEFT:
         sectionOut = /*#__PURE__*/_react["default"].createElement(TextLeft, {
-          content: content
+          content: content,
+          textColorTheme: textColorTheme
         });
         break;
       case CONTENT_TYPE_TEXT_RIGHT:
         sectionOut = /*#__PURE__*/_react["default"].createElement(TextRight, {
-          content: content
+          content: content,
+          textColorTheme: textColorTheme
         });
         break;
       case CONTENT_TYPE_TEXT_CENTER:
         sectionOut = /*#__PURE__*/_react["default"].createElement(TextCenter, {
-          content: content
+          content: content,
+          textColorTheme: textColorTheme
         });
         break;
       case CONTENT_TYPE_TEXT_IMAGE_LEFT:
@@ -576,7 +637,9 @@ var ContentSections = exports.ContentSections = function ContentSections(_ref29)
           image: image,
           showHeading: showHeading,
           ctaData: ctaData,
-          content: content
+          content: content,
+          buttonColorTheme: buttonColorTheme,
+          textColorTheme: textColorTheme
         });
         break;
       default:
@@ -588,7 +651,8 @@ var ContentSections = exports.ContentSections = function ContentSections(_ref29)
       sectionOut: sectionOut,
       id: id,
       headingOut: headingOut,
-      scripts: scripts
+      scripts: scripts,
+      backgroundColorTheme: backgroundColorTheme
     });
   });
 };

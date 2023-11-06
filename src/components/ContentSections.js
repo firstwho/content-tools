@@ -18,6 +18,89 @@ export const CONTENT_TYPE_IMAGE_FULL = "image-only-full";
 export const CONTENT_TYPE_DIVIDER = "divider";
 export const CONTENT_TYPE_SIGN_UP = "sign-up";
 
+/*
+Theme colors:
+  black
+  white
+  rose
+  pink
+  fuchsia
+  purple
+  violet
+  indigo
+  blue
+  sky
+  cyan
+  teal
+  emerald
+  green
+  lime
+  yellow
+  amber
+  orange
+  red
+  stone
+  neutral
+  gray
+  slate
+*/
+
+// color themes for buttons and backgrounds
+
+const backgroundColorThemes = {
+  ["none"]: "pt-0 mb-6",
+  ["black"]: "bg-black border p-4 mb-6 rounded",
+  ["white"]: "bg-white border border-gray-100 p-4 mb-6 rounded",
+  ["rose"]: "bg-rose-100 border border-rose-200 p-4 mb-6 rounded",
+  ["pink"]: "bg-pink-100 border border-pink-200 p-4 mb-6 rounded",
+  ["fuchsia"]: "bg-fuchsia-100 border border-fuchsia-200 p-4 mb-6 rounded",
+  ["purple"]: "bg-purple-100 border border-purple-200 p-4 mb-6 rounded",
+  ["violet"]: "bg-violet-100 border border-violet-200 p-4 mb-6 rounded",
+  ["indigo"]: "bg-indigo-100 border border-indigo-200 p-4 mb-6 rounded",
+  ["blue"]: "bg-blue-100 border border-blue-200 p-4 mb-6 rounded",
+  ["sky"]: "bg-sky-100 border border-sky-200 p-4 mb-6 rounded",
+  ["cyan"]: "bg-cyan-100 border border-cyan-200 p-4 mb-6 rounded",
+  ["teal"]: "bg-teal-100 border border-teal-200 p-4 mb-6 rounded",
+  ["emerald"]: "bg-emerald-100 border border-emerald-200 p-4 mb-6 rounded",
+  ["green"]: "bg-green-100 border border-green-200 p-4 mb-6 rounded",
+  ["lime"]: "bg-lime-100 border border-lime-200 p-4 mb-6 rounded",
+  ["yellow"]: "bg-yellow-100 border border-yellow-200 p-4 mb-6 rounded",
+  ["amber"]: "bg-amber-100 border border-amber-200 p-4 mb-6 rounded",
+  ["orange"]: "bg-orange-100 border border-orange-200 p-4 mb-6 rounded",
+  ["red"]: "bg-red-100 border border-red-200 p-4 mb-6 rounded",
+  ["stone"]: "bg-stone-100 border border-stone-200 p-4 mb-6 rounded",
+  ["neutral"]: "bg-neutral-100 border border-neutral-200 p-4 mb-6 rounded",
+  ["gray"]: "bg-gray-100 border border-gray-200 p-4 mb-6 rounded",
+  ["slate"]: "bg-slate-100 border border-slate-200 p-4 mb-6 rounded"
+};
+
+const textColorThemes = {
+  ["none"]: "",
+  ["black"]: "text-black",
+  ["white"]: "text-white",
+  ["rose"]: "text-rose-800",
+  ["pink"]: "text-pink-800",
+  ["fuchsia"]: "text-fuchsia-800",
+  ["purple"]: "text-purple-800",
+  ["violet"]: "text-violet-800",
+  ["indigo"]: "text-indigo-800",
+  ["blue"]: "text-blue-800",
+  ["sky"]: "text-sky-800",
+  ["cyan"]: "text-cyan-800",
+  ["teal"]: "text-teal-800",
+  ["emerald"]: "text-emerald-800",
+  ["green"]: "text-green-800",
+  ["lime"]: "text-lime-800",
+  ["yellow"]: "text-yellow-800",
+  ["amber"]: "text-amber-800",
+  ["orange"]: "text-orange-800",
+  ["red"]: "text-red-800",
+  ["stone"]: "text-stone-800",
+  ["neutral"]: "text-neutral-800",
+  ["gray"]: "text-gray-800",
+  ["slate"]: "text-slate-800"
+};
+
 // NOTE localFont is NextJS font object
 
 const useScript = (url) => {
@@ -225,7 +308,14 @@ const TableOfContents = ({
   );
 };
 
-const Heading = ({ title, level = 2, anchor, setActiveHeader, localFont }) => {
+const Heading = ({
+  title,
+  level = 2,
+  anchor,
+  setActiveHeader,
+  localFont,
+  textColorTheme = "none"
+}) => {
   const ref = useRef();
   useOnScreen(ref, setActiveHeader, anchor);
 
@@ -233,7 +323,7 @@ const Heading = ({ title, level = 2, anchor, setActiveHeader, localFont }) => {
     return (
       <h1
         ref={ref}
-        className={`${localFont.className} mb-2 text-base font-semibold xl:mb-4 xl:text-4xl`}
+        className={`${localFont.className} ${textColorThemes[textColorTheme]} mb-2 text-base font-semibold xl:mb-4 xl:text-4xl`}
       >
         {title}
       </h1>
@@ -250,7 +340,7 @@ const Heading = ({ title, level = 2, anchor, setActiveHeader, localFont }) => {
           });
         }}
         ref={ref}
-        className={`${localFont.className} cursor-pointer mt-4 text-2xl font-semibold xl:mb-2 xl:text-3xl flex items-center text-slate-700 hover:text-slate-900`}
+        className={`${localFont.className} cursor-pointer text-2xl font-semibold xl:mb-2 xl:text-3xl flex items-center ${textColorThemes[textColorTheme]}`}
       >
         <div>{title}</div>
         <div className="rounded-full bg-gray-100 p-1 ml-2">
@@ -262,7 +352,7 @@ const Heading = ({ title, level = 2, anchor, setActiveHeader, localFont }) => {
     return (
       <h3
         ref={ref}
-        className={`${localFont.className} mb-2 text-md font-semibold xl:mb-4 xl:text-2xl`}
+        className={`${localFont.className} text-md font-semibold xl:mb-2 xl:text-2xl ${textColorThemes[textColorTheme]}`}
       >
         {title}
       </h3>
@@ -271,7 +361,7 @@ const Heading = ({ title, level = 2, anchor, setActiveHeader, localFont }) => {
     return (
       <h4
         ref={ref}
-        className={`${localFont.className} mb-2 text-base font-semibold xl:mb-4 xl:text-xl`}
+        className={`${localFont.className} text-base font-semibold xl:mb-2 xl:text-xl ${textColorThemes[textColorTheme]}`}
       >
         {title}
       </h4>
@@ -280,7 +370,7 @@ const Heading = ({ title, level = 2, anchor, setActiveHeader, localFont }) => {
     return (
       <h5
         ref={ref}
-        className={`${localFont.className} mb-2 text-base font-semibold xl:mb-4`}
+        className={`${localFont.className} text-base font-semibold xl:mb-2 ${textColorThemes[textColorTheme]}`}
       >
         {title}
       </h5>
@@ -288,23 +378,23 @@ const Heading = ({ title, level = 2, anchor, setActiveHeader, localFont }) => {
   return null;
 };
 
-const TextLeft = ({ content }) => (
+const TextLeft = ({ content, textColorTheme = "none" }) => (
   <div
-    className="leading-loose prose lg:prose-lg max-w-max"
+    className={`leading-loose prose lg:prose-lg max-w-max ${textColorThemes[textColorTheme]}`}
     dangerouslySetInnerHTML={{ __html: content }}
   />
 );
 
-const TextRight = ({ content }) => (
+const TextRight = ({ content, textColorTheme = "none" }) => (
   <div
-    className="text-right leading-loose prose lg:prose-lg max-w-max"
+    className={`text-right leading-loose prose lg:prose-lg max-w-max ${textColorThemes[textColorTheme]}`}
     dangerouslySetInnerHTML={{ __html: content }}
   />
 );
 
-const TextCenter = ({ content }) => (
+const TextCenter = ({ content, textColorTheme = "none" }) => (
   <div
-    className="text-center leading-loose prose lg:prose-lg max-w-max"
+    className={`text-center leading-loose prose lg:prose-lg max-w-max ${textColorThemes[textColorTheme]}`}
     dangerouslySetInnerHTML={{ __html: content }}
   />
 );
@@ -371,11 +461,17 @@ const ImageRight = ({ imageUrl, height, width }) => (
   </div>
 );
 
-const Section = ({ sectionOut, id, headingOut, scripts }) => {
+const Section = ({
+  sectionOut,
+  id,
+  headingOut,
+  scripts,
+  backgroundColorTheme = "none"
+}) => {
   useScript(scripts?.[0] || false);
 
   return (
-    <section key={id} className="pt-0 pb-6">
+    <section key={id} className={backgroundColorThemes[backgroundColorTheme]}>
       <div className="relative">
         <a
           className="absolute -top-10"
@@ -390,17 +486,20 @@ const Section = ({ sectionOut, id, headingOut, scripts }) => {
   );
 };
 
-const CTAButton = ({ label, url }) => (
+const CTAButton = ({ label, url, buttonColorTheme = "indigo" }) => (
   <a
     href={url}
-    className="rounded-md bg-indigo-600 px-3.5 py-2.5 text-base font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+    className={`${buttonColorThemes[buttonColorTheme]} rounded-md px-3.5 py-2.5 text-base font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2`}
   >
     {label}
   </a>
 );
 
 const CTALink = ({ label, url }) => (
-  <a href={url} className="text-sm font-semibold leading-6 text-gray-900">
+  <a
+    href={url}
+    className="text-base font-semibold leading-6 text-gray-900 hover:underline"
+  >
     {label}
   </a>
 );
@@ -437,7 +536,14 @@ const CTAForm = ({ iframeUrl, type, formOrientation }) => {
   );
 };
 
-const CTASection = ({ id, image, ctaData = {}, content }) => {
+const CTASection = ({
+  id,
+  image,
+  ctaData = {},
+  content,
+  buttonColorTheme,
+  textColorTheme
+}) => {
   const {
     cta_primary: primaryLabel,
     cta_primary_type: primaryType,
@@ -459,36 +565,60 @@ const CTASection = ({ id, image, ctaData = {}, content }) => {
       type: primaryType,
       label: primaryLabel,
       url: primaryUrl
-    },
-    {
-      id: `id-${id}-cta-secondary`,
-      type: secondaryType,
-      label: secondaryLabel,
-      url: secondaryUrl
     }
-  ];
+  ].concat(
+    secondaryLabel
+      ? [
+          {
+            id: `id-${id}-cta-secondary`,
+            type: secondaryType,
+            label: secondaryLabel,
+            url: secondaryUrl
+          }
+        ]
+      : []
+  );
 
   const ctaContent = (
-    <div className="mt-10 flex items-center gap-x-6 bg-amber-100 p-2 rounded-lg">
-      {ctas.map(({ id, type, label, url }) => {
-        if (type === "button")
-          return <CTAButton key={id} label={label} url={url} />;
-        if (type === "link")
-          return <CTALink key={id} label={label} url={url} />;
-        return (
-          <CTAForm
-            type={type}
-            formOrientation={formOrientation}
-            key={id}
-            label={label}
-            url={url}
-            jobId={jobId}
-            workflowStepId={workflowStepId}
-            iframeUrl={iframeUrl}
-          />
-        );
-      })}
-    </div>
+    <>
+      {content && (
+        <TextLeft content={content} textColorTheme={textColorTheme} />
+      )}
+      <div className="mt-4 flex items-center gap-x-6 rounded-lg">
+        {ctas.map(({ id, type, label, url }) => {
+          if (type === "button")
+            return (
+              <CTAButton
+                key={id}
+                label={label}
+                url={url}
+                buttonColorTheme={buttonColorTheme}
+              />
+            );
+          if (type === "link")
+            return (
+              <CTALink
+                key={id}
+                label={label}
+                url={url}
+                textColorTheme={textColorTheme}
+              />
+            );
+          return (
+            <CTAForm
+              type={type}
+              formOrientation={formOrientation}
+              key={id}
+              label={label}
+              url={url}
+              jobId={jobId}
+              workflowStepId={workflowStepId}
+              iframeUrl={iframeUrl}
+            />
+          );
+        })}
+      </div>
+    </>
   );
 
   if (imageUrl)
@@ -520,7 +650,11 @@ export const ContentSections = ({
       image,
       show_heading: showHeading,
       ctaData,
-      scripts
+      scripts,
+      backgroundColorTheme,
+      textColorTheme,
+      headingColorTheme,
+      buttonColorTheme
     }) => {
       const imageUrl = image && "url" in image ? image["url"] : null;
       const imageHeight = image && "height" in image ? image["height"] : null;
@@ -534,18 +668,25 @@ export const ContentSections = ({
             anchor={`heading-${id}`}
             setActiveHeader={setActiveHeader}
             localFont={localFont}
+            textColorTheme={headingColorTheme}
           />
         );
       let sectionOut;
       switch (contentType) {
         case CONTENT_TYPE_TEXT_LEFT:
-          sectionOut = <TextLeft content={content} />;
+          sectionOut = (
+            <TextLeft content={content} textColorTheme={textColorTheme} />
+          );
           break;
         case CONTENT_TYPE_TEXT_RIGHT:
-          sectionOut = <TextRight content={content} />;
+          sectionOut = (
+            <TextRight content={content} textColorTheme={textColorTheme} />
+          );
           break;
         case CONTENT_TYPE_TEXT_CENTER:
-          sectionOut = <TextCenter content={content} />;
+          sectionOut = (
+            <TextCenter content={content} textColorTheme={textColorTheme} />
+          );
           break;
         case CONTENT_TYPE_TEXT_IMAGE_LEFT:
           sectionOut = (
@@ -613,6 +754,8 @@ export const ContentSections = ({
               showHeading={showHeading}
               ctaData={ctaData}
               content={content}
+              buttonColorTheme={buttonColorTheme}
+              textColorTheme={textColorTheme}
             />
           );
           break;
@@ -629,6 +772,7 @@ export const ContentSections = ({
           id={id}
           headingOut={headingOut}
           scripts={scripts}
+          backgroundColorTheme={backgroundColorTheme}
         />
       );
     }
