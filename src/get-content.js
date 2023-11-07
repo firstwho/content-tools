@@ -1,6 +1,5 @@
-import fetch from "node-fetch";
-import fs from "fs";
-import AdmZip from "adm-zip";
+const fs = require("fs");
+const AdmZip = require("adm-zip");
 
 const toBuffer = (ab) => {
   const buf = Buffer.alloc(ab.byteLength);
@@ -11,7 +10,7 @@ const toBuffer = (ab) => {
   return buf;
 };
 
-export const getContent = async () => {
+const getContent = async () => {
   // get environment variables
   const API_KEY = process.env?.CONTENT_API_KEY;
   if (!API_KEY) {
@@ -46,3 +45,11 @@ export const getContent = async () => {
   var zip = new AdmZip(`${WRITE_PATH}/content.zip`);
   zip.extractAllTo(`${WRITE_PATH}/content`, true);
 };
+
+(() => {
+  const run = async () => {
+    await getContent();
+  };
+
+  run();
+})();

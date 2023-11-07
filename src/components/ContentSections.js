@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { FaLink } from "react-icons/fa";
 import copy from "copy-to-clipboard";
 import toast from "react-hot-toast";
 import ScrollTo from "react-scroll-into-view";
@@ -99,6 +98,54 @@ const textColorThemes = {
   ["neutral"]: "text-neutral-800",
   ["gray"]: "text-gray-800",
   ["slate"]: "text-slate-800"
+};
+
+const buttonColorThemes = {
+  ["black"]: "bg-black text-white hover:bg-gray-900",
+  ["white"]:
+    "bg-white text-black hover:bg-gray-100 focus-visible:outline-white border border-gray-300",
+  ["rose"]:
+    "bg-rose-600 text-white hover:bg-rose-500 focus-visible:outline-rose-600",
+  ["pink"]:
+    "bg-pink-600 text-white hover:bg-pink-500 focus-visible:outline-pink-600",
+  ["fuchsia"]:
+    "bg-fuchsia-600 text-white hover:bg-fuchsia-500 focus-visible:outline-fuchsia-600",
+  ["purple"]:
+    "bg-purple-600 text-white hover:bg-purple-500 focus-visible:outline-purple-600",
+  ["violet"]:
+    "bg-violet-600 text-white hover:bg-violet-500 focus-visible:outline-violet-600",
+  ["indigo"]:
+    "bg-indigo-600 text-white hover:bg-indigo-500 focus-visible:outline-indigo-600",
+  ["blue"]:
+    "bg-blue-600 text-white hover:bg-blue-500 focus-visible:outline-blue-600",
+  ["sky"]:
+    "bg-sky-600 text-white hover:bg-sky-500 focus-visible:outline-sky-600",
+  ["cyan"]:
+    "bg-cyan-600 text-white hover:bg-cyan-500 focus-visible:outline-cyan-600",
+  ["teal"]:
+    "bg-teal-600 text-white hover:bg-teal-500 focus-visible:outline-teal-600",
+  ["emerald"]:
+    "bg-emerald-600 text-white hover:bg-emerald-500 focus-visible:outline-emerald-600",
+  ["green"]:
+    "bg-green-600 text-white hover:bg-green-500 focus-visible:outline-green-600",
+  ["lime"]:
+    "bg-lime-600 text-white hover:bg-lime-500 focus-visible:outline-lime-600",
+  ["yellow"]:
+    "bg-yellow-600 text-white hover:bg-yellow-500 focus-visible:outline-yellow-600",
+  ["amber"]:
+    "bg-amber-600 text-white hover:bg-amber-500 focus-visible:outline-amber-600",
+  ["orange"]:
+    "bg-orange-600 text-white hover:bg-orange-500 focus-visible:outline-orange-600",
+  ["red"]:
+    "bg-red-600 text-white hover:bg-red-500 focus-visible:outline-red-600",
+  ["stone"]:
+    "bg-stone-600 text-white hover:bg-stone-500 focus-visible:outline-stone-600",
+  ["neutral"]:
+    "bg-neutral-600 text-white hover:bg-neutral-500 focus-visible:outline-neutral-600",
+  ["gray"]:
+    "bg-gray-600 text-white hover:bg-gray-500 focus-visible:outline-gray-600",
+  ["slate"]:
+    "bg-slate-600 text-white hover:bg-slate-500 focus-visible:outline-slate-600"
 };
 
 // NOTE localFont is NextJS font object
@@ -343,8 +390,21 @@ const Heading = ({
         className={`${localFont.className} cursor-pointer text-2xl font-semibold xl:mb-2 xl:text-3xl flex items-center ${textColorThemes[textColorTheme]}`}
       >
         <div>{title}</div>
-        <div className="rounded-full bg-gray-100 p-1 ml-2">
-          <FaLink className="h-4 w-4 text-gray-500" />
+        <div className="p-1 ml-2">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth="1.5"
+            stroke="currentColor"
+            className="w-4 h-4"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"
+            />
+          </svg>
         </div>
       </h2>
     );
@@ -772,7 +832,7 @@ export const ContentSections = ({
           id={id}
           headingOut={headingOut}
           scripts={scripts}
-          backgroundColorTheme={backgroundColorTheme}
+          backgroundColorTheme={backgroundColorTheme || "none"}
         />
       );
     }

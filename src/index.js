@@ -1,8 +1,7 @@
-import { DoContentSections, ContentSections } from "./components/ContentSections"
-import { InternalLink } from "./components/InternalLink"
-
-module.exports = {
+import {
   DoContentSections,
-  ContentSections,
-  InternalLink
-};
+  ContentSections
+} from "./components/ContentSections";
+import { InternalLink } from "./components/InternalLink";
+
+export { ContentSections, DoContentSections, InternalLink };

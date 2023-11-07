@@ -6,4 +6,4 @@ set -a
 . $DIR/.env
 set +a
 
-npx babel-node src/run.js
+node ./node_modules/.bin/get-content
