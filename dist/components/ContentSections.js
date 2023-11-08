@@ -530,7 +530,7 @@ const CTAForm = _ref21 => {
   return /*#__PURE__*/_react.default.createElement("iframe", {
     src: iframeUrl,
     className: classes,
-    sandbox: "allow-top-navigation allow-scripts allow-forms"
+    sandbox: "allow-top-navigation allow-scripts allow-forms allow-same-origin"
   });
 };
 const CTASection = _ref22 => {
