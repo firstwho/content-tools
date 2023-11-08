@@ -1,6 +1,6 @@
 {
   "name": "@opinephp/content-tools",
-  "version": "1.0.24",
+  "version": "1.0.25",
   "description": "Tools and utilities for working with FirstWho as a headless CMS",
   "repository": {
     "type": "git",
