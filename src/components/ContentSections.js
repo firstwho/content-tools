@@ -591,7 +591,7 @@ const CTAForm = ({ iframeUrl, type, formOrientation }) => {
     <iframe
       src={iframeUrl}
       className={classes}
-      sandbox="allow-top-navigation allow-scripts allow-forms"
+      sandbox="allow-top-navigation allow-scripts allow-forms allow-same-origin"
     />
   );
 };
