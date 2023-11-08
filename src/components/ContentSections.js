@@ -49,55 +49,55 @@ Theme colors:
 const backgroundColorThemes = {
   ["none"]: "pt-0 mb-6",
   ["black"]: "bg-black border p-4 mb-6 rounded",
-  ["white"]: "bg-white border border-gray-100 p-4 mb-6 rounded",
-  ["rose"]: "bg-rose-100 border border-rose-200 p-4 mb-6 rounded",
-  ["pink"]: "bg-pink-100 border border-pink-200 p-4 mb-6 rounded",
-  ["fuchsia"]: "bg-fuchsia-100 border border-fuchsia-200 p-4 mb-6 rounded",
-  ["purple"]: "bg-purple-100 border border-purple-200 p-4 mb-6 rounded",
-  ["violet"]: "bg-violet-100 border border-violet-200 p-4 mb-6 rounded",
-  ["indigo"]: "bg-indigo-100 border border-indigo-200 p-4 mb-6 rounded",
-  ["blue"]: "bg-blue-100 border border-blue-200 p-4 mb-6 rounded",
-  ["sky"]: "bg-sky-100 border border-sky-200 p-4 mb-6 rounded",
-  ["cyan"]: "bg-cyan-100 border border-cyan-200 p-4 mb-6 rounded",
-  ["teal"]: "bg-teal-100 border border-teal-200 p-4 mb-6 rounded",
-  ["emerald"]: "bg-emerald-100 border border-emerald-200 p-4 mb-6 rounded",
-  ["green"]: "bg-green-100 border border-green-200 p-4 mb-6 rounded",
-  ["lime"]: "bg-lime-100 border border-lime-200 p-4 mb-6 rounded",
-  ["yellow"]: "bg-yellow-100 border border-yellow-200 p-4 mb-6 rounded",
-  ["amber"]: "bg-amber-100 border border-amber-200 p-4 mb-6 rounded",
-  ["orange"]: "bg-orange-100 border border-orange-200 p-4 mb-6 rounded",
-  ["red"]: "bg-red-100 border border-red-200 p-4 mb-6 rounded",
-  ["stone"]: "bg-stone-100 border border-stone-200 p-4 mb-6 rounded",
-  ["neutral"]: "bg-neutral-100 border border-neutral-200 p-4 mb-6 rounded",
-  ["gray"]: "bg-gray-100 border border-gray-200 p-4 mb-6 rounded",
-  ["slate"]: "bg-slate-100 border border-slate-200 p-4 mb-6 rounded"
+  ["white"]: "bg-white border border-gray-50 p-4 mb-6 rounded",
+  ["rose"]: "bg-rose-50 border border-rose-200 p-4 mb-6 rounded",
+  ["pink"]: "bg-pink-50 border border-pink-200 p-4 mb-6 rounded",
+  ["fuchsia"]: "bg-fuchsia-50 border border-fuchsia-200 p-4 mb-6 rounded",
+  ["purple"]: "bg-purple-50 border border-purple-200 p-4 mb-6 rounded",
+  ["violet"]: "bg-violet-50 border border-violet-200 p-4 mb-6 rounded",
+  ["indigo"]: "bg-indigo-50 border border-indigo-200 p-4 mb-6 rounded",
+  ["blue"]: "bg-blue-50 border border-blue-200 p-4 mb-6 rounded",
+  ["sky"]: "bg-sky-50 border border-sky-200 p-4 mb-6 rounded",
+  ["cyan"]: "bg-cyan-50 border border-cyan-200 p-4 mb-6 rounded",
+  ["teal"]: "bg-teal-50 border border-teal-200 p-4 mb-6 rounded",
+  ["emerald"]: "bg-emerald-50 border border-emerald-200 p-4 mb-6 rounded",
+  ["green"]: "bg-green-50 border border-green-200 p-4 mb-6 rounded",
+  ["lime"]: "bg-lime-50 border border-lime-200 p-4 mb-6 rounded",
+  ["yellow"]: "bg-yellow-50 border border-yellow-200 p-4 mb-6 rounded",
+  ["amber"]: "bg-amber-50 border border-amber-200 p-4 mb-6 rounded",
+  ["orange"]: "bg-orange-50 border border-orange-200 p-4 mb-6 rounded",
+  ["red"]: "bg-red-50 border border-red-200 p-4 mb-6 rounded",
+  ["stone"]: "bg-stone-50 border border-stone-200 p-4 mb-6 rounded",
+  ["neutral"]: "bg-neutral-50 border border-neutral-200 p-4 mb-6 rounded",
+  ["gray"]: "bg-gray-50 border border-gray-200 p-4 mb-6 rounded",
+  ["slate"]: "bg-slate-50 border border-slate-200 p-4 mb-6 rounded"
 };
 
 const textColorThemes = {
   ["none"]: "",
   ["black"]: "text-black",
   ["white"]: "text-white",
-  ["rose"]: "text-rose-800",
-  ["pink"]: "text-pink-800",
-  ["fuchsia"]: "text-fuchsia-800",
-  ["purple"]: "text-purple-800",
-  ["violet"]: "text-violet-800",
-  ["indigo"]: "text-indigo-800",
-  ["blue"]: "text-blue-800",
-  ["sky"]: "text-sky-800",
-  ["cyan"]: "text-cyan-800",
-  ["teal"]: "text-teal-800",
-  ["emerald"]: "text-emerald-800",
-  ["green"]: "text-green-800",
-  ["lime"]: "text-lime-800",
-  ["yellow"]: "text-yellow-800",
-  ["amber"]: "text-amber-800",
-  ["orange"]: "text-orange-800",
-  ["red"]: "text-red-800",
-  ["stone"]: "text-stone-800",
-  ["neutral"]: "text-neutral-800",
-  ["gray"]: "text-gray-800",
-  ["slate"]: "text-slate-800"
+  ["rose"]: "text-rose-900",
+  ["pink"]: "text-pink-900",
+  ["fuchsia"]: "text-fuchsia-900",
+  ["purple"]: "text-purple-900",
+  ["violet"]: "text-violet-900",
+  ["indigo"]: "text-indigo-900",
+  ["blue"]: "text-blue-900",
+  ["sky"]: "text-sky-900",
+  ["cyan"]: "text-cyan-900",
+  ["teal"]: "text-teal-900",
+  ["emerald"]: "text-emerald-900",
+  ["green"]: "text-green-900",
+  ["lime"]: "text-lime-900",
+  ["yellow"]: "text-yellow-900",
+  ["amber"]: "text-amber-900",
+  ["orange"]: "text-orange-900",
+  ["red"]: "text-red-900",
+  ["stone"]: "text-stone-900",
+  ["neutral"]: "text-neutral-900",
+  ["gray"]: "text-gray-900",
+  ["slate"]: "text-slate-900"
 };
 
 const buttonColorThemes = {
@@ -440,21 +440,21 @@ const Heading = ({
 
 const TextLeft = ({ content, textColorTheme = "none" }) => (
   <div
-    className={`leading-loose prose lg:prose-lg max-w-max ${textColorThemes[textColorTheme]}`}
+    className={`leading-loose prose lg:prose-lg max-w-none ${textColorThemes[textColorTheme]}`}
     dangerouslySetInnerHTML={{ __html: content }}
   />
 );
 
 const TextRight = ({ content, textColorTheme = "none" }) => (
   <div
-    className={`text-right leading-loose prose lg:prose-lg max-w-max ${textColorThemes[textColorTheme]}`}
+    className={`text-right leading-loose prose lg:prose-lg max-w-none ${textColorThemes[textColorTheme]}`}
     dangerouslySetInnerHTML={{ __html: content }}
   />
 );
 
 const TextCenter = ({ content, textColorTheme = "none" }) => (
   <div
-    className={`text-center leading-loose prose lg:prose-lg max-w-max ${textColorThemes[textColorTheme]}`}
+    className={`text-center leading-loose prose lg:prose-lg max-w-none ${textColorThemes[textColorTheme]}`}
     dangerouslySetInnerHTML={{ __html: content }}
   />
 );
@@ -470,7 +470,7 @@ const ImageOnLeft = ({
       <img src={imageUrl} alt="" />
     </div>
     <div
-      className={`${colSpanContent} leading-loose prose lg:prose-lg max-w-max`}
+      className={`${colSpanContent} leading-loose prose lg:prose-lg max-w-none`}
       dangerouslySetInnerHTML={{ __html: content }}
     />
   </div>
@@ -490,7 +490,7 @@ const ImageOnRight = ({
       className={`${colSpanImage} float-none md:float-right ml-0 md:ml-8 mb-4`}
     />
     <div
-      className={`${colSpanContent} leading-loose prose lg:prose-lg max-w-max`}
+      className={`${colSpanContent} leading-loose prose lg:prose-lg max-w-none`}
       dangerouslySetInnerHTML={{ __html: content }}
     />
     {ctaContent}
@@ -735,17 +735,26 @@ export const ContentSections = ({
       switch (contentType) {
         case CONTENT_TYPE_TEXT_LEFT:
           sectionOut = (
-            <TextLeft content={content} textColorTheme={textColorTheme} />
+            <TextLeft
+              content={content}
+              textColorTheme={textColorTheme || "none"}
+            />
           );
           break;
         case CONTENT_TYPE_TEXT_RIGHT:
           sectionOut = (
-            <TextRight content={content} textColorTheme={textColorTheme} />
+            <TextRight
+              content={content}
+              textColorTheme={textColorTheme || "none"}
+            />
           );
           break;
         case CONTENT_TYPE_TEXT_CENTER:
           sectionOut = (
-            <TextCenter content={content} textColorTheme={textColorTheme} />
+            <TextCenter
+              content={content}
+              textColorTheme={textColorTheme || "none"}
+            />
           );
           break;
         case CONTENT_TYPE_TEXT_IMAGE_LEFT:
