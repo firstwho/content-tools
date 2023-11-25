@@ -15,6 +15,7 @@ var _core = require("@dnd-kit/core");
 var _sortable = require("@dnd-kit/sortable");
 var _modifiers = require("@dnd-kit/modifiers");
 var _utilities = require("@dnd-kit/utilities");
+var _react2 = require("@headlessui/react");
 function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
 function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && Object.prototype.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
 const CONTENT_TYPE_TEXT_LEFT = exports.CONTENT_TYPE_TEXT_LEFT = "text-only-left";
@@ -292,7 +293,14 @@ const TocItem = _ref5 => {
     className: `${matched && offset <= activeUntil ? "bg-slate-700" : "bg-white"} shrink-0 rounded-full w-3 h-3 border-slate-800 border-2 -ml-[7px] z-20`
   }), /*#__PURE__*/_react.default.createElement("div", {
     className: "flex grow"
-  }, showStuff && /*#__PURE__*/_react.default.createElement("div", (0, _extends2.default)({}, listeners, {
+  }, /*#__PURE__*/_react.default.createElement(_react2.Transition, {
+    show: showStuff,
+    className: "transition-all duration-500 overflow-hidden",
+    enterFrom: "transform scale-95 opacity-0 max-h-0",
+    enterTo: "transform scale-100 opacity-100 max-h-96",
+    leaveFrom: "transform scale-100 opacity-100 max-h-96",
+    leaveTo: "transform scale-95 opacity-0 max-h-0"
+  }, /*#__PURE__*/_react.default.createElement("div", (0, _extends2.default)({}, listeners, {
     className: "h-6 w-6 inline-block text-slate-500 -ml-1 mr-1 shrink",
     "aria-hidden": "true",
     style: {
@@ -309,14 +317,21 @@ const TocItem = _ref5 => {
     fill: "currentColor",
     fillRule: "evenodd",
     clipRule: "evenodd"
-  }))), /*#__PURE__*/_react.default.createElement("div", {
+  })))), /*#__PURE__*/_react.default.createElement("div", {
     className: "grow flex flex-col"
   }, /*#__PURE__*/_react.default.createElement(_reactScrollIntoView.default, {
     selector: `#heading-${id}`,
     className: "flex"
   }, /*#__PURE__*/_react.default.createElement("span", {
     className: `${editCallback ? "hover:underline" : ""} ${matched && offset <= activeUntil ? "text-slate-800" : editCallback ? "text-slate-800" : "text-gray-500"} ${localFont.className} grow ${showMeter ? "pl-4" : ""} pr-2 space-x-2 hover:text-gray-900 text-lg cursor-pointer ${showHeading ? "" : "opacity-50"}`
-  }, heading)), showStuff && /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("div", {
+  }, heading)), /*#__PURE__*/_react.default.createElement(_react2.Transition, {
+    show: showStuff,
+    className: "transition-all duration-500 overflow-hidden",
+    enterFrom: "transform scale-95 opacity-0 max-h-0",
+    enterTo: "transform scale-100 opacity-100 max-h-96",
+    leaveFrom: "transform scale-100 opacity-100 max-h-96",
+    leaveTo: "transform scale-95 opacity-0 max-h-0"
+  }, /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("div", {
     className: `${showMeter ? "pl-4" : ""} flex gap-x-2`
   }, /*#__PURE__*/_react.default.createElement("span", {
     onClick: () => editCallback(id),
@@ -340,7 +355,7 @@ const TocItem = _ref5 => {
       });
     },
     className: "cursor-pointer rounded-md bg-red-600 px-2.5 py-1.5 text-base font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
-  }, "Delete")))))));
+  }, "Delete"))))))));
 };
 const TableOfContents = _ref6 => {
   let {

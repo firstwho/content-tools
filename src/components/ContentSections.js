@@ -12,6 +12,7 @@ import {
 } from "@dnd-kit/sortable";
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { CSS } from "@dnd-kit/utilities";
+import { Transition } from "@headlessui/react";
 
 export const CONTENT_TYPE_TEXT_LEFT = "text-only-left";
 export const CONTENT_TYPE_TEXT_RIGHT = "text-only-right";
@@ -322,7 +323,14 @@ const TocItem = ({
         ></div>
       )}
       <div className="flex grow">
-        {showStuff && (
+        <Transition
+          show={showStuff}
+          className="transition-all duration-500 overflow-hidden"
+          enterFrom="transform scale-95 opacity-0 max-h-0"
+          enterTo="transform scale-100 opacity-100 max-h-96"
+          leaveFrom="transform scale-100 opacity-100 max-h-96"
+          leaveTo="transform scale-95 opacity-0 max-h-0"
+        >
           <div
             {...listeners}
             className="h-6 w-6 inline-block text-slate-500 -ml-1 mr-1 shrink"
@@ -344,7 +352,7 @@ const TocItem = ({
               ></path>
             </svg>
           </div>
-        )}
+        </Transition>
 
         <div className="grow flex flex-col">
           <ScrollTo selector={`#heading-${id}`} className="flex">
@@ -365,7 +373,14 @@ const TocItem = ({
             </span>
           </ScrollTo>
 
-          {showStuff && (
+          <Transition
+            show={showStuff}
+            className="transition-all duration-500 overflow-hidden"
+            enterFrom="transform scale-95 opacity-0 max-h-0"
+            enterTo="transform scale-100 opacity-100 max-h-96"
+            leaveFrom="transform scale-100 opacity-100 max-h-96"
+            leaveTo="transform scale-95 opacity-0 max-h-0"
+          >
             <div>
               <div className={`${showMeter ? "pl-4" : ""} flex gap-x-2`}>
                 <span
@@ -405,7 +420,7 @@ const TocItem = ({
                 </div>
               )}
             </div>
-          )}
+          </Transition>
         </div>
       </div>
     </li>

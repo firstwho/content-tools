@@ -1,6 +1,6 @@
 {
   "name": "@opinephp/content-tools",
-  "version": "1.0.26",
+  "version": "1.0.27",
   "description": "Tools and utilities for working with FirstWho as a headless CMS",
   "repository": {
     "type": "git",
@@ -53,6 +53,7 @@
     "@dnd-kit/modifiers": "^7.0.0",
     "@dnd-kit/sortable": "^8.0.0",
     "@dnd-kit/utilities": "^3.2.2",
+    "@headlessui/react": "^1.7.17",
     "copy-to-clipboard": "^3.3.3",
     "core-js": "^3.33.2",
     "react-hot-toast": "^2.4.1",
