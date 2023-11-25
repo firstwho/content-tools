@@ -291,10 +291,7 @@ const TocItem = _ref5 => {
   }), showMeter && /*#__PURE__*/_react.default.createElement("div", {
     className: `${matched && offset <= activeUntil ? "bg-slate-700" : "bg-white"} shrink-0 rounded-full w-3 h-3 border-slate-800 border-2 -ml-[7px] z-20`
   }), /*#__PURE__*/_react.default.createElement("div", {
-    className: "flex flex-col grow"
-  }, /*#__PURE__*/_react.default.createElement(_reactScrollIntoView.default, {
-    selector: `#heading-${id}`,
-    className: "flex"
+    className: "flex grow"
   }, showStuff && /*#__PURE__*/_react.default.createElement("div", (0, _extends2.default)({}, listeners, {
     className: "h-6 w-6 inline-block text-slate-500 -ml-1 mr-1 shrink",
     "aria-hidden": "true",
@@ -314,10 +311,12 @@ const TocItem = _ref5 => {
     clipRule: "evenodd"
   }))), /*#__PURE__*/_react.default.createElement("div", {
     className: "grow flex flex-col"
-  }, /*#__PURE__*/_react.default.createElement("a", {
-    href: `#heading-${id}`,
+  }, /*#__PURE__*/_react.default.createElement(_reactScrollIntoView.default, {
+    selector: `#heading-${id}`,
+    className: "flex"
+  }, /*#__PURE__*/_react.default.createElement("span", {
     className: `${editCallback ? "hover:underline" : ""} ${matched && offset <= activeUntil ? "text-slate-800" : editCallback ? "text-slate-800" : "text-gray-500"} ${localFont.className} grow ${showMeter ? "pl-4" : ""} pr-2 space-x-2 hover:text-gray-900 text-lg cursor-pointer ${showHeading ? "" : "opacity-50"}`
-  }, heading), showStuff && /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("div", {
+  }, heading)), showStuff && /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("div", {
     className: `${showMeter ? "pl-4" : ""} flex gap-x-2`
   }, /*#__PURE__*/_react.default.createElement("span", {
     onClick: () => editCallback(id),
@@ -341,7 +340,7 @@ const TocItem = _ref5 => {
       });
     },
     className: "cursor-pointer rounded-md bg-red-600 px-2.5 py-1.5 text-base font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
-  }, "Delete"))))))));
+  }, "Delete")))))));
 };
 const TableOfContents = _ref6 => {
   let {

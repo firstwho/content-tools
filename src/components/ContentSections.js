@@ -321,35 +321,34 @@ const TocItem = ({
           } shrink-0 rounded-full w-3 h-3 border-slate-800 border-2 -ml-[7px] z-20`}
         ></div>
       )}
-      <div className="flex flex-col grow">
-        <ScrollTo selector={`#heading-${id}`} className="flex">
-          {showStuff && (
-            <div
-              {...listeners}
-              className="h-6 w-6 inline-block text-slate-500 -ml-1 mr-1 shrink"
-              aria-hidden="true"
-              style={{ marginTop: "2px" }}
+      <div className="flex grow">
+        {showStuff && (
+          <div
+            {...listeners}
+            className="h-6 w-6 inline-block text-slate-500 -ml-1 mr-1 shrink"
+            aria-hidden="true"
+            style={{ marginTop: "2px" }}
+          >
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 15 15"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
             >
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 15 15"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M7.1813 1.68179C7.35704 1.50605 7.64196 1.50605 7.8177 1.68179L10.3177 4.18179C10.4934 4.35753 10.4934 4.64245 10.3177 4.81819C10.142 4.99392 9.85704 4.99392 9.6813 4.81819L7.9495 3.08638L7.9495 11.9136L9.6813 10.1818C9.85704 10.0061 10.142 10.0061 10.3177 10.1818C10.4934 10.3575 10.4934 10.6424 10.3177 10.8182L7.8177 13.3182C7.73331 13.4026 7.61885 13.45 7.4995 13.45C7.38015 13.45 7.26569 13.4026 7.1813 13.3182L4.6813 10.8182C4.50557 10.6424 4.50557 10.3575 4.6813 10.1818C4.85704 10.0061 5.14196 10.0061 5.3177 10.1818L7.0495 11.9136L7.0495 3.08638L5.3177 4.81819C5.14196 4.99392 4.85704 4.99392 4.6813 4.81819C4.50557 4.64245 4.50557 4.35753 4.6813 4.18179L7.1813 1.68179Z"
-                  fill="currentColor"
-                  fillRule="evenodd"
-                  clipRule="evenodd"
-                ></path>
-              </svg>
-            </div>
-          )}
+              <path
+                d="M7.1813 1.68179C7.35704 1.50605 7.64196 1.50605 7.8177 1.68179L10.3177 4.18179C10.4934 4.35753 10.4934 4.64245 10.3177 4.81819C10.142 4.99392 9.85704 4.99392 9.6813 4.81819L7.9495 3.08638L7.9495 11.9136L9.6813 10.1818C9.85704 10.0061 10.142 10.0061 10.3177 10.1818C10.4934 10.3575 10.4934 10.6424 10.3177 10.8182L7.8177 13.3182C7.73331 13.4026 7.61885 13.45 7.4995 13.45C7.38015 13.45 7.26569 13.4026 7.1813 13.3182L4.6813 10.8182C4.50557 10.6424 4.50557 10.3575 4.6813 10.1818C4.85704 10.0061 5.14196 10.0061 5.3177 10.1818L7.0495 11.9136L7.0495 3.08638L5.3177 4.81819C5.14196 4.99392 4.85704 4.99392 4.6813 4.81819C4.50557 4.64245 4.50557 4.35753 4.6813 4.18179L7.1813 1.68179Z"
+                fill="currentColor"
+                fillRule="evenodd"
+                clipRule="evenodd"
+              ></path>
+            </svg>
+          </div>
+        )}
 
-          <div className="grow flex flex-col">
-            <a
-              href={`#heading-${id}`}
+        <div className="grow flex flex-col">
+          <ScrollTo selector={`#heading-${id}`} className="flex">
+            <span
               className={`${editCallback ? "hover:underline" : ""} ${
                 matched && offset <= activeUntil
                   ? "text-slate-800"
@@ -363,51 +362,51 @@ const TocItem = ({
               }`}
             >
               {heading}
-            </a>
+            </span>
+          </ScrollTo>
 
-            {showStuff && (
-              <div>
-                <div className={`${showMeter ? "pl-4" : ""} flex gap-x-2`}>
-                  <span
-                    onClick={() => editCallback(id)}
-                    className={buttonClasses}
-                  >
-                    Edit
-                  </span>
-                  <span
-                    onClick={() => setIsDeleting(!isDeleting)}
-                    className={buttonClasses}
-                  >
-                    Delete
-                  </span>
-                </div>
-                {isDeleting && (
-                  <div className="bg-white p-4 flex flex-col gap-y-4 rounded-md my-2">
-                    <div className="font-semibold">
-                      Are you sure you want to delete this section?
-                    </div>
-                    <div className="flex gap-x-4">
-                      <span
-                        onClick={() => setIsDeleting(false)}
-                        className="cursor-pointer rounded-md bg-gray-200 px-2.5 py-1.5 text-base font-semibold text-gray-900 shadow-sm hover:bg-gray-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-200"
-                      >
-                        Cancel
-                      </span>
-                      <span
-                        onClick={async () => {
-                          await deleteCallback({ id });
-                        }}
-                        className="cursor-pointer rounded-md bg-red-600 px-2.5 py-1.5 text-base font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
-                      >
-                        Delete
-                      </span>
-                    </div>
-                  </div>
-                )}
+          {showStuff && (
+            <div>
+              <div className={`${showMeter ? "pl-4" : ""} flex gap-x-2`}>
+                <span
+                  onClick={() => editCallback(id)}
+                  className={buttonClasses}
+                >
+                  Edit
+                </span>
+                <span
+                  onClick={() => setIsDeleting(!isDeleting)}
+                  className={buttonClasses}
+                >
+                  Delete
+                </span>
               </div>
-            )}
-          </div>
-        </ScrollTo>
+              {isDeleting && (
+                <div className="bg-white p-4 flex flex-col gap-y-4 rounded-md my-2">
+                  <div className="font-semibold">
+                    Are you sure you want to delete this section?
+                  </div>
+                  <div className="flex gap-x-4">
+                    <span
+                      onClick={() => setIsDeleting(false)}
+                      className="cursor-pointer rounded-md bg-gray-200 px-2.5 py-1.5 text-base font-semibold text-gray-900 shadow-sm hover:bg-gray-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-200"
+                    >
+                      Cancel
+                    </span>
+                    <span
+                      onClick={async () => {
+                        await deleteCallback({ id });
+                      }}
+                      className="cursor-pointer rounded-md bg-red-600 px-2.5 py-1.5 text-base font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+                    >
+                      Delete
+                    </span>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </li>
   );
