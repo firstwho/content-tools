@@ -4,6 +4,14 @@ import React, { useEffect, useRef, useState } from "react";
 import copy from "copy-to-clipboard";
 import toast from "react-hot-toast";
 import ScrollTo from "react-scroll-into-view";
+import { DndContext } from "@dnd-kit/core";
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  useSortable
+} from "@dnd-kit/sortable";
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
+import { CSS } from "@dnd-kit/utilities";
 
 export const CONTENT_TYPE_TEXT_LEFT = "text-only-left";
 export const CONTENT_TYPE_TEXT_RIGHT = "text-only-right";
@@ -148,6 +156,72 @@ const buttonColorThemes = {
     "bg-slate-600 text-white hover:bg-slate-500 focus-visible:outline-slate-600"
 };
 
+const arrayMoveMutable = (array, fromIndex, toIndex) => {
+  const startIndex = fromIndex < 0 ? array.length + fromIndex : fromIndex;
+
+  if (startIndex >= 0 && startIndex < array.length) {
+    const endIndex = toIndex < 0 ? array.length + toIndex : toIndex;
+
+    const [item] = array.splice(fromIndex, 1);
+    array.splice(endIndex, 0, item);
+  }
+};
+
+const arrayMoveImmutable = (array, fromIndex, toIndex) => {
+  if (!array) return;
+  array = [...array];
+  arrayMoveMutable(array, fromIndex, toIndex);
+  return array;
+};
+
+const SortableList = ({
+  rows,
+  dispatch,
+  collection,
+  sortApi,
+  idField = "id",
+  sortableItems = [],
+  setIsSorting
+}) => (
+  <DndContext
+    id={collection}
+    modifiers={[restrictToVerticalAxis]}
+    onDragStart={({ active: { id } }) => {
+      setIsSorting(id);
+    }}
+    onDragCancel={() => {
+      setIsSorting(null);
+    }}
+    onDragEnd={async ({ active: { id: activeId }, over: { id: overId } }) => {
+      const oldIndex = rows.findIndex((row) => row[idField] === activeId);
+      const newIndex = rows.findIndex((row) => row[idField] === overId);
+      let sortedRows = arrayMoveImmutable(rows, oldIndex, newIndex);
+      let ids = sortedRows.map((row) => row[idField]);
+
+      dispatch({
+        type: "SORT_ROWS",
+        data: {
+          collection: collection || null,
+          oldIndex: oldIndex,
+          newIndex: newIndex,
+          sortedRows,
+          ids,
+          idField
+        }
+      });
+
+      // api
+      if (sortApi) await sortApi({ ids });
+
+      setIsSorting(null);
+    }}
+  >
+    <SortableContext items={rows} strategy={verticalListSortingStrategy}>
+      {sortableItems}
+    </SortableContext>
+  </DndContext>
+);
+
 // NOTE localFont is NextJS font object
 
 const useScript = (url) => {
@@ -194,18 +268,45 @@ const TocItem = ({
   matched,
   visibleSections,
   localFont,
-  showMeter
+  showMeter,
+  sortCollection,
+  isSorting
 }) => {
-  const [isHovering, setIsHovering] = useState(false);
+  const { attributes, listeners, setNodeRef, transform, transition } =
+    sortCollection
+      ? useSortable({ id })
+      : {
+          attributes: {},
+          listeners: {},
+          setNodeRef: null,
+          transform: "",
+          transition: ""
+        };
+
+  const style = sortCollection
+    ? {
+        transform: CSS.Translate.toString(transform),
+        transition
+      }
+    : {};
+
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
+
+  const showStuff = editCallback && ((isHovering && !isSorting) || isSorting);
 
   return (
     <li
-      className={`flex items-center relative ${
-        isHovering && editCallback ? "bg-gray-100 rounded-md" : ""
-      } ${editCallback ? "-ml-2 px-2" : ""}`}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      className={`${
+        isSorting ? "bg-gray-50 z-index-50" : ""
+      } flex items-center relative ${
+        editCallback ? "pt-2 first:pt-0 pl-4" : ""
+      }`}
     >
       {showMeter && offset === 0 && (
         <div className="absolute h-1/2 w-4 top-0 -left-2 bg-white z-10"></div>
@@ -220,65 +321,93 @@ const TocItem = ({
           } shrink-0 rounded-full w-3 h-3 border-slate-800 border-2 -ml-[7px] z-20`}
         ></div>
       )}
-      <div className="flex flex-col">
-        <ScrollTo selector={`#heading-${id}`}>
-          <div
-            href={`#heading-${id}`}
-            className={`${
-              isHovering || (matched && offset <= activeUntil)
-                ? "text-slate-800"
-                : "text-gray-500"
-            } ${localFont.className} grow ${
-              showMeter ? "pl-4" : ""
-            } pr-2 space-x-2 hover:text-gray-900 text-lg cursor-pointer ${
-              showHeading ? "" : "opacity-50"
-            }`}
-          >
-            {heading}
-          </div>
-        </ScrollTo>
-        {isHovering && editCallback && (
-          <>
+      <div className="flex flex-col grow">
+        <ScrollTo selector={`#heading-${id}`} className="flex">
+          {showStuff && (
             <div
-              className={`${
-                showMeter ? "pl-4" : ""
-              } pr-2 flex gap-x-2 mt-1 mb-2`}
+              {...listeners}
+              className="h-6 w-6 inline-block text-slate-500 -ml-1 mr-1 shrink"
+              aria-hidden="true"
+              style={{ marginTop: "2px" }}
             >
-              <span onClick={() => editCallback(id)} className={buttonClasses}>
-                Edit
-              </span>
-              <span
-                onClick={() => setIsDeleting(!isDeleting)}
-                className={buttonClasses}
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 15 15"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
               >
-                Delete
-              </span>
+                <path
+                  d="M7.1813 1.68179C7.35704 1.50605 7.64196 1.50605 7.8177 1.68179L10.3177 4.18179C10.4934 4.35753 10.4934 4.64245 10.3177 4.81819C10.142 4.99392 9.85704 4.99392 9.6813 4.81819L7.9495 3.08638L7.9495 11.9136L9.6813 10.1818C9.85704 10.0061 10.142 10.0061 10.3177 10.1818C10.4934 10.3575 10.4934 10.6424 10.3177 10.8182L7.8177 13.3182C7.73331 13.4026 7.61885 13.45 7.4995 13.45C7.38015 13.45 7.26569 13.4026 7.1813 13.3182L4.6813 10.8182C4.50557 10.6424 4.50557 10.3575 4.6813 10.1818C4.85704 10.0061 5.14196 10.0061 5.3177 10.1818L7.0495 11.9136L7.0495 3.08638L5.3177 4.81819C5.14196 4.99392 4.85704 4.99392 4.6813 4.81819C4.50557 4.64245 4.50557 4.35753 4.6813 4.18179L7.1813 1.68179Z"
+                  fill="currentColor"
+                  fillRule="evenodd"
+                  clipRule="evenodd"
+                ></path>
+              </svg>
             </div>
-            {isDeleting && (
-              <div className="bg-white p-4 flex flex-col gap-y-4 rounded-md my-2">
-                <div className="font-semibold">
-                  Are you sure you want to delete this section?
-                </div>
-                <div className="flex gap-x-4">
+          )}
+
+          <div className="grow flex flex-col">
+            <a
+              href={`#heading-${id}`}
+              className={`${editCallback ? "hover:underline" : ""} ${
+                matched && offset <= activeUntil
+                  ? "text-slate-800"
+                  : editCallback
+                  ? "text-slate-800"
+                  : "text-gray-500"
+              } ${localFont.className} grow ${
+                showMeter ? "pl-4" : ""
+              } pr-2 space-x-2 hover:text-gray-900 text-lg cursor-pointer ${
+                showHeading ? "" : "opacity-50"
+              }`}
+            >
+              {heading}
+            </a>
+
+            {showStuff && (
+              <div>
+                <div className={`${showMeter ? "pl-4" : ""} flex gap-x-2`}>
                   <span
-                    onClick={() => setIsDeleting(false)}
-                    className="cursor-pointer rounded-md bg-gray-200 px-2.5 py-1.5 text-base font-semibold text-gray-900 shadow-sm hover:bg-gray-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-200"
+                    onClick={() => editCallback(id)}
+                    className={buttonClasses}
                   >
-                    Cancel
+                    Edit
                   </span>
                   <span
-                    onClick={async () => {
-                      await deleteCallback({ id });
-                    }}
-                    className="cursor-pointer rounded-md bg-red-600 px-2.5 py-1.5 text-base font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+                    onClick={() => setIsDeleting(!isDeleting)}
+                    className={buttonClasses}
                   >
                     Delete
                   </span>
                 </div>
+                {isDeleting && (
+                  <div className="bg-white p-4 flex flex-col gap-y-4 rounded-md my-2">
+                    <div className="font-semibold">
+                      Are you sure you want to delete this section?
+                    </div>
+                    <div className="flex gap-x-4">
+                      <span
+                        onClick={() => setIsDeleting(false)}
+                        className="cursor-pointer rounded-md bg-gray-200 px-2.5 py-1.5 text-base font-semibold text-gray-900 shadow-sm hover:bg-gray-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gray-200"
+                      >
+                        Cancel
+                      </span>
+                      <span
+                        onClick={async () => {
+                          await deleteCallback({ id });
+                        }}
+                        className="cursor-pointer rounded-md bg-red-600 px-2.5 py-1.5 text-base font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
+                      >
+                        Delete
+                      </span>
+                    </div>
+                  </div>
+                )}
               </div>
             )}
-          </>
-        )}
+          </div>
+        </ScrollTo>
       </div>
     </li>
   );
@@ -289,8 +418,15 @@ const TableOfContents = ({
   activeHeader,
   localFont,
   showInvisibleHeaders,
-  showMeter
+  showMeter,
+  tocHeading = "Contents",
+  sortApi = () => {},
+  dispatch,
+  sortCollection,
+  tocGridClasses = "col-span-12 md:col-span-1"
 }) => {
+  const [isSorting, setIsSorting] = useState(null);
+
   const visibleSections = showInvisibleHeaders
     ? sections
     : sections.filter(({ show_heading: showHeading }) => showHeading === true);
@@ -307,20 +443,32 @@ const TableOfContents = ({
         );
 
   return (
-    <div className="col-span-12 md:col-span-1">
-      <div className="sticky top-[95px] hidden lg:block">
-        <h3
-          className={`${localFont.className} -ml-1 mb-3 text-xl font-semibold text-slate-700`}
-        >
-          Contents
-        </h3>
+    <div className={tocGridClasses}>
+      <div
+        className={`sticky ${
+          sortCollection ? "top-0" : "top-[95px]"
+        } hidden lg:block`}
+      >
+        {tocHeading && (
+          <h3
+            className={`${localFont.className} -ml-1 mb-3 text-xl font-semibold text-slate-700`}
+          >
+            {tocHeading}
+          </h3>
+        )}
         <ul
-          className={`mt-2 lg:mt-4 lg:space-y-4 ${
-            showMeter ? "border-l-2 border-slate-700" : ""
-          }`}
+          className={`${sortCollection ? "" : "mt-2"} ${
+            tocHeading ? "lg:mt-4" : ""
+          } ${
+            sortCollection
+              ? "lg:space-y-2 grid grid-cols-1 divide-y"
+              : "lg:space-y-4"
+          } ${showMeter ? "border-l-2 border-slate-700" : ""}`}
         >
-          {visibleSections.length > 0 &&
-            visibleSections.map(
+          <SortableList
+            setIsSorting={setIsSorting}
+            rows={visibleSections}
+            sortableItems={visibleSections.map(
               (
                 {
                   id,
@@ -346,9 +494,15 @@ const TableOfContents = ({
                   deleteCallback={deleteCallback}
                   buttonClasses={buttonClasses}
                   showMeter={showMeter}
+                  sortCollection={sortCollection}
+                  isSorting={id === isSorting}
                 />
               )
             )}
+            collection={sortCollection}
+            dispatch={dispatch}
+            sortApi={sortApi}
+          />
         </ul>
       </div>
     </div>
@@ -361,7 +515,8 @@ const Heading = ({
   anchor,
   setActiveHeader,
   localFont,
-  textColorTheme = "none"
+  textColorTheme = "none",
+  showCopyLink = true
 }) => {
   const ref = useRef();
   useOnScreen(ref, setActiveHeader, anchor);
@@ -379,6 +534,7 @@ const Heading = ({
     return (
       <h2
         onClick={() => {
+          if (!showCopyLink) return;
           copy(
             window.location.origin + window.location.pathname + `#${anchor}`
           );
@@ -390,22 +546,24 @@ const Heading = ({
         className={`${localFont.className} cursor-pointer text-2xl font-semibold xl:mb-2 xl:text-3xl flex items-center ${textColorThemes[textColorTheme]}`}
       >
         <div>{title}</div>
-        <div className="p-1 ml-2">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            strokeWidth="1.5"
-            stroke="currentColor"
-            className="w-4 h-4"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"
-            />
-          </svg>
-        </div>
+        {showCopyLink && (
+          <div className="p-1 ml-2">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              strokeWidth="1.5"
+              stroke="currentColor"
+              className="w-4 h-4"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"
+              />
+            </svg>
+          </div>
+        )}
       </h2>
     );
   if (level === 3)
@@ -694,6 +852,7 @@ const CTASection = ({
 };
 
 export const ContentSections = ({
+  showCopyLink = true,
   sections,
   colSpanContent,
   colSpanImage,
@@ -729,6 +888,7 @@ export const ContentSections = ({
             setActiveHeader={setActiveHeader}
             localFont={localFont}
             textColorTheme={headingColorTheme}
+            showCopyLink={showCopyLink}
           />
         );
       let sectionOut;
@@ -851,21 +1011,35 @@ export const DoContentSections = ({
   sections,
   localFont,
   showInvisibleHeaders = false,
-  showMeter = true
+  showMeter = true,
+  showCopyLink = true,
+  tocHeading = "Contents",
+  sortApi = () => {},
+  dispatch,
+  sortCollection,
+  outerGridClasses = "grid grid-cols-4 gap-0 lg:gap-6",
+  tocGridClasses = "col-span-12 md:col-span-1",
+  mainGridClasses = "col-span-4 lg:col-span-3"
 }) => {
   const [activeHeader, setActiveHeader] = useState(null);
 
   return (
-    <div className="grid grid-cols-4 gap-0 lg:gap-6">
+    <div className={outerGridClasses}>
       <TableOfContents
         sections={sections}
         activeHeader={activeHeader}
         localFont={localFont}
         showInvisibleHeaders={showInvisibleHeaders}
         showMeter={showMeter}
+        tocHeading={tocHeading}
+        sortApi={sortApi}
+        dispatch={dispatch}
+        sortCollection={sortCollection}
+        tocGridClasses={tocGridClasses}
       />
-      <div className="col-span-4 lg:col-span-3">
+      <div className={mainGridClasses}>
         <ContentSections
+          showCopyLink={showCopyLink}
           sections={sections}
           setActiveHeader={setActiveHeader}
           localFont={localFont}
