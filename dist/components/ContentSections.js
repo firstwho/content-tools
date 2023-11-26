@@ -6,10 +6,16 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.DoContentSections = exports.ContentSections = exports.CONTENT_TYPE_TEXT_RIGHT = exports.CONTENT_TYPE_TEXT_LEFT = exports.CONTENT_TYPE_TEXT_IMAGE_RIGHT = exports.CONTENT_TYPE_TEXT_IMAGE_LEFT = exports.CONTENT_TYPE_TEXT_CENTER = exports.CONTENT_TYPE_SIGN_UP = exports.CONTENT_TYPE_IMAGE_RIGHT = exports.CONTENT_TYPE_IMAGE_LEFT = exports.CONTENT_TYPE_IMAGE_FULL = exports.CONTENT_TYPE_IMAGE_CENTER = exports.CONTENT_TYPE_DIVIDER = void 0;
+var _extends2 = _interopRequireDefault(require("@babel/runtime/helpers/extends"));
 var _react = _interopRequireWildcard(require("react"));
 var _copyToClipboard = _interopRequireDefault(require("copy-to-clipboard"));
 var _reactHotToast = _interopRequireDefault(require("react-hot-toast"));
 var _reactScrollIntoView = _interopRequireDefault(require("react-scroll-into-view"));
+var _core = require("@dnd-kit/core");
+var _sortable = require("@dnd-kit/sortable");
+var _modifiers = require("@dnd-kit/modifiers");
+var _utilities = require("@dnd-kit/utilities");
+var _react2 = require("@headlessui/react");
 function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
 function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && Object.prototype.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
 const CONTENT_TYPE_TEXT_LEFT = exports.CONTENT_TYPE_TEXT_LEFT = "text-only-left";
@@ -130,6 +136,80 @@ const buttonColorThemes = {
   ["gray"]: "bg-gray-600 text-white hover:bg-gray-500 focus-visible:outline-gray-600",
   ["slate"]: "bg-slate-600 text-white hover:bg-slate-500 focus-visible:outline-slate-600"
 };
+const arrayMoveMutable = (array, fromIndex, toIndex) => {
+  const startIndex = fromIndex < 0 ? array.length + fromIndex : fromIndex;
+  if (startIndex >= 0 && startIndex < array.length) {
+    const endIndex = toIndex < 0 ? array.length + toIndex : toIndex;
+    const [item] = array.splice(fromIndex, 1);
+    array.splice(endIndex, 0, item);
+  }
+};
+const arrayMoveImmutable = (array, fromIndex, toIndex) => {
+  if (!array) return;
+  array = [...array];
+  arrayMoveMutable(array, fromIndex, toIndex);
+  return array;
+};
+const SortableList = _ref => {
+  let {
+    rows,
+    dispatch,
+    collection,
+    sortApi,
+    idField = "id",
+    sortableItems = [],
+    setIsSorting
+  } = _ref;
+  return /*#__PURE__*/_react.default.createElement(_core.DndContext, {
+    id: collection,
+    modifiers: [_modifiers.restrictToVerticalAxis],
+    onDragStart: _ref2 => {
+      let {
+        active: {
+          id
+        }
+      } = _ref2;
+      setIsSorting(id);
+    },
+    onDragCancel: () => {
+      setIsSorting(null);
+    },
+    onDragEnd: async _ref3 => {
+      let {
+        active: {
+          id: activeId
+        },
+        over: {
+          id: overId
+        }
+      } = _ref3;
+      const oldIndex = rows.findIndex(row => row[idField] === activeId);
+      const newIndex = rows.findIndex(row => row[idField] === overId);
+      let sortedRows = arrayMoveImmutable(rows, oldIndex, newIndex);
+      let ids = sortedRows.map(row => row[idField]);
+      dispatch({
+        type: "SORT_ROWS",
+        data: {
+          collection: collection || null,
+          oldIndex: oldIndex,
+          newIndex: newIndex,
+          sortedRows,
+          ids,
+          idField
+        }
+      });
+
+      // api
+      if (sortApi) await sortApi({
+        ids
+      });
+      setIsSorting(null);
+    }
+  }, /*#__PURE__*/_react.default.createElement(_sortable.SortableContext, {
+    items: rows,
+    strategy: _sortable.verticalListSortingStrategy
+  }, sortableItems));
+};
 
 // NOTE localFont is NextJS font object
 
@@ -147,19 +227,21 @@ const useScript = url => {
 };
 const useOnScreen = (ref, setActiveHeader, anchor) => {
   (0, _react.useEffect)(() => {
-    const observer = new IntersectionObserver(_ref => {
-      let [entry] = _ref;
+    const observer = new IntersectionObserver(_ref4 => {
+      let [entry] = _ref4;
+      if (!(typeof entry === "object" && entry !== null)) return;
       if (entry.isIntersecting === true) setActiveHeader(anchor);
     }, {
       rootMargin: "0px 0px -300px 0px"
     });
+    if (!(typeof ref.current === "object" && ref.current !== null)) return;
     observer.observe(ref.current);
     return () => {
       observer.disconnect();
     };
   }, [ref, anchor, setActiveHeader]);
 };
-const TocItem = _ref2 => {
+const TocItem = _ref5 => {
   let {
     id,
     heading,
@@ -172,29 +254,87 @@ const TocItem = _ref2 => {
     matched,
     visibleSections,
     localFont,
-    showMeter
-  } = _ref2;
-  const [isHovering, setIsHovering] = (0, _react.useState)(false);
+    showMeter,
+    sortCollection,
+    isSorting
+  } = _ref5;
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition
+  } = sortCollection ? (0, _sortable.useSortable)({
+    id
+  }) : {
+    attributes: {},
+    listeners: {},
+    setNodeRef: null,
+    transform: "",
+    transition: ""
+  };
+  const style = sortCollection ? {
+    transform: _utilities.CSS.Translate.toString(transform),
+    transition
+  } : {};
   const [isDeleting, setIsDeleting] = (0, _react.useState)(false);
-  return /*#__PURE__*/_react.default.createElement("li", {
-    className: `flex items-center relative ${isHovering && editCallback ? "bg-gray-100 rounded-md" : ""} ${editCallback ? "-ml-2 px-2" : ""}`,
+  const [isHovering, setIsHovering] = (0, _react.useState)(false);
+  const showStuff = editCallback && (isHovering && !isSorting || isSorting);
+  return /*#__PURE__*/_react.default.createElement("li", (0, _extends2.default)({
     onMouseEnter: () => setIsHovering(true),
-    onMouseLeave: () => setIsHovering(false)
-  }, showMeter && offset === 0 && /*#__PURE__*/_react.default.createElement("div", {
+    onMouseLeave: () => setIsHovering(false),
+    ref: setNodeRef,
+    style: style
+  }, attributes, {
+    className: `${isSorting ? "bg-gray-50 z-index-50" : ""} flex items-center relative ${editCallback ? "pt-2 first:pt-0 pl-4" : ""}`
+  }), showMeter && offset === 0 && /*#__PURE__*/_react.default.createElement("div", {
     className: "absolute h-1/2 w-4 top-0 -left-2 bg-white z-10"
   }), showMeter && offset === visibleSections.length - 1 && /*#__PURE__*/_react.default.createElement("div", {
     className: "absolute h-1/2 w-4 bottom-0 -left-2 bg-white z-10"
   }), showMeter && /*#__PURE__*/_react.default.createElement("div", {
     className: `${matched && offset <= activeUntil ? "bg-slate-700" : "bg-white"} shrink-0 rounded-full w-3 h-3 border-slate-800 border-2 -ml-[7px] z-20`
   }), /*#__PURE__*/_react.default.createElement("div", {
-    className: "flex flex-col"
+    className: "flex grow"
+  }, /*#__PURE__*/_react.default.createElement(_react2.Transition, {
+    show: showStuff,
+    className: "transition-all duration-500 overflow-hidden",
+    enterFrom: "transform scale-95 opacity-0 max-h-0",
+    enterTo: "transform scale-100 opacity-100 max-h-96",
+    leaveFrom: "transform scale-100 opacity-100 max-h-96",
+    leaveTo: "transform scale-95 opacity-0 max-h-0"
+  }, /*#__PURE__*/_react.default.createElement("div", (0, _extends2.default)({}, listeners, {
+    className: "h-6 w-6 inline-block text-slate-500 -ml-1 mr-1 shrink",
+    "aria-hidden": "true",
+    style: {
+      marginTop: "2px"
+    }
+  }), /*#__PURE__*/_react.default.createElement("svg", {
+    width: "24",
+    height: "24",
+    viewBox: "0 0 15 15",
+    fill: "none",
+    xmlns: "http://www.w3.org/2000/svg"
+  }, /*#__PURE__*/_react.default.createElement("path", {
+    d: "M7.1813 1.68179C7.35704 1.50605 7.64196 1.50605 7.8177 1.68179L10.3177 4.18179C10.4934 4.35753 10.4934 4.64245 10.3177 4.81819C10.142 4.99392 9.85704 4.99392 9.6813 4.81819L7.9495 3.08638L7.9495 11.9136L9.6813 10.1818C9.85704 10.0061 10.142 10.0061 10.3177 10.1818C10.4934 10.3575 10.4934 10.6424 10.3177 10.8182L7.8177 13.3182C7.73331 13.4026 7.61885 13.45 7.4995 13.45C7.38015 13.45 7.26569 13.4026 7.1813 13.3182L4.6813 10.8182C4.50557 10.6424 4.50557 10.3575 4.6813 10.1818C4.85704 10.0061 5.14196 10.0061 5.3177 10.1818L7.0495 11.9136L7.0495 3.08638L5.3177 4.81819C5.14196 4.99392 4.85704 4.99392 4.6813 4.81819C4.50557 4.64245 4.50557 4.35753 4.6813 4.18179L7.1813 1.68179Z",
+    fill: "currentColor",
+    fillRule: "evenodd",
+    clipRule: "evenodd"
+  })))), /*#__PURE__*/_react.default.createElement("div", {
+    className: "grow flex flex-col"
   }, /*#__PURE__*/_react.default.createElement(_reactScrollIntoView.default, {
-    selector: `#heading-${id}`
-  }, /*#__PURE__*/_react.default.createElement("div", {
-    href: `#heading-${id}`,
-    className: `${isHovering || matched && offset <= activeUntil ? "text-slate-800" : "text-gray-500"} ${localFont.className} grow ${showMeter ? "pl-4" : ""} pr-2 space-x-2 hover:text-gray-900 text-lg cursor-pointer ${showHeading ? "" : "opacity-50"}`
-  }, heading)), isHovering && editCallback && /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, /*#__PURE__*/_react.default.createElement("div", {
-    className: `${showMeter ? "pl-4" : ""} pr-2 flex gap-x-2 mt-1 mb-2`
+    selector: `#heading-${id}`,
+    className: "flex"
+  }, /*#__PURE__*/_react.default.createElement("span", {
+    className: `${editCallback ? "hover:underline" : ""} ${matched && offset <= activeUntil ? "text-slate-800" : editCallback ? "text-slate-800" : "text-gray-500"} ${localFont.className} grow ${showMeter ? "pl-4" : ""} pr-2 space-x-2 hover:text-gray-900 text-lg cursor-pointer ${showHeading ? "" : "opacity-50"}`
+  }, heading)), /*#__PURE__*/_react.default.createElement(_react2.Transition, {
+    show: showStuff,
+    className: "transition-all duration-500 overflow-hidden",
+    enterFrom: "transform scale-95 opacity-0 max-h-0",
+    enterTo: "transform scale-100 opacity-100 max-h-96",
+    leaveFrom: "transform scale-100 opacity-100 max-h-96",
+    leaveTo: "transform scale-95 opacity-0 max-h-0"
+  }, /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("div", {
+    className: `${showMeter ? "pl-4" : ""} flex gap-x-2`
   }, /*#__PURE__*/_react.default.createElement("span", {
     onClick: () => editCallback(id),
     className: buttonClasses
@@ -217,74 +357,90 @@ const TocItem = _ref2 => {
       });
     },
     className: "cursor-pointer rounded-md bg-red-600 px-2.5 py-1.5 text-base font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
-  }, "Delete"))))));
+  }, "Delete"))))))));
 };
-const TableOfContents = _ref3 => {
+const TableOfContents = _ref6 => {
   let {
     sections,
     activeHeader,
     localFont,
     showInvisibleHeaders,
-    showMeter
-  } = _ref3;
-  const visibleSections = showInvisibleHeaders ? sections : sections.filter(_ref4 => {
+    showMeter,
+    tocHeading = "Contents",
+    sortApi = () => {},
+    dispatch,
+    sortCollection,
+    tocGridClasses = "col-span-12 md:col-span-1"
+  } = _ref6;
+  const [isSorting, setIsSorting] = (0, _react.useState)(null);
+  const visibleSections = showInvisibleHeaders ? sections : sections.filter(_ref7 => {
     let {
       show_heading: showHeading
-    } = _ref4;
+    } = _ref7;
     return showHeading === true;
   });
-  const [matched, activeUntil] = activeHeader === null ? [false, -1] : visibleSections.reduce((_ref5, _ref6, offset) => {
-    let [isMatched, matchedOffset] = _ref5;
+  const [matched, activeUntil] = activeHeader === null ? [false, -1] : visibleSections.reduce((_ref8, _ref9, offset) => {
+    let [isMatched, matchedOffset] = _ref8;
     let {
       id
-    } = _ref6;
+    } = _ref9;
     if (isMatched) return [isMatched, matchedOffset];
     if (`heading-${id}` === activeHeader) return [true, offset];
     return [false, -1];
   }, [false, -1]);
   return /*#__PURE__*/_react.default.createElement("div", {
-    className: "col-span-12 md:col-span-1"
+    className: tocGridClasses
   }, /*#__PURE__*/_react.default.createElement("div", {
-    className: "sticky top-[95px] hidden lg:block"
-  }, /*#__PURE__*/_react.default.createElement("h3", {
+    className: `sticky ${sortCollection ? "top-0" : "top-[95px]"} hidden lg:block`
+  }, tocHeading && /*#__PURE__*/_react.default.createElement("h3", {
     className: `${localFont.className} -ml-1 mb-3 text-xl font-semibold text-slate-700`
-  }, "Contents"), /*#__PURE__*/_react.default.createElement("ul", {
-    className: `mt-2 lg:mt-4 lg:space-y-4 ${showMeter ? "border-l-2 border-slate-700" : ""}`
-  }, visibleSections.length > 0 && visibleSections.map((_ref7, offset) => {
-    let {
-      id,
-      heading,
-      show_heading: showHeading,
-      editCallback,
-      deleteCallback,
-      buttonClasses
-    } = _ref7;
-    return /*#__PURE__*/_react.default.createElement(TocItem, {
-      matched: matched,
-      activeUntil: activeUntil,
-      key: id,
-      id: id,
-      heading: heading,
-      showHeading: showHeading,
-      offset: offset,
-      visibleSections: visibleSections,
-      localFont: localFont,
-      editCallback: editCallback,
-      deleteCallback: deleteCallback,
-      buttonClasses: buttonClasses,
-      showMeter: showMeter
-    });
+  }, tocHeading), /*#__PURE__*/_react.default.createElement("ul", {
+    className: `${sortCollection ? "" : "mt-2"} ${tocHeading ? "lg:mt-4" : ""} ${sortCollection ? "lg:space-y-2 grid grid-cols-1 divide-y" : "lg:space-y-4"} ${showMeter ? "border-l-2 border-slate-700" : ""}`
+  }, /*#__PURE__*/_react.default.createElement(SortableList, {
+    setIsSorting: setIsSorting,
+    rows: visibleSections,
+    sortableItems: visibleSections.map((_ref10, offset) => {
+      let {
+        id,
+        heading,
+        show_heading: showHeading,
+        editCallback,
+        deleteCallback,
+        buttonClasses
+      } = _ref10;
+      return /*#__PURE__*/_react.default.createElement(TocItem, {
+        matched: matched,
+        activeUntil: activeUntil,
+        key: id,
+        id: id,
+        heading: heading,
+        showHeading: showHeading,
+        offset: offset,
+        visibleSections: visibleSections,
+        localFont: localFont,
+        editCallback: editCallback,
+        deleteCallback: deleteCallback,
+        buttonClasses: buttonClasses,
+        showMeter: showMeter,
+        sortCollection: sortCollection,
+        isSorting: id === isSorting
+      });
+    }),
+    collection: sortCollection,
+    dispatch: dispatch,
+    sortApi: sortApi
   }))));
 };
-const Heading = _ref8 => {
+const Heading = _ref11 => {
   let {
     title,
     level = 2,
     anchor,
     setActiveHeader,
     localFont,
-    textColorTheme = "none"
-  } = _ref8;
+    textColorTheme = "none",
+    showCopyLink = true
+  } = _ref11;
   const ref = (0, _react.useRef)();
   useOnScreen(ref, setActiveHeader, anchor);
   if (level === 1) return /*#__PURE__*/_react.default.createElement("h1", {
@@ -293,6 +449,7 @@ const Heading = _ref8 => {
   }, title);
   if (level === 2) return /*#__PURE__*/_react.default.createElement("h2", {
     onClick: () => {
+      if (!showCopyLink) return;
       (0, _copyToClipboard.default)(window.location.origin + window.location.pathname + `#${anchor}`);
       _reactHotToast.default.success("Link copied to clipboard", {
         position: "bottom-center"
@@ -300,7 +457,7 @@ const Heading = _ref8 => {
     },
     ref: ref,
     className: `${localFont.className} cursor-pointer text-2xl font-semibold xl:mb-2 xl:text-3xl flex items-center ${textColorThemes[textColorTheme]}`
-  }, /*#__PURE__*/_react.default.createElement("div", null, title), /*#__PURE__*/_react.default.createElement("div", {
+  }, /*#__PURE__*/_react.default.createElement("div", null, title), showCopyLink && /*#__PURE__*/_react.default.createElement("div", {
     className: "p-1 ml-2"
   }, /*#__PURE__*/_react.default.createElement("svg", {
     xmlns: "http://www.w3.org/2000/svg",
@@ -328,11 +485,11 @@ const Heading = _ref8 => {
   }, title);
   return null;
 };
-const TextLeft = _ref9 => {
+const TextLeft = _ref12 => {
   let {
     content,
     textColorTheme = "none"
-  } = _ref9;
+  } = _ref12;
   return /*#__PURE__*/_react.default.createElement("div", {
     className: `leading-loose prose lg:prose-lg max-w-none ${textColorThemes[textColorTheme]}`,
     dangerouslySetInnerHTML: {
@@ -340,11 +497,11 @@ const TextLeft = _ref9 => {
     }
   });
 };
-const TextRight = _ref10 => {
+const TextRight = _ref13 => {
   let {
     content,
     textColorTheme = "none"
-  } = _ref10;
+  } = _ref13;
   return /*#__PURE__*/_react.default.createElement("div", {
     className: `text-right leading-loose prose lg:prose-lg max-w-none ${textColorThemes[textColorTheme]}`,
     dangerouslySetInnerHTML: {
@@ -352,11 +509,11 @@ const TextRight = _ref10 => {
     }
   });
 };
-const TextCenter = _ref11 => {
+const TextCenter = _ref14 => {
   let {
     content,
     textColorTheme = "none"
-  } = _ref11;
+  } = _ref14;
   return /*#__PURE__*/_react.default.createElement("div", {
     className: `text-center leading-loose prose lg:prose-lg max-w-none ${textColorThemes[textColorTheme]}`,
     dangerouslySetInnerHTML: {
@@ -364,13 +521,13 @@ const TextCenter = _ref11 => {
     }
   });
 };
-const ImageOnLeft = _ref12 => {
+const ImageOnLeft = _ref15 => {
   let {
     content,
     imageUrl,
     colSpanContent = "col-span-12 md:col-span-6",
     colSpanImage = "col-span-12 md:col-span-6"
-  } = _ref12;
+  } = _ref15;
   return /*#__PURE__*/_react.default.createElement("div", {
     className: "grid grid-cols-12 gap-4"
   }, /*#__PURE__*/_react.default.createElement("div", {
@@ -385,14 +542,14 @@ const ImageOnLeft = _ref12 => {
     }
   }));
 };
-const ImageOnRight = _ref13 => {
+const ImageOnRight = _ref16 => {
   let {
     content,
     imageUrl,
     colSpanContent = "w-full",
     colSpanImage = "w-full md:w-1/2",
     ctaContent = null
-  } = _ref13;
+  } = _ref16;
   return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("img", {
     src: imageUrl,
     alt: "",
@@ -404,12 +561,12 @@ const ImageOnRight = _ref13 => {
     }
   }), ctaContent);
 };
-const ImageCenter = _ref14 => {
+const ImageCenter = _ref17 => {
   let {
     imageUrl,
     height,
     width
-  } = _ref14;
+  } = _ref17;
   return /*#__PURE__*/_react.default.createElement("div", {
     className: "flex justify-center"
   }, /*#__PURE__*/_react.default.createElement("img", {
@@ -419,22 +576,22 @@ const ImageCenter = _ref14 => {
     alt: ""
   }));
 };
-const ImageCenterFull = _ref15 => {
+const ImageCenterFull = _ref18 => {
   let {
     imageUrl
-  } = _ref15;
+  } = _ref18;
   return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("img", {
     className: "object-fill",
     src: imageUrl,
     alt: ""
   }));
 };
-const ImageLeft = _ref16 => {
+const ImageLeft = _ref19 => {
   let {
     imageUrl,
     height,
     width
-  } = _ref16;
+  } = _ref19;
   return /*#__PURE__*/_react.default.createElement("div", {
     className: "flex justify-start"
   }, /*#__PURE__*/_react.default.createElement("img", {
@@ -444,12 +601,12 @@ const ImageLeft = _ref16 => {
     alt: ""
   }));
 };
-const ImageRight = _ref17 => {
+const ImageRight = _ref20 => {
   let {
     imageUrl,
     height,
     width
-  } = _ref17;
+  } = _ref20;
   return /*#__PURE__*/_react.default.createElement("div", {
     className: "flex justify-end"
   }, /*#__PURE__*/_react.default.createElement("img", {
@@ -459,14 +616,14 @@ const ImageRight = _ref17 => {
     alt: ""
   }));
 };
-const Section = _ref18 => {
+const Section = _ref21 => {
   let {
     sectionOut,
     id,
     headingOut,
     scripts,
     backgroundColorTheme = "none"
-  } = _ref18;
+  } = _ref21;
   useScript(scripts?.[0] || false);
   return /*#__PURE__*/_react.default.createElement("section", {
     key: id,
@@ -479,33 +636,33 @@ const Section = _ref18 => {
     name: `heading-${id}`
   })), headingOut, sectionOut);
 };
-const CTAButton = _ref19 => {
+const CTAButton = _ref22 => {
   let {
     label,
     url,
     buttonColorTheme = "indigo"
-  } = _ref19;
+  } = _ref22;
   return /*#__PURE__*/_react.default.createElement("a", {
     href: url,
     className: `${buttonColorThemes[buttonColorTheme]} rounded-md px-3.5 py-2.5 text-base font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2`
   }, label);
 };
-const CTALink = _ref20 => {
+const CTALink = _ref23 => {
   let {
     label,
     url
-  } = _ref20;
+  } = _ref23;
   return /*#__PURE__*/_react.default.createElement("a", {
     href: url,
     className: "text-base font-semibold leading-6 text-gray-900 hover:underline"
   }, label);
 };
-const CTAForm = _ref21 => {
+const CTAForm = _ref24 => {
   let {
     iframeUrl,
     type,
     formOrientation
-  } = _ref21;
+  } = _ref24;
   let classes = "";
   switch (`${type}__${formOrientation}`) {
     case "form-email__vertical":
@@ -533,7 +690,7 @@ const CTAForm = _ref21 => {
     sandbox: "allow-top-navigation allow-scripts allow-forms allow-same-origin"
   });
 };
-const CTASection = _ref22 => {
+const CTASection = _ref25 => {
   let {
     id,
     image,
@@ -541,7 +698,7 @@ const CTASection = _ref22 => {
     content,
     buttonColorTheme,
     textColorTheme
-  } = _ref22;
+  } = _ref25;
   const {
     cta_primary: primaryLabel,
     cta_primary_type: primaryType,
@@ -571,13 +728,13 @@ const CTASection = _ref22 => {
     textColorTheme: textColorTheme
   }), /*#__PURE__*/_react.default.createElement("div", {
     className: "mt-4 flex items-center gap-x-6 rounded-lg"
-  }, ctas.map(_ref23 => {
+  }, ctas.map(_ref26 => {
     let {
       id,
       type,
       label,
       url
-    } = _ref23;
+    } = _ref26;
     if (type === "button") return /*#__PURE__*/_react.default.createElement(CTAButton, {
       key: id,
       label: label,
@@ -608,15 +765,16 @@ const CTASection = _ref22 => {
   });
   return /*#__PURE__*/_react.default.createElement("div", null, ctaContent);
 };
-const ContentSections = _ref24 => {
+const ContentSections = _ref27 => {
   let {
+    showCopyLink = true,
     sections,
     colSpanContent,
     colSpanImage,
     localFont,
     setActiveHeader = () => {}
-  } = _ref24;
-  return sections.map(_ref25 => {
+  } = _ref27;
+  return sections.map(_ref28 => {
     let {
       content,
       content_type: contentType,
@@ -631,7 +789,7 @@ const ContentSections = _ref24 => {
       textColorTheme,
       headingColorTheme,
       buttonColorTheme
-    } = _ref25;
+    } = _ref28;
     const imageUrl = image && "url" in image ? image["url"] : null;
     const imageHeight = image && "height" in image ? image["height"] : null;
     const imageWidth = image && "width" in image ? image["width"] : null;
@@ -641,7 +799,8 @@ const ContentSections = _ref24 => {
       anchor: `heading-${id}`,
       setActiveHeader: setActiveHeader,
       localFont: localFont,
-      textColorTheme: headingColorTheme
+      textColorTheme: headingColorTheme,
+      showCopyLink: showCopyLink
     });
     let sectionOut;
     switch (contentType) {
@@ -737,25 +896,39 @@ const ContentSections = _ref24 => {
   });
 };
 exports.ContentSections = ContentSections;
-const DoContentSections = _ref26 => {
+const DoContentSections = _ref29 => {
   let {
     sections,
     localFont,
     showInvisibleHeaders = false,
-    showMeter = true
-  } = _ref26;
+    showMeter = true,
+    showCopyLink = true,
+    tocHeading = "Contents",
+    sortApi = () => {},
+    dispatch,
+    sortCollection,
+    outerGridClasses = "grid grid-cols-4 gap-0 lg:gap-6",
+    tocGridClasses = "col-span-12 md:col-span-1",
+    mainGridClasses = "col-span-4 lg:col-span-3"
+  } = _ref29;
   const [activeHeader, setActiveHeader] = (0, _react.useState)(null);
   return /*#__PURE__*/_react.default.createElement("div", {
-    className: "grid grid-cols-4 gap-0 lg:gap-6"
+    className: outerGridClasses
   }, /*#__PURE__*/_react.default.createElement(TableOfContents, {
     sections: sections,
     activeHeader: activeHeader,
     localFont: localFont,
     showInvisibleHeaders: showInvisibleHeaders,
-    showMeter: showMeter
+    showMeter: showMeter,
+    tocHeading: tocHeading,
+    sortApi: sortApi,
+    dispatch: dispatch,
+    sortCollection: sortCollection,
+    tocGridClasses: tocGridClasses
   }), /*#__PURE__*/_react.default.createElement("div", {
-    className: "col-span-4 lg:col-span-3"
+    className: mainGridClasses
   }, /*#__PURE__*/_react.default.createElement(ContentSections, {
+    showCopyLink: showCopyLink,
     sections: sections,
     setActiveHeader: setActiveHeader,
     localFont: localFont
