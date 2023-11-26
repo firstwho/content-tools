@@ -229,10 +229,12 @@ const useOnScreen = (ref, setActiveHeader, anchor) => {
   (0, _react.useEffect)(() => {
     const observer = new IntersectionObserver(_ref4 => {
       let [entry] = _ref4;
+      if (!(typeof entry === "object" && entry !== null)) return;
       if (entry.isIntersecting === true) setActiveHeader(anchor);
     }, {
       rootMargin: "0px 0px -300px 0px"
     });
+    if (!(typeof ref.current === "object" && ref.current !== null)) return;
     observer.observe(ref.current);
     return () => {
       observer.disconnect();
