@@ -296,7 +296,7 @@ const TocItem = _ref5 => {
   }), /*#__PURE__*/_react.default.createElement("div", {
     className: "flex grow"
   }, /*#__PURE__*/_react.default.createElement(_react2.Transition, {
-    show: showStuff,
+    show: showStuff || false,
     className: "transition-all duration-500 overflow-hidden",
     enterFrom: "transform scale-95 opacity-0 max-h-0",
     enterTo: "transform scale-100 opacity-100 max-h-96",
@@ -327,7 +327,7 @@ const TocItem = _ref5 => {
   }, /*#__PURE__*/_react.default.createElement("span", {
     className: `${editCallback ? "hover:underline" : ""} ${matched && offset <= activeUntil ? "text-slate-800" : editCallback ? "text-slate-800" : "text-gray-500"} ${localFont.className} grow ${showMeter ? "pl-4" : ""} pr-2 space-x-2 hover:text-gray-900 text-lg cursor-pointer ${showHeading ? "" : "opacity-50"}`
   }, heading)), /*#__PURE__*/_react.default.createElement(_react2.Transition, {
-    show: showStuff,
+    show: showStuff || false,
     className: "transition-all duration-500 overflow-hidden",
     enterFrom: "transform scale-95 opacity-0 max-h-0",
     enterTo: "transform scale-100 opacity-100 max-h-96",

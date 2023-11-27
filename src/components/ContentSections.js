@@ -327,7 +327,7 @@ const TocItem = ({
       )}
       <div className="flex grow">
         <Transition
-          show={showStuff}
+          show={showStuff || false}
           className="transition-all duration-500 overflow-hidden"
           enterFrom="transform scale-95 opacity-0 max-h-0"
           enterTo="transform scale-100 opacity-100 max-h-96"
@@ -377,7 +377,7 @@ const TocItem = ({
           </ScrollTo>
 
           <Transition
-            show={showStuff}
+            show={showStuff || false}
             className="transition-all duration-500 overflow-hidden"
             enterFrom="transform scale-95 opacity-0 max-h-0"
             enterTo="transform scale-100 opacity-100 max-h-96"
