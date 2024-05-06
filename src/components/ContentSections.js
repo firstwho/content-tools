@@ -1034,9 +1034,9 @@ export const DoContentSections = ({
   sortApi = () => {},
   dispatch,
   sortCollection,
-  outerGridClasses = "grid grid-cols-4 gap-0 lg:gap-6",
-  tocGridClasses = "col-span-12 md:col-span-1",
-  mainGridClasses = "col-span-4 lg:col-span-3"
+  outerGridClasses = "grid grid-cols-4 gap-0 md:gap-6",
+  tocGridClasses = "col-span-4 md:col-span-1",
+  mainGridClasses = "col-span-4 md:col-span-3"
 }) => {
   const [activeHeader, setActiveHeader] = useState(null);
 
