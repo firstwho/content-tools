@@ -613,23 +613,35 @@ const Heading = ({
   return null;
 };
 
-const TextLeft = ({ content, textColorTheme = "none" }) => (
+const TextLeft = ({ content, textColorTheme = "none", contentFont = {} }) => (
   <div
-    className={`leading-loose prose lg:prose-lg max-w-none ${textColorThemes[textColorTheme]}`}
+    className={`${
+      contentFont?.className || ""
+    } leading-loose prose lg:prose-lg max-w-none ${
+      textColorThemes[textColorTheme]
+    }`}
     dangerouslySetInnerHTML={{ __html: content }}
   />
 );
 
-const TextRight = ({ content, textColorTheme = "none" }) => (
+const TextRight = ({ content, textColorTheme = "none", contentFont = {} }) => (
   <div
-    className={`text-right leading-loose prose lg:prose-lg max-w-none ${textColorThemes[textColorTheme]}`}
+    className={`${
+      contentFont?.className || ""
+    } text-right leading-loose prose lg:prose-lg max-w-none ${
+      textColorThemes[textColorTheme]
+    }`}
     dangerouslySetInnerHTML={{ __html: content }}
   />
 );
 
-const TextCenter = ({ content, textColorTheme = "none" }) => (
+const TextCenter = ({ content, textColorTheme = "none", contentFont = {} }) => (
   <div
-    className={`text-center leading-loose prose lg:prose-lg max-w-none ${textColorThemes[textColorTheme]}`}
+    className={`${
+      contentFont?.className || ""
+    } text-center leading-loose prose lg:prose-lg max-w-none ${
+      textColorThemes[textColorTheme]
+    }`}
     dangerouslySetInnerHTML={{ __html: content }}
   />
 );
@@ -638,14 +650,17 @@ const ImageOnLeft = ({
   content,
   imageUrl,
   colSpanContent = "col-span-12 md:col-span-6",
-  colSpanImage = "col-span-12 md:col-span-6"
+  colSpanImage = "col-span-12 md:col-span-6",
+  contentFont = {}
 }) => (
   <div className="grid grid-cols-12 gap-4">
     <div className={colSpanImage}>
       <img src={imageUrl} alt="" />
     </div>
     <div
-      className={`${colSpanContent} leading-loose prose lg:prose-lg max-w-none`}
+      className={`${colSpanContent} ${
+        contentFont?.className || ""
+      } leading-loose prose lg:prose-lg max-w-none`}
       dangerouslySetInnerHTML={{ __html: content }}
     />
   </div>
@@ -656,7 +671,8 @@ const ImageOnRight = ({
   imageUrl,
   colSpanContent = "w-full",
   colSpanImage = "w-full md:w-1/2",
-  ctaContent = null
+  ctaContent = null,
+  contentFont = {}
 }) => (
   <div>
     <img
@@ -665,7 +681,9 @@ const ImageOnRight = ({
       className={`${colSpanImage} float-none md:float-right ml-0 md:ml-8 mb-4`}
     />
     <div
-      className={`${colSpanContent} leading-loose prose lg:prose-lg max-w-none`}
+      className={`${colSpanContent} ${
+        contentFont?.className || ""
+      } leading-loose prose lg:prose-lg max-w-none`}
       dangerouslySetInnerHTML={{ __html: content }}
     />
     {ctaContent}
@@ -874,6 +892,8 @@ export const ContentSections = ({
   colSpanContent,
   colSpanImage,
   localFont,
+  headingFont,
+  contentFont,
   setActiveHeader = () => {}
 }) =>
   sections.map(
@@ -903,7 +923,7 @@ export const ContentSections = ({
             level={headingLevel}
             anchor={`heading-${id}`}
             setActiveHeader={setActiveHeader}
-            localFont={localFont}
+            localFont={headingFont || localFont}
             textColorTheme={headingColorTheme}
             showCopyLink={showCopyLink}
           />
@@ -915,6 +935,7 @@ export const ContentSections = ({
             <TextLeft
               content={content}
               textColorTheme={textColorTheme || "none"}
+              contentFont={contentFont || localFont}
             />
           );
           break;
@@ -923,6 +944,7 @@ export const ContentSections = ({
             <TextRight
               content={content}
               textColorTheme={textColorTheme || "none"}
+              contentFont={contentFont || localFont}
             />
           );
           break;
@@ -931,6 +953,7 @@ export const ContentSections = ({
             <TextCenter
               content={content}
               textColorTheme={textColorTheme || "none"}
+              contentFont={contentFont || localFont}
             />
           );
           break;
@@ -941,6 +964,7 @@ export const ContentSections = ({
               imageUrl={imageUrl}
               colSpanContent={colSpanContent}
               colSpanImage={colSpanImage}
+              contentFont={contentFont || localFont}
             />
           );
           break;
@@ -951,6 +975,7 @@ export const ContentSections = ({
               imageUrl={imageUrl}
               colSpanContent={colSpanContent}
               colSpanImage={colSpanImage}
+              contentFont={contentFont || localFont}
             />
           );
           break;
@@ -1002,6 +1027,7 @@ export const ContentSections = ({
               content={content}
               buttonColorTheme={buttonColorTheme}
               textColorTheme={textColorTheme}
+              contentFont={contentFont || localFont}
             />
           );
           break;
@@ -1027,6 +1053,9 @@ export const ContentSections = ({
 export const DoContentSections = ({
   sections,
   localFont,
+  tocFont,
+  headingFont,
+  contentFont,
   showInvisibleHeaders = false,
   showMeter = true,
   showCopyLink = true,
@@ -1045,7 +1074,7 @@ export const DoContentSections = ({
       <TableOfContents
         sections={sections}
         activeHeader={activeHeader}
-        localFont={localFont}
+        localFont={tocFont || localFont}
         showInvisibleHeaders={showInvisibleHeaders}
         showMeter={showMeter}
         tocHeading={tocHeading}
@@ -1060,6 +1089,8 @@ export const DoContentSections = ({
           sections={sections}
           setActiveHeader={setActiveHeader}
           localFont={localFont}
+          headingFont={headingFont}
+          contentFont={contentFont}
         />
       </div>
     </div>

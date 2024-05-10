@@ -488,10 +488,11 @@ const Heading = _ref11 => {
 const TextLeft = _ref12 => {
   let {
     content,
-    textColorTheme = "none"
+    textColorTheme = "none",
+    contentFont = {}
   } = _ref12;
   return /*#__PURE__*/_react.default.createElement("div", {
-    className: `leading-loose prose lg:prose-lg max-w-none ${textColorThemes[textColorTheme]}`,
+    className: `${contentFont?.className || ""} leading-loose prose lg:prose-lg max-w-none ${textColorThemes[textColorTheme]}`,
     dangerouslySetInnerHTML: {
       __html: content
     }
@@ -500,10 +501,11 @@ const TextLeft = _ref12 => {
 const TextRight = _ref13 => {
   let {
     content,
-    textColorTheme = "none"
+    textColorTheme = "none",
+    contentFont = {}
   } = _ref13;
   return /*#__PURE__*/_react.default.createElement("div", {
-    className: `text-right leading-loose prose lg:prose-lg max-w-none ${textColorThemes[textColorTheme]}`,
+    className: `${contentFont?.className || ""} text-right leading-loose prose lg:prose-lg max-w-none ${textColorThemes[textColorTheme]}`,
     dangerouslySetInnerHTML: {
       __html: content
     }
@@ -512,10 +514,11 @@ const TextRight = _ref13 => {
 const TextCenter = _ref14 => {
   let {
     content,
-    textColorTheme = "none"
+    textColorTheme = "none",
+    contentFont = {}
   } = _ref14;
   return /*#__PURE__*/_react.default.createElement("div", {
-    className: `text-center leading-loose prose lg:prose-lg max-w-none ${textColorThemes[textColorTheme]}`,
+    className: `${contentFont?.className || ""} text-center leading-loose prose lg:prose-lg max-w-none ${textColorThemes[textColorTheme]}`,
     dangerouslySetInnerHTML: {
       __html: content
     }
@@ -526,7 +529,8 @@ const ImageOnLeft = _ref15 => {
     content,
     imageUrl,
     colSpanContent = "col-span-12 md:col-span-6",
-    colSpanImage = "col-span-12 md:col-span-6"
+    colSpanImage = "col-span-12 md:col-span-6",
+    contentFont = {}
   } = _ref15;
   return /*#__PURE__*/_react.default.createElement("div", {
     className: "grid grid-cols-12 gap-4"
@@ -536,7 +540,7 @@ const ImageOnLeft = _ref15 => {
     src: imageUrl,
     alt: ""
   })), /*#__PURE__*/_react.default.createElement("div", {
-    className: `${colSpanContent} leading-loose prose lg:prose-lg max-w-none`,
+    className: `${colSpanContent} ${contentFont?.className || ""} leading-loose prose lg:prose-lg max-w-none`,
     dangerouslySetInnerHTML: {
       __html: content
     }
@@ -548,14 +552,15 @@ const ImageOnRight = _ref16 => {
     imageUrl,
     colSpanContent = "w-full",
     colSpanImage = "w-full md:w-1/2",
-    ctaContent = null
+    ctaContent = null,
+    contentFont = {}
   } = _ref16;
   return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("img", {
     src: imageUrl,
     alt: "",
     className: `${colSpanImage} float-none md:float-right ml-0 md:ml-8 mb-4`
   }), /*#__PURE__*/_react.default.createElement("div", {
-    className: `${colSpanContent} leading-loose prose lg:prose-lg max-w-none`,
+    className: `${colSpanContent} ${contentFont?.className || ""} leading-loose prose lg:prose-lg max-w-none`,
     dangerouslySetInnerHTML: {
       __html: content
     }
@@ -772,6 +777,8 @@ const ContentSections = _ref27 => {
     colSpanContent,
     colSpanImage,
     localFont,
+    headingFont,
+    contentFont,
     setActiveHeader = () => {}
   } = _ref27;
   return sections.map(_ref28 => {
@@ -798,7 +805,7 @@ const ContentSections = _ref27 => {
       level: headingLevel,
       anchor: `heading-${id}`,
       setActiveHeader: setActiveHeader,
-      localFont: localFont,
+      localFont: headingFont || localFont,
       textColorTheme: headingColorTheme,
       showCopyLink: showCopyLink
     });
@@ -807,19 +814,22 @@ const ContentSections = _ref27 => {
       case CONTENT_TYPE_TEXT_LEFT:
         sectionOut = /*#__PURE__*/_react.default.createElement(TextLeft, {
           content: content,
-          textColorTheme: textColorTheme || "none"
+          textColorTheme: textColorTheme || "none",
+          contentFont: contentFont || localFont
         });
         break;
       case CONTENT_TYPE_TEXT_RIGHT:
         sectionOut = /*#__PURE__*/_react.default.createElement(TextRight, {
           content: content,
-          textColorTheme: textColorTheme || "none"
+          textColorTheme: textColorTheme || "none",
+          contentFont: contentFont || localFont
         });
         break;
       case CONTENT_TYPE_TEXT_CENTER:
         sectionOut = /*#__PURE__*/_react.default.createElement(TextCenter, {
           content: content,
-          textColorTheme: textColorTheme || "none"
+          textColorTheme: textColorTheme || "none",
+          contentFont: contentFont || localFont
         });
         break;
       case CONTENT_TYPE_TEXT_IMAGE_LEFT:
@@ -827,7 +837,8 @@ const ContentSections = _ref27 => {
           content: content,
           imageUrl: imageUrl,
           colSpanContent: colSpanContent,
-          colSpanImage: colSpanImage
+          colSpanImage: colSpanImage,
+          contentFont: contentFont || localFont
         });
         break;
       case CONTENT_TYPE_TEXT_IMAGE_RIGHT:
@@ -835,7 +846,8 @@ const ContentSections = _ref27 => {
           content: content,
           imageUrl: imageUrl,
           colSpanContent: colSpanContent,
-          colSpanImage: colSpanImage
+          colSpanImage: colSpanImage,
+          contentFont: contentFont || localFont
         });
         break;
       case CONTENT_TYPE_IMAGE_LEFT:
@@ -878,7 +890,8 @@ const ContentSections = _ref27 => {
           ctaData: ctaData,
           content: content,
           buttonColorTheme: buttonColorTheme,
-          textColorTheme: textColorTheme
+          textColorTheme: textColorTheme,
+          contentFont: contentFont || localFont
         });
         break;
       default:
@@ -900,6 +913,9 @@ const DoContentSections = _ref29 => {
   let {
     sections,
     localFont,
+    tocFont,
+    headingFont,
+    contentFont,
     showInvisibleHeaders = false,
     showMeter = true,
     showCopyLink = true,
@@ -917,7 +933,7 @@ const DoContentSections = _ref29 => {
   }, /*#__PURE__*/_react.default.createElement(TableOfContents, {
     sections: sections,
     activeHeader: activeHeader,
-    localFont: localFont,
+    localFont: tocFont || localFont,
     showInvisibleHeaders: showInvisibleHeaders,
     showMeter: showMeter,
     tocHeading: tocHeading,
@@ -931,7 +947,9 @@ const DoContentSections = _ref29 => {
     showCopyLink: showCopyLink,
     sections: sections,
     setActiveHeader: setActiveHeader,
-    localFont: localFont
+    localFont: localFont,
+    headingFont: headingFont,
+    contentFont: contentFont
   })));
 };
 exports.DoContentSections = DoContentSections;
