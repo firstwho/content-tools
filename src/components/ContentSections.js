@@ -274,7 +274,9 @@ const TocItem = ({
   localFont,
   showMeter,
   sortCollection,
-  isSorting
+  isSorting,
+  tocItemClasses,
+  tocItemMatchedClasses
 }) => {
   const { attributes, listeners, setNodeRef, transform, transition } =
     sortCollection
@@ -298,6 +300,24 @@ const TocItem = ({
   const [isHovering, setIsHovering] = useState(false);
 
   const showStuff = editCallback && ((isHovering && !isSorting) || isSorting);
+
+  const itemClasses = tocItemClasses
+    ? `${localFont.className} grow space-x-2 cursor-pointer ${tocItemClasses} ${
+        matched && offset <= activeUntil
+          ? tocItemMatchedClasses
+          : "text-gray-500"
+      }`
+    : `${editCallback ? "hover:underline" : ""} ${
+        matched && offset <= activeUntil
+          ? "text-slate-800"
+          : editCallback
+          ? "text-slate-800"
+          : "text-gray-500"
+      } ${localFont.className} grow ${
+        showMeter ? "pl-4" : ""
+      } pr-2 space-x-2 hover:text-gray-900 text-lg cursor-pointer ${
+        showHeading ? "" : "opacity-50"
+      }`;
 
   return (
     <li
@@ -359,21 +379,7 @@ const TocItem = ({
 
         <div className="grow flex flex-col">
           <ScrollTo selector={`#heading-${id}`} className="flex">
-            <span
-              className={`${editCallback ? "hover:underline" : ""} ${
-                matched && offset <= activeUntil
-                  ? "text-slate-800"
-                  : editCallback
-                  ? "text-slate-800"
-                  : "text-gray-500"
-              } ${localFont.className} grow ${
-                showMeter ? "pl-4" : ""
-              } pr-2 space-x-2 hover:text-gray-900 text-lg cursor-pointer ${
-                showHeading ? "" : "opacity-50"
-              }`}
-            >
-              {heading}
-            </span>
+            <span className={itemClasses}>{heading}</span>
           </ScrollTo>
 
           <Transition
@@ -440,7 +446,9 @@ const TableOfContents = ({
   sortApi = () => {},
   dispatch,
   sortCollection,
-  tocGridClasses = "col-span-12 md:col-span-1"
+  tocGridClasses = "col-span-12 md:col-span-1",
+  tocItemClasses,
+  tocItemMatchedClasses
 }) => {
   const [isSorting, setIsSorting] = useState(null);
 
@@ -513,6 +521,8 @@ const TableOfContents = ({
                   showMeter={showMeter}
                   sortCollection={sortCollection}
                   isSorting={id === isSorting}
+                  tocItemClasses={tocItemClasses}
+                  tocItemMatchedClasses={tocItemMatchedClasses}
                 />
               )
             )}
@@ -533,7 +543,8 @@ const Heading = ({
   setActiveHeader,
   localFont,
   textColorTheme = "none",
-  showCopyLink = true
+  showCopyLink = true,
+  headingClasses = "text-2xl font-semibold xl:mb-2 xl:text-3xl"
 }) => {
   const ref = useRef();
   useOnScreen(ref, setActiveHeader, anchor);
@@ -560,7 +571,7 @@ const Heading = ({
           });
         }}
         ref={ref}
-        className={`${localFont.className} cursor-pointer text-2xl font-semibold xl:mb-2 xl:text-3xl flex items-center ${textColorThemes[textColorTheme]}`}
+        className={`${localFont.className} cursor-pointer ${headingClasses} flex items-center ${textColorThemes[textColorTheme]}`}
       >
         <div>{title}</div>
         {showCopyLink && (
@@ -894,6 +905,7 @@ export const ContentSections = ({
   localFont,
   headingFont,
   contentFont,
+  headingClasses,
   setActiveHeader = () => {}
 }) =>
   sections.map(
@@ -926,6 +938,7 @@ export const ContentSections = ({
             localFont={headingFont || localFont}
             textColorTheme={headingColorTheme}
             showCopyLink={showCopyLink}
+            headingClasses={headingClasses}
           />
         );
       let sectionOut;
@@ -1065,7 +1078,10 @@ export const DoContentSections = ({
   sortCollection,
   outerGridClasses = "grid grid-cols-4 gap-0 md:gap-6",
   tocGridClasses = "col-span-4 md:col-span-1",
-  mainGridClasses = "col-span-4 md:col-span-3"
+  mainGridClasses = "col-span-4 md:col-span-3",
+  tocItemClasses,
+  tocItemMatchedClasses,
+  headingClasses = "text-2xl font-semibold xl:mb-2 xl:text-3xl"
 }) => {
   const [activeHeader, setActiveHeader] = useState(null);
 
@@ -1082,6 +1098,8 @@ export const DoContentSections = ({
         dispatch={dispatch}
         sortCollection={sortCollection}
         tocGridClasses={tocGridClasses}
+        tocItemClasses={tocItemClasses}
+        tocItemMatchedClasses={tocItemMatchedClasses}
       />
       <div className={mainGridClasses}>
         <ContentSections
@@ -1091,6 +1109,7 @@ export const DoContentSections = ({
           localFont={localFont}
           headingFont={headingFont}
           contentFont={contentFont}
+          headingClasses={headingClasses}
         />
       </div>
     </div>

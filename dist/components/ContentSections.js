@@ -256,7 +256,9 @@ const TocItem = _ref5 => {
     localFont,
     showMeter,
     sortCollection,
-    isSorting
+    isSorting,
+    tocItemClasses,
+    tocItemMatchedClasses
   } = _ref5;
   const {
     attributes,
@@ -280,6 +282,7 @@ const TocItem = _ref5 => {
   const [isDeleting, setIsDeleting] = (0, _react.useState)(false);
   const [isHovering, setIsHovering] = (0, _react.useState)(false);
   const showStuff = editCallback && (isHovering && !isSorting || isSorting);
+  const itemClasses = tocItemClasses ? `${localFont.className} grow space-x-2 cursor-pointer ${tocItemClasses} ${matched && offset <= activeUntil ? tocItemMatchedClasses : "text-gray-500"}` : `${editCallback ? "hover:underline" : ""} ${matched && offset <= activeUntil ? "text-slate-800" : editCallback ? "text-slate-800" : "text-gray-500"} ${localFont.className} grow ${showMeter ? "pl-4" : ""} pr-2 space-x-2 hover:text-gray-900 text-lg cursor-pointer ${showHeading ? "" : "opacity-50"}`;
   return /*#__PURE__*/_react.default.createElement("li", (0, _extends2.default)({
     onMouseEnter: () => setIsHovering(true),
     onMouseLeave: () => setIsHovering(false),
@@ -325,7 +328,7 @@ const TocItem = _ref5 => {
     selector: `#heading-${id}`,
     className: "flex"
   }, /*#__PURE__*/_react.default.createElement("span", {
-    className: `${editCallback ? "hover:underline" : ""} ${matched && offset <= activeUntil ? "text-slate-800" : editCallback ? "text-slate-800" : "text-gray-500"} ${localFont.className} grow ${showMeter ? "pl-4" : ""} pr-2 space-x-2 hover:text-gray-900 text-lg cursor-pointer ${showHeading ? "" : "opacity-50"}`
+    className: itemClasses
   }, heading)), /*#__PURE__*/_react.default.createElement(_react2.Transition, {
     show: showStuff || false,
     className: "transition-all duration-500 overflow-hidden",
@@ -370,7 +373,9 @@ const TableOfContents = _ref6 => {
     sortApi = () => {},
     dispatch,
     sortCollection,
-    tocGridClasses = "col-span-12 md:col-span-1"
+    tocGridClasses = "col-span-12 md:col-span-1",
+    tocItemClasses,
+    tocItemMatchedClasses
   } = _ref6;
   const [isSorting, setIsSorting] = (0, _react.useState)(null);
   const visibleSections = showInvisibleHeaders ? sections : sections.filter(_ref7 => {
@@ -423,7 +428,9 @@ const TableOfContents = _ref6 => {
         buttonClasses: buttonClasses,
         showMeter: showMeter,
         sortCollection: sortCollection,
-        isSorting: id === isSorting
+        isSorting: id === isSorting,
+        tocItemClasses: tocItemClasses,
+        tocItemMatchedClasses: tocItemMatchedClasses
       });
     }),
     collection: sortCollection,
@@ -439,7 +446,8 @@ const Heading = _ref11 => {
     setActiveHeader,
     localFont,
     textColorTheme = "none",
-    showCopyLink = true
+    showCopyLink = true,
+    headingClasses = "text-2xl font-semibold xl:mb-2 xl:text-3xl"
   } = _ref11;
   const ref = (0, _react.useRef)();
   useOnScreen(ref, setActiveHeader, anchor);
@@ -456,7 +464,7 @@ const Heading = _ref11 => {
       });
     },
     ref: ref,
-    className: `${localFont.className} cursor-pointer text-2xl font-semibold xl:mb-2 xl:text-3xl flex items-center ${textColorThemes[textColorTheme]}`
+    className: `${localFont.className} cursor-pointer ${headingClasses} flex items-center ${textColorThemes[textColorTheme]}`
   }, /*#__PURE__*/_react.default.createElement("div", null, title), showCopyLink && /*#__PURE__*/_react.default.createElement("div", {
     className: "p-1 ml-2"
   }, /*#__PURE__*/_react.default.createElement("svg", {
@@ -779,6 +787,7 @@ const ContentSections = _ref27 => {
     localFont,
     headingFont,
     contentFont,
+    headingClasses,
     setActiveHeader = () => {}
   } = _ref27;
   return sections.map(_ref28 => {
@@ -807,7 +816,8 @@ const ContentSections = _ref27 => {
       setActiveHeader: setActiveHeader,
       localFont: headingFont || localFont,
       textColorTheme: headingColorTheme,
-      showCopyLink: showCopyLink
+      showCopyLink: showCopyLink,
+      headingClasses: headingClasses
     });
     let sectionOut;
     switch (contentType) {
@@ -925,7 +935,10 @@ const DoContentSections = _ref29 => {
     sortCollection,
     outerGridClasses = "grid grid-cols-4 gap-0 md:gap-6",
     tocGridClasses = "col-span-4 md:col-span-1",
-    mainGridClasses = "col-span-4 md:col-span-3"
+    mainGridClasses = "col-span-4 md:col-span-3",
+    tocItemClasses,
+    tocItemMatchedClasses,
+    headingClasses = "text-2xl font-semibold xl:mb-2 xl:text-3xl"
   } = _ref29;
   const [activeHeader, setActiveHeader] = (0, _react.useState)(null);
   return /*#__PURE__*/_react.default.createElement("div", {
@@ -940,7 +953,9 @@ const DoContentSections = _ref29 => {
     sortApi: sortApi,
     dispatch: dispatch,
     sortCollection: sortCollection,
-    tocGridClasses: tocGridClasses
+    tocGridClasses: tocGridClasses,
+    tocItemClasses: tocItemClasses,
+    tocItemMatchedClasses: tocItemMatchedClasses
   }), /*#__PURE__*/_react.default.createElement("div", {
     className: mainGridClasses
   }, /*#__PURE__*/_react.default.createElement(ContentSections, {
@@ -949,7 +964,8 @@ const DoContentSections = _ref29 => {
     setActiveHeader: setActiveHeader,
     localFont: localFont,
     headingFont: headingFont,
-    contentFont: contentFont
+    contentFont: contentFont,
+    headingClasses: headingClasses
   })));
 };
 exports.DoContentSections = DoContentSections;
