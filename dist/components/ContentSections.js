@@ -5,7 +5,7 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.DoContentSections = exports.ContentSections = exports.CONTENT_TYPE_TEXT_RIGHT = exports.CONTENT_TYPE_TEXT_LEFT = exports.CONTENT_TYPE_TEXT_IMAGE_RIGHT = exports.CONTENT_TYPE_TEXT_IMAGE_LEFT = exports.CONTENT_TYPE_TEXT_CENTER = exports.CONTENT_TYPE_SIGN_UP = exports.CONTENT_TYPE_IMAGE_RIGHT = exports.CONTENT_TYPE_IMAGE_LEFT = exports.CONTENT_TYPE_IMAGE_FULL = exports.CONTENT_TYPE_IMAGE_CENTER = exports.CONTENT_TYPE_DIVIDER = void 0;
+exports.DoContentSections = exports.ContentSections = exports.CONTENT_TYPE_TEXT_RIGHT = exports.CONTENT_TYPE_TEXT_LEFT = exports.CONTENT_TYPE_TEXT_IMAGE_RIGHT = exports.CONTENT_TYPE_TEXT_IMAGE_LEFT = exports.CONTENT_TYPE_TEXT_CENTER = exports.CONTENT_TYPE_SIGN_UP = exports.CONTENT_TYPE_MUX_VIDEO = exports.CONTENT_TYPE_IMAGE_RIGHT = exports.CONTENT_TYPE_IMAGE_LEFT = exports.CONTENT_TYPE_IMAGE_FULL = exports.CONTENT_TYPE_IMAGE_CENTER = exports.CONTENT_TYPE_DIVIDER = void 0;
 var _extends2 = _interopRequireDefault(require("@babel/runtime/helpers/extends"));
 var _react = _interopRequireWildcard(require("react"));
 var _copyToClipboard = _interopRequireDefault(require("copy-to-clipboard"));
@@ -16,6 +16,8 @@ var _sortable = require("@dnd-kit/sortable");
 var _modifiers = require("@dnd-kit/modifiers");
 var _utilities = require("@dnd-kit/utilities");
 var _react2 = require("@headlessui/react");
+var _muxPlayerReact = _interopRequireDefault(require("@mux/mux-player-react"));
+require("@mux/mux-player/themes/microvideo");
 function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
 function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && {}.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
 const CONTENT_TYPE_TEXT_LEFT = exports.CONTENT_TYPE_TEXT_LEFT = "text-only-left";
@@ -29,6 +31,7 @@ const CONTENT_TYPE_IMAGE_CENTER = exports.CONTENT_TYPE_IMAGE_CENTER = "image-onl
 const CONTENT_TYPE_IMAGE_FULL = exports.CONTENT_TYPE_IMAGE_FULL = "image-only-full";
 const CONTENT_TYPE_DIVIDER = exports.CONTENT_TYPE_DIVIDER = "divider";
 const CONTENT_TYPE_SIGN_UP = exports.CONTENT_TYPE_SIGN_UP = "sign-up";
+const CONTENT_TYPE_MUX_VIDEO = exports.CONTENT_TYPE_MUX_VIDEO = "mux-video";
 
 /*
 Theme colors:
@@ -804,7 +807,10 @@ const ContentSections = _ref27 => {
       backgroundColorTheme,
       textColorTheme,
       headingColorTheme,
-      buttonColorTheme
+      buttonColorTheme,
+      muxPlaybackId,
+      muxPosterOffset,
+      muxAccentColor
     } = _ref28;
     const imageUrl = image && "url" in image ? image["url"] : null;
     const imageHeight = image && "height" in image ? image["height"] : null;
@@ -890,6 +896,20 @@ const ContentSections = _ref27 => {
         sectionOut = /*#__PURE__*/_react.default.createElement("hr", {
           className: "my-4 mx-auto w-10/12 border-b-2 border-gray-300 md:my-10"
         });
+        break;
+      case CONTENT_TYPE_MUX_VIDEO:
+        sectionOut = /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement(_muxPlayerReact.default, {
+          poster: `https://image.mux.com/${muxPlaybackId}/thumbnail.jpg?width=1920&height=1080&time=${muxPosterOffset || 1}`,
+          streamType: "on-demand",
+          playbackId: muxPlaybackId,
+          primaryColor: "#FFFFFF",
+          secondaryColor: "#000000",
+          accentColor: muxAccentColor || "#4F45E4",
+          theme: "microvideo",
+          themeProps: {
+            style: "--seek-backward-button: none; --seek-forward-button: none;"
+          }
+        }));
         break;
       case CONTENT_TYPE_SIGN_UP:
         sectionOut = /*#__PURE__*/_react.default.createElement(CTASection, {

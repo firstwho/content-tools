@@ -13,6 +13,8 @@ import {
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { CSS } from "@dnd-kit/utilities";
 import { Transition } from "@headlessui/react";
+import MuxPlayer from "@mux/mux-player-react";
+import "@mux/mux-player/themes/microvideo";
 
 export const CONTENT_TYPE_TEXT_LEFT = "text-only-left";
 export const CONTENT_TYPE_TEXT_RIGHT = "text-only-right";
@@ -25,6 +27,7 @@ export const CONTENT_TYPE_IMAGE_CENTER = "image-only-center";
 export const CONTENT_TYPE_IMAGE_FULL = "image-only-full";
 export const CONTENT_TYPE_DIVIDER = "divider";
 export const CONTENT_TYPE_SIGN_UP = "sign-up";
+export const CONTENT_TYPE_MUX_VIDEO = "mux-video";
 
 /*
 Theme colors:
@@ -922,7 +925,10 @@ export const ContentSections = ({
       backgroundColorTheme,
       textColorTheme,
       headingColorTheme,
-      buttonColorTheme
+      buttonColorTheme,
+      muxPlaybackId,
+      muxPosterOffset,
+      muxAccentColor
     }) => {
       const imageUrl = image && "url" in image ? image["url"] : null;
       const imageHeight = image && "height" in image ? image["height"] : null;
@@ -1027,6 +1033,29 @@ export const ContentSections = ({
           sectionOut = (
             <hr className="my-4 mx-auto w-10/12 border-b-2 border-gray-300 md:my-10" />
           );
+          break;
+
+        case CONTENT_TYPE_MUX_VIDEO:
+          sectionOut = (
+            <div>
+              <MuxPlayer
+                poster={`https://image.mux.com/${muxPlaybackId}/thumbnail.jpg?width=1920&height=1080&time=${
+                  muxPosterOffset || 1
+                }`}
+                streamType="on-demand"
+                playbackId={muxPlaybackId}
+                primaryColor="#FFFFFF"
+                secondaryColor="#000000"
+                accentColor={muxAccentColor || "#4F45E4"}
+                theme="microvideo"
+                themeProps={{
+                  style:
+                    "--seek-backward-button: none; --seek-forward-button: none;"
+                }}
+              />
+            </div>
+          );
+
           break;
 
         case CONTENT_TYPE_SIGN_UP:
