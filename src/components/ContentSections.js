@@ -178,26 +178,21 @@ const arrayMoveImmutable = (array, fromIndex, toIndex) => {
   return array;
 };
 
-const VideoItem = ({ muxPlaybackId, muxAccentColor, muxPosterOffset }) => {
+const VideoItem = ({ muxPlaybackId, muxPosterOffset }) => {
   const [showVideo, setShowVideo] = useState(false);
 
-  if (showVideo) return <div>video</div>;
-  // return (
-  //   <MuxPlayer
-  //     poster={`https://image.mux.com/${muxPlaybackId}/thumbnail.jpg?width=1920&height=1080&time=${
-  //       muxPosterOffset || 1
-  //     }`}
-  //     streamType="on-demand"
-  //     playbackId={muxPlaybackId}
-  //     primaryColor="#FFFFFF"
-  //     secondaryColor="#000000"
-  //     accentColor={muxAccentColor || "#4F45E4"}
-  //     theme="microvideo"
-  //     themeProps={{
-  //       style: "--seek-backward-button: none; --seek-forward-button: none;"
-  //     }}
-  //   />
-  // );
+  if (showVideo)
+    return (
+      <mux-video
+        style={{ width: "100%", aspectRatio: "16/9", objectFit: "contain" }}
+        className="flex"
+        playback-id={muxPlaybackId}
+        disable-tracking
+        disable-cookies
+        controls
+        autoplay
+      ></mux-video>
+    );
 
   if (!showVideo)
     return (

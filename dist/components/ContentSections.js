@@ -157,28 +157,22 @@ const arrayMoveImmutable = (array, fromIndex, toIndex) => {
 const VideoItem = _ref => {
   let {
     muxPlaybackId,
-    muxAccentColor,
     muxPosterOffset
   } = _ref;
   const [showVideo, setShowVideo] = (0, _react.useState)(false);
-  if (showVideo) return /*#__PURE__*/_react.default.createElement("div", null, "video");
-  // return (
-  //   <MuxPlayer
-  //     poster={`https://image.mux.com/${muxPlaybackId}/thumbnail.jpg?width=1920&height=1080&time=${
-  //       muxPosterOffset || 1
-  //     }`}
-  //     streamType="on-demand"
-  //     playbackId={muxPlaybackId}
-  //     primaryColor="#FFFFFF"
-  //     secondaryColor="#000000"
-  //     accentColor={muxAccentColor || "#4F45E4"}
-  //     theme="microvideo"
-  //     themeProps={{
-  //       style: "--seek-backward-button: none; --seek-forward-button: none;"
-  //     }}
-  //   />
-  // );
-
+  if (showVideo) return /*#__PURE__*/_react.default.createElement("mux-video", {
+    style: {
+      width: "100%",
+      aspectRatio: "16/9",
+      objectFit: "contain"
+    },
+    className: "flex",
+    "playback-id": muxPlaybackId,
+    "disable-tracking": true,
+    "disable-cookies": true,
+    controls: true,
+    autoplay: true
+  });
   if (!showVideo) return /*#__PURE__*/_react.default.createElement("div", {
     onClick: () => {
       setShowVideo(true);
