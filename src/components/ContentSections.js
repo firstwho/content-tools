@@ -178,6 +178,55 @@ const arrayMoveImmutable = (array, fromIndex, toIndex) => {
   return array;
 };
 
+const VideoItem = ({ muxPlaybackId, muxAccentColor, muxPosterOffset }) => {
+  const [showVideo, setShowVideo] = useState(false);
+
+  if (showVideo)
+    return (
+      <MuxPlayer
+        poster={`https://image.mux.com/${muxPlaybackId}/thumbnail.jpg?width=1920&height=1080&time=${
+          muxPosterOffset || 1
+        }`}
+        streamType="on-demand"
+        playbackId={muxPlaybackId}
+        primaryColor="#FFFFFF"
+        secondaryColor="#000000"
+        accentColor={muxAccentColor || "#4F45E4"}
+        theme="microvideo"
+        themeProps={{
+          style: "--seek-backward-button: none; --seek-forward-button: none;"
+        }}
+      />
+    );
+
+  if (!showVideo)
+    return (
+      <div
+        onClick={() => setShowVideo(true)}
+        class="group/item cursor-pointer aspect-video rounded-lg border-gray-100 shadow grid"
+      >
+        <img
+          class="object-cover z-0 col-start-1 row-start-1"
+          src={`https://image.mux.com/${muxPlaybackId}/thumbnail.jpg?width=1920&height=1080&time=${
+            muxPosterOffset || 1
+          }`}
+        />
+        <div class="object-cover bg-black opacity-20 z-10 col-start-1 row-start-1"></div>
+        <svg
+          class="filter group-hover/item:drop-shadow-lg z-20 h-32 w-32 col-start-1 row-start-1 text-white place-self-center	"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          <polygon points="5 3 19 12 5 21 5 3" />
+        </svg>
+      </div>
+    );
+};
+
 const SortableList = ({
   rows,
   dispatch,
@@ -1037,23 +1086,11 @@ export const ContentSections = ({
 
         case CONTENT_TYPE_MUX_VIDEO:
           sectionOut = (
-            <div>
-              <MuxPlayer
-                poster={`https://image.mux.com/${muxPlaybackId}/thumbnail.jpg?width=1920&height=1080&time=${
-                  muxPosterOffset || 1
-                }`}
-                streamType="on-demand"
-                playbackId={muxPlaybackId}
-                primaryColor="#FFFFFF"
-                secondaryColor="#000000"
-                accentColor={muxAccentColor || "#4F45E4"}
-                theme="microvideo"
-                themeProps={{
-                  style:
-                    "--seek-backward-button: none; --seek-forward-button: none;"
-                }}
-              />
-            </div>
+            <VideoItem
+              muxPlaybackId={muxPlaybackId}
+              muxAccentColor={muxAccentColor}
+              muxPosterOffset={muxPosterOffset}
+            />
           );
 
           break;

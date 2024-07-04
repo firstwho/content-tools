@@ -153,7 +153,46 @@ const arrayMoveImmutable = (array, fromIndex, toIndex) => {
   arrayMoveMutable(array, fromIndex, toIndex);
   return array;
 };
-const SortableList = _ref => {
+const VideoItem = _ref => {
+  let {
+    muxPlaybackId,
+    muxAccentColor,
+    muxPosterOffset
+  } = _ref;
+  const [showVideo, setShowVideo] = (0, _react.useState)(false);
+  if (showVideo) return /*#__PURE__*/_react.default.createElement(_muxPlayerReact.default, {
+    poster: `https://image.mux.com/${muxPlaybackId}/thumbnail.jpg?width=1920&height=1080&time=${muxPosterOffset || 1}`,
+    streamType: "on-demand",
+    playbackId: muxPlaybackId,
+    primaryColor: "#FFFFFF",
+    secondaryColor: "#000000",
+    accentColor: muxAccentColor || "#4F45E4",
+    theme: "microvideo",
+    themeProps: {
+      style: "--seek-backward-button: none; --seek-forward-button: none;"
+    }
+  });
+  if (!showVideo) return /*#__PURE__*/_react.default.createElement("div", {
+    onClick: () => setShowVideo(true),
+    class: "group/item cursor-pointer aspect-video rounded-lg border-gray-100 shadow grid"
+  }, /*#__PURE__*/_react.default.createElement("img", {
+    class: "object-cover z-0 col-start-1 row-start-1",
+    src: `https://image.mux.com/${muxPlaybackId}/thumbnail.jpg?width=1920&height=1080&time=${muxPosterOffset || 1}`
+  }), /*#__PURE__*/_react.default.createElement("div", {
+    class: "object-cover bg-black opacity-20 z-10 col-start-1 row-start-1"
+  }), /*#__PURE__*/_react.default.createElement("svg", {
+    class: "filter group-hover/item:drop-shadow-lg z-20 h-32 w-32 col-start-1 row-start-1 text-white place-self-center\t",
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    "stroke-width": "2",
+    "stroke-linecap": "round",
+    "stroke-linejoin": "round"
+  }, /*#__PURE__*/_react.default.createElement("polygon", {
+    points: "5 3 19 12 5 21 5 3"
+  })));
+};
+const SortableList = _ref2 => {
   let {
     rows,
     dispatch,
@@ -162,22 +201,22 @@ const SortableList = _ref => {
     idField = "id",
     sortableItems = [],
     setIsSorting
-  } = _ref;
+  } = _ref2;
   return /*#__PURE__*/_react.default.createElement(_core.DndContext, {
     id: collection,
     modifiers: [_modifiers.restrictToVerticalAxis],
-    onDragStart: _ref2 => {
+    onDragStart: _ref3 => {
       let {
         active: {
           id
         }
-      } = _ref2;
+      } = _ref3;
       setIsSorting(id);
     },
     onDragCancel: () => {
       setIsSorting(null);
     },
-    onDragEnd: async _ref3 => {
+    onDragEnd: async _ref4 => {
       let {
         active: {
           id: activeId
@@ -185,7 +224,7 @@ const SortableList = _ref => {
         over: {
           id: overId
         }
-      } = _ref3;
+      } = _ref4;
       const oldIndex = rows.findIndex(row => row[idField] === activeId);
       const newIndex = rows.findIndex(row => row[idField] === overId);
       let sortedRows = arrayMoveImmutable(rows, oldIndex, newIndex);
@@ -230,8 +269,8 @@ const useScript = url => {
 };
 const useOnScreen = (ref, setActiveHeader, anchor) => {
   (0, _react.useEffect)(() => {
-    const observer = new IntersectionObserver(_ref4 => {
-      let [entry] = _ref4;
+    const observer = new IntersectionObserver(_ref5 => {
+      let [entry] = _ref5;
       if (!(typeof entry === "object" && entry !== null)) return;
       if (entry.isIntersecting === true) setActiveHeader(anchor);
     }, {
@@ -244,7 +283,7 @@ const useOnScreen = (ref, setActiveHeader, anchor) => {
     };
   }, [ref, anchor, setActiveHeader]);
 };
-const TocItem = _ref5 => {
+const TocItem = _ref6 => {
   let {
     id,
     heading,
@@ -262,7 +301,7 @@ const TocItem = _ref5 => {
     isSorting,
     tocItemClasses,
     tocItemMatchedClasses
-  } = _ref5;
+  } = _ref6;
   const {
     attributes,
     listeners,
@@ -365,7 +404,7 @@ const TocItem = _ref5 => {
     className: "cursor-pointer rounded-md bg-red-600 px-2.5 py-1.5 text-base font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
   }, "Delete"))))))));
 };
-const TableOfContents = _ref6 => {
+const TableOfContents = _ref7 => {
   let {
     sections,
     activeHeader,
@@ -379,19 +418,19 @@ const TableOfContents = _ref6 => {
     tocGridClasses = "col-span-12 md:col-span-1",
     tocItemClasses,
     tocItemMatchedClasses
-  } = _ref6;
+  } = _ref7;
   const [isSorting, setIsSorting] = (0, _react.useState)(null);
-  const visibleSections = showInvisibleHeaders ? sections : sections.filter(_ref7 => {
+  const visibleSections = showInvisibleHeaders ? sections : sections.filter(_ref8 => {
     let {
       show_heading: showHeading
-    } = _ref7;
+    } = _ref8;
     return showHeading === true;
   });
-  const [matched, activeUntil] = activeHeader === null ? [false, -1] : visibleSections.reduce((_ref8, _ref9, offset) => {
-    let [isMatched, matchedOffset] = _ref8;
+  const [matched, activeUntil] = activeHeader === null ? [false, -1] : visibleSections.reduce((_ref9, _ref10, offset) => {
+    let [isMatched, matchedOffset] = _ref9;
     let {
       id
-    } = _ref9;
+    } = _ref10;
     if (isMatched) return [isMatched, matchedOffset];
     if (`heading-${id}` === activeHeader) return [true, offset];
     return [false, -1];
@@ -407,7 +446,7 @@ const TableOfContents = _ref6 => {
   }, /*#__PURE__*/_react.default.createElement(SortableList, {
     setIsSorting: setIsSorting,
     rows: visibleSections,
-    sortableItems: visibleSections.map((_ref10, offset) => {
+    sortableItems: visibleSections.map((_ref11, offset) => {
       let {
         id,
         heading,
@@ -415,7 +454,7 @@ const TableOfContents = _ref6 => {
         editCallback,
         deleteCallback,
         buttonClasses
-      } = _ref10;
+      } = _ref11;
       return /*#__PURE__*/_react.default.createElement(TocItem, {
         matched: matched,
         activeUntil: activeUntil,
@@ -441,7 +480,7 @@ const TableOfContents = _ref6 => {
     sortApi: sortApi
   }))));
 };
-const Heading = _ref11 => {
+const Heading = _ref12 => {
   let {
     title,
     level = 2,
@@ -451,7 +490,7 @@ const Heading = _ref11 => {
     textColorTheme = "none",
     showCopyLink = true,
     headingClasses = "text-2xl font-semibold xl:mb-2 xl:text-3xl"
-  } = _ref11;
+  } = _ref12;
   const ref = (0, _react.useRef)();
   useOnScreen(ref, setActiveHeader, anchor);
   if (level === 1) return /*#__PURE__*/_react.default.createElement("h1", {
@@ -496,12 +535,12 @@ const Heading = _ref11 => {
   }, title);
   return null;
 };
-const TextLeft = _ref12 => {
+const TextLeft = _ref13 => {
   let {
     content,
     textColorTheme = "none",
     contentFont = {}
-  } = _ref12;
+  } = _ref13;
   return /*#__PURE__*/_react.default.createElement("div", {
     className: `${contentFont?.className || ""} leading-loose prose lg:prose-lg max-w-none ${textColorThemes[textColorTheme]}`,
     dangerouslySetInnerHTML: {
@@ -509,12 +548,12 @@ const TextLeft = _ref12 => {
     }
   });
 };
-const TextRight = _ref13 => {
+const TextRight = _ref14 => {
   let {
     content,
     textColorTheme = "none",
     contentFont = {}
-  } = _ref13;
+  } = _ref14;
   return /*#__PURE__*/_react.default.createElement("div", {
     className: `${contentFont?.className || ""} text-right leading-loose prose lg:prose-lg max-w-none ${textColorThemes[textColorTheme]}`,
     dangerouslySetInnerHTML: {
@@ -522,12 +561,12 @@ const TextRight = _ref13 => {
     }
   });
 };
-const TextCenter = _ref14 => {
+const TextCenter = _ref15 => {
   let {
     content,
     textColorTheme = "none",
     contentFont = {}
-  } = _ref14;
+  } = _ref15;
   return /*#__PURE__*/_react.default.createElement("div", {
     className: `${contentFont?.className || ""} text-center leading-loose prose lg:prose-lg max-w-none ${textColorThemes[textColorTheme]}`,
     dangerouslySetInnerHTML: {
@@ -535,14 +574,14 @@ const TextCenter = _ref14 => {
     }
   });
 };
-const ImageOnLeft = _ref15 => {
+const ImageOnLeft = _ref16 => {
   let {
     content,
     imageUrl,
     colSpanContent = "col-span-12 md:col-span-6",
     colSpanImage = "col-span-12 md:col-span-6",
     contentFont = {}
-  } = _ref15;
+  } = _ref16;
   return /*#__PURE__*/_react.default.createElement("div", {
     className: "grid grid-cols-12 gap-4"
   }, /*#__PURE__*/_react.default.createElement("div", {
@@ -557,7 +596,7 @@ const ImageOnLeft = _ref15 => {
     }
   }));
 };
-const ImageOnRight = _ref16 => {
+const ImageOnRight = _ref17 => {
   let {
     content,
     imageUrl,
@@ -565,7 +604,7 @@ const ImageOnRight = _ref16 => {
     colSpanImage = "w-full md:w-1/2",
     ctaContent = null,
     contentFont = {}
-  } = _ref16;
+  } = _ref17;
   return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("img", {
     src: imageUrl,
     alt: "",
@@ -577,12 +616,12 @@ const ImageOnRight = _ref16 => {
     }
   }), ctaContent);
 };
-const ImageCenter = _ref17 => {
+const ImageCenter = _ref18 => {
   let {
     imageUrl,
     height,
     width
-  } = _ref17;
+  } = _ref18;
   return /*#__PURE__*/_react.default.createElement("div", {
     className: "flex justify-center"
   }, /*#__PURE__*/_react.default.createElement("img", {
@@ -592,22 +631,22 @@ const ImageCenter = _ref17 => {
     alt: ""
   }));
 };
-const ImageCenterFull = _ref18 => {
+const ImageCenterFull = _ref19 => {
   let {
     imageUrl
-  } = _ref18;
+  } = _ref19;
   return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("img", {
     className: "object-fill",
     src: imageUrl,
     alt: ""
   }));
 };
-const ImageLeft = _ref19 => {
+const ImageLeft = _ref20 => {
   let {
     imageUrl,
     height,
     width
-  } = _ref19;
+  } = _ref20;
   return /*#__PURE__*/_react.default.createElement("div", {
     className: "flex justify-start"
   }, /*#__PURE__*/_react.default.createElement("img", {
@@ -617,12 +656,12 @@ const ImageLeft = _ref19 => {
     alt: ""
   }));
 };
-const ImageRight = _ref20 => {
+const ImageRight = _ref21 => {
   let {
     imageUrl,
     height,
     width
-  } = _ref20;
+  } = _ref21;
   return /*#__PURE__*/_react.default.createElement("div", {
     className: "flex justify-end"
   }, /*#__PURE__*/_react.default.createElement("img", {
@@ -632,14 +671,14 @@ const ImageRight = _ref20 => {
     alt: ""
   }));
 };
-const Section = _ref21 => {
+const Section = _ref22 => {
   let {
     sectionOut,
     id,
     headingOut,
     scripts,
     backgroundColorTheme = "none"
-  } = _ref21;
+  } = _ref22;
   useScript(scripts?.[0] || false);
   return /*#__PURE__*/_react.default.createElement("section", {
     key: id,
@@ -652,33 +691,33 @@ const Section = _ref21 => {
     name: `heading-${id}`
   })), headingOut, sectionOut);
 };
-const CTAButton = _ref22 => {
+const CTAButton = _ref23 => {
   let {
     label,
     url,
     buttonColorTheme = "indigo"
-  } = _ref22;
+  } = _ref23;
   return /*#__PURE__*/_react.default.createElement("a", {
     href: url,
     className: `${buttonColorThemes[buttonColorTheme]} rounded-md px-3.5 py-2.5 text-base font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2`
   }, label);
 };
-const CTALink = _ref23 => {
+const CTALink = _ref24 => {
   let {
     label,
     url
-  } = _ref23;
+  } = _ref24;
   return /*#__PURE__*/_react.default.createElement("a", {
     href: url,
     className: "text-base font-semibold leading-6 text-gray-900 hover:underline"
   }, label);
 };
-const CTAForm = _ref24 => {
+const CTAForm = _ref25 => {
   let {
     iframeUrl,
     type,
     formOrientation
-  } = _ref24;
+  } = _ref25;
   let classes = "";
   switch (`${type}__${formOrientation}`) {
     case "form-email__vertical":
@@ -706,7 +745,7 @@ const CTAForm = _ref24 => {
     sandbox: "allow-top-navigation allow-scripts allow-forms allow-same-origin"
   });
 };
-const CTASection = _ref25 => {
+const CTASection = _ref26 => {
   let {
     id,
     image,
@@ -714,7 +753,7 @@ const CTASection = _ref25 => {
     content,
     buttonColorTheme,
     textColorTheme
-  } = _ref25;
+  } = _ref26;
   const {
     cta_primary: primaryLabel,
     cta_primary_type: primaryType,
@@ -744,13 +783,13 @@ const CTASection = _ref25 => {
     textColorTheme: textColorTheme
   }), /*#__PURE__*/_react.default.createElement("div", {
     className: "mt-4 flex items-center gap-x-6 rounded-lg"
-  }, ctas.map(_ref26 => {
+  }, ctas.map(_ref27 => {
     let {
       id,
       type,
       label,
       url
-    } = _ref26;
+    } = _ref27;
     if (type === "button") return /*#__PURE__*/_react.default.createElement(CTAButton, {
       key: id,
       label: label,
@@ -781,7 +820,7 @@ const CTASection = _ref25 => {
   });
   return /*#__PURE__*/_react.default.createElement("div", null, ctaContent);
 };
-const ContentSections = _ref27 => {
+const ContentSections = _ref28 => {
   let {
     showCopyLink = true,
     sections,
@@ -792,8 +831,8 @@ const ContentSections = _ref27 => {
     contentFont,
     headingClasses,
     setActiveHeader = () => {}
-  } = _ref27;
-  return sections.map(_ref28 => {
+  } = _ref28;
+  return sections.map(_ref29 => {
     let {
       content,
       content_type: contentType,
@@ -811,7 +850,7 @@ const ContentSections = _ref27 => {
       muxPlaybackId,
       muxPosterOffset,
       muxAccentColor
-    } = _ref28;
+    } = _ref29;
     const imageUrl = image && "url" in image ? image["url"] : null;
     const imageHeight = image && "height" in image ? image["height"] : null;
     const imageWidth = image && "width" in image ? image["width"] : null;
@@ -898,18 +937,11 @@ const ContentSections = _ref27 => {
         });
         break;
       case CONTENT_TYPE_MUX_VIDEO:
-        sectionOut = /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement(_muxPlayerReact.default, {
-          poster: `https://image.mux.com/${muxPlaybackId}/thumbnail.jpg?width=1920&height=1080&time=${muxPosterOffset || 1}`,
-          streamType: "on-demand",
-          playbackId: muxPlaybackId,
-          primaryColor: "#FFFFFF",
-          secondaryColor: "#000000",
-          accentColor: muxAccentColor || "#4F45E4",
-          theme: "microvideo",
-          themeProps: {
-            style: "--seek-backward-button: none; --seek-forward-button: none;"
-          }
-        }));
+        sectionOut = /*#__PURE__*/_react.default.createElement(VideoItem, {
+          muxPlaybackId: muxPlaybackId,
+          muxAccentColor: muxAccentColor,
+          muxPosterOffset: muxPosterOffset
+        });
         break;
       case CONTENT_TYPE_SIGN_UP:
         sectionOut = /*#__PURE__*/_react.default.createElement(CTASection, {
@@ -939,7 +971,7 @@ const ContentSections = _ref27 => {
   });
 };
 exports.ContentSections = ContentSections;
-const DoContentSections = _ref29 => {
+const DoContentSections = _ref30 => {
   let {
     sections,
     localFont,
@@ -959,7 +991,7 @@ const DoContentSections = _ref29 => {
     tocItemClasses,
     tocItemMatchedClasses,
     headingClasses = "text-2xl font-semibold xl:mb-2 xl:text-3xl"
-  } = _ref29;
+  } = _ref30;
   const [activeHeader, setActiveHeader] = (0, _react.useState)(null);
   return /*#__PURE__*/_react.default.createElement("div", {
     className: outerGridClasses
