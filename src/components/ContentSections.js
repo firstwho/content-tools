@@ -202,24 +202,26 @@ const VideoItem = ({ muxPlaybackId, muxAccentColor, muxPosterOffset }) => {
   if (!showVideo)
     return (
       <div
-        onClick={() => setShowVideo(true)}
-        class="group/item cursor-pointer aspect-video rounded-lg border-gray-100 shadow grid"
+        onClick={() => {
+          setShowVideo(true);
+        }}
+        className="group/item cursor-pointer aspect-video rounded-lg border-gray-100 shadow grid"
       >
         <img
-          class="object-cover z-0 col-start-1 row-start-1"
+          className="object-cover z-0 col-start-1 row-start-1"
           src={`https://image.mux.com/${muxPlaybackId}/thumbnail.jpg?width=1920&height=1080&time=${
             muxPosterOffset || 1
           }`}
         />
-        <div class="object-cover bg-black opacity-20 z-10 col-start-1 row-start-1"></div>
+        <div className="object-cover bg-black opacity-20 z-10 col-start-1 row-start-1"></div>
         <svg
-          class="filter group-hover/item:drop-shadow-lg z-20 h-32 w-32 col-start-1 row-start-1 text-white place-self-center	"
+          className="filter group-hover/item:drop-shadow-lg z-20 h-32 w-32 col-start-1 row-start-1 text-white place-self-center"
           viewBox="0 0 24 24"
           fill="none"
           stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
         >
           <polygon points="5 3 19 12 5 21 5 3" />
         </svg>
