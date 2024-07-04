@@ -213,18 +213,16 @@ const VideoItem = ({ muxPlaybackId, muxAccentColor, muxPosterOffset }) => {
             muxPosterOffset || 1
           }`}
         />
-        <div className="object-cover bg-black opacity-20 z-10 col-start-1 row-start-1"></div>
-        <svg
-          className="filter group-hover/item:drop-shadow-lg z-20 h-32 w-32 col-start-1 row-start-1 text-white place-self-center"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <polygon points="5 3 19 12 5 21 5 3" />
-        </svg>
+        <div className="object-cover bg-black group-hover/item:opacity-10 opacity-20 z-10 col-start-1 row-start-1"></div>
+
+        <div class="group-hover/item:bg-indigo-600 z-20 col-start-1 row-start-1 grid h-24 w-32 place-self-center rounded-full bg-indigo-700">
+          <svg class="mt-3 h-20 w-20 place-self-center" viewBox="0 0 100 125">
+            <path
+              d="m77.6 54.3-46 26.6c-2 1.2-4.6-.3-4.6-2.7V25c0-2.4 2.6-3.8 4.6-2.7l46 26.6c2 1.3 2 4.2 0 5.4z"
+              fill="white"
+            />
+          </svg>
+        </div>
       </div>
     );
 };
