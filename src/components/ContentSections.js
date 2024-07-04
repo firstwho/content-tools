@@ -13,8 +13,8 @@ import {
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { CSS } from "@dnd-kit/utilities";
 import { Transition } from "@headlessui/react";
-import MuxPlayer from "@mux/mux-player-react";
-import "@mux/mux-player/themes/microvideo";
+// import MuxPlayer from "@mux/mux-player-react";
+// import "@mux/mux-player/themes/microvideo";
 
 export const CONTENT_TYPE_TEXT_LEFT = "text-only-left";
 export const CONTENT_TYPE_TEXT_RIGHT = "text-only-right";
@@ -181,23 +181,23 @@ const arrayMoveImmutable = (array, fromIndex, toIndex) => {
 const VideoItem = ({ muxPlaybackId, muxAccentColor, muxPosterOffset }) => {
   const [showVideo, setShowVideo] = useState(false);
 
-  if (showVideo)
-    return (
-      <MuxPlayer
-        poster={`https://image.mux.com/${muxPlaybackId}/thumbnail.jpg?width=1920&height=1080&time=${
-          muxPosterOffset || 1
-        }`}
-        streamType="on-demand"
-        playbackId={muxPlaybackId}
-        primaryColor="#FFFFFF"
-        secondaryColor="#000000"
-        accentColor={muxAccentColor || "#4F45E4"}
-        theme="microvideo"
-        themeProps={{
-          style: "--seek-backward-button: none; --seek-forward-button: none;"
-        }}
-      />
-    );
+  if (showVideo) return <div>video</div>;
+  // return (
+  //   <MuxPlayer
+  //     poster={`https://image.mux.com/${muxPlaybackId}/thumbnail.jpg?width=1920&height=1080&time=${
+  //       muxPosterOffset || 1
+  //     }`}
+  //     streamType="on-demand"
+  //     playbackId={muxPlaybackId}
+  //     primaryColor="#FFFFFF"
+  //     secondaryColor="#000000"
+  //     accentColor={muxAccentColor || "#4F45E4"}
+  //     theme="microvideo"
+  //     themeProps={{
+  //       style: "--seek-backward-button: none; --seek-forward-button: none;"
+  //     }}
+  //   />
+  // );
 
   if (!showVideo)
     return (

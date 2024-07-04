@@ -16,10 +16,11 @@ var _sortable = require("@dnd-kit/sortable");
 var _modifiers = require("@dnd-kit/modifiers");
 var _utilities = require("@dnd-kit/utilities");
 var _react2 = require("@headlessui/react");
-var _muxPlayerReact = _interopRequireDefault(require("@mux/mux-player-react"));
-require("@mux/mux-player/themes/microvideo");
 function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
 function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && {}.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
+// import MuxPlayer from "@mux/mux-player-react";
+// import "@mux/mux-player/themes/microvideo";
+
 const CONTENT_TYPE_TEXT_LEFT = exports.CONTENT_TYPE_TEXT_LEFT = "text-only-left";
 const CONTENT_TYPE_TEXT_RIGHT = exports.CONTENT_TYPE_TEXT_RIGHT = "text-only-right";
 const CONTENT_TYPE_TEXT_CENTER = exports.CONTENT_TYPE_TEXT_CENTER = "text-only-center";
@@ -160,34 +161,42 @@ const VideoItem = _ref => {
     muxPosterOffset
   } = _ref;
   const [showVideo, setShowVideo] = (0, _react.useState)(false);
-  if (showVideo) return /*#__PURE__*/_react.default.createElement(_muxPlayerReact.default, {
-    poster: `https://image.mux.com/${muxPlaybackId}/thumbnail.jpg?width=1920&height=1080&time=${muxPosterOffset || 1}`,
-    streamType: "on-demand",
-    playbackId: muxPlaybackId,
-    primaryColor: "#FFFFFF",
-    secondaryColor: "#000000",
-    accentColor: muxAccentColor || "#4F45E4",
-    theme: "microvideo",
-    themeProps: {
-      style: "--seek-backward-button: none; --seek-forward-button: none;"
-    }
-  });
+  if (showVideo) return /*#__PURE__*/_react.default.createElement("div", null, "video");
+  // return (
+  //   <MuxPlayer
+  //     poster={`https://image.mux.com/${muxPlaybackId}/thumbnail.jpg?width=1920&height=1080&time=${
+  //       muxPosterOffset || 1
+  //     }`}
+  //     streamType="on-demand"
+  //     playbackId={muxPlaybackId}
+  //     primaryColor="#FFFFFF"
+  //     secondaryColor="#000000"
+  //     accentColor={muxAccentColor || "#4F45E4"}
+  //     theme="microvideo"
+  //     themeProps={{
+  //       style: "--seek-backward-button: none; --seek-forward-button: none;"
+  //     }}
+  //   />
+  // );
+
   if (!showVideo) return /*#__PURE__*/_react.default.createElement("div", {
-    onClick: () => setShowVideo(true),
-    class: "group/item cursor-pointer aspect-video rounded-lg border-gray-100 shadow grid"
+    onClick: () => {
+      setShowVideo(true);
+    },
+    className: "group/item cursor-pointer aspect-video rounded-lg border-gray-100 shadow grid"
   }, /*#__PURE__*/_react.default.createElement("img", {
-    class: "object-cover z-0 col-start-1 row-start-1",
+    className: "object-cover z-0 col-start-1 row-start-1",
     src: `https://image.mux.com/${muxPlaybackId}/thumbnail.jpg?width=1920&height=1080&time=${muxPosterOffset || 1}`
   }), /*#__PURE__*/_react.default.createElement("div", {
-    class: "object-cover bg-black opacity-20 z-10 col-start-1 row-start-1"
+    className: "object-cover bg-black opacity-20 z-10 col-start-1 row-start-1"
   }), /*#__PURE__*/_react.default.createElement("svg", {
-    class: "filter group-hover/item:drop-shadow-lg z-20 h-32 w-32 col-start-1 row-start-1 text-white place-self-center\t",
+    className: "filter group-hover/item:drop-shadow-lg z-20 h-32 w-32 col-start-1 row-start-1 text-white place-self-center",
     viewBox: "0 0 24 24",
     fill: "none",
     stroke: "currentColor",
-    "stroke-width": "2",
-    "stroke-linecap": "round",
-    "stroke-linejoin": "round"
+    strokeWidth: "2",
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
   }, /*#__PURE__*/_react.default.createElement("polygon", {
     points: "5 3 19 12 5 21 5 3"
   })));
