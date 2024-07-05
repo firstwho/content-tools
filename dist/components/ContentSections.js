@@ -168,6 +168,7 @@ const VideoItem = _ref => {
     },
     className: "flex",
     "playback-id": muxPlaybackId,
+    "metadata-video-title": "About FirstWho",
     "disable-tracking": true,
     "disable-cookies": true,
     controls: true,
@@ -179,18 +180,16 @@ const VideoItem = _ref => {
     },
     className: "group/item cursor-pointer aspect-video rounded-lg border-gray-100 shadow grid"
   }, /*#__PURE__*/_react.default.createElement("img", {
-    className: "object-cover z-0 col-start-1 row-start-1",
+    className: "object-cover col-start-1 row-start-1",
     src: `https://image.mux.com/${muxPlaybackId}/thumbnail.jpg?width=1920&height=1080&time=${muxPosterOffset || 1}`
   }), /*#__PURE__*/_react.default.createElement("div", {
-    className: "object-cover bg-black group-hover/item:opacity-10 opacity-20 z-10 col-start-1 row-start-1"
-  }), /*#__PURE__*/_react.default.createElement("div", {
-    class: "group-hover/item:bg-indigo-600 z-20 col-start-1 row-start-1 grid h-24 w-32 place-self-center rounded-full bg-indigo-700"
+    className: "border-indigo-600 border-2 x-group-hover/item:border-gray-900 group-hover/item:bg-indigo-600 col-start-1 row-start-1 grid h-24 w-32 place-self-center rounded-full bg-indigo-800"
   }, /*#__PURE__*/_react.default.createElement("svg", {
-    class: "mt-3 h-20 w-20 place-self-center",
+    className: "mt-3 h-20 w-20 place-self-center",
     viewBox: "0 0 100 125"
   }, /*#__PURE__*/_react.default.createElement("path", {
-    d: "m77.6 54.3-46 26.6c-2 1.2-4.6-.3-4.6-2.7V25c0-2.4 2.6-3.8 4.6-2.7l46 26.6c2 1.3 2 4.2 0 5.4z",
-    fill: "white"
+    className: "fill-indigo-50 group-hover/item:fill-white",
+    d: "m77.6 54.3-46 26.6c-2 1.2-4.6-.3-4.6-2.7V25c0-2.4 2.6-3.8 4.6-2.7l46 26.6c2 1.3 2 4.2 0 5.4z"
   }))));
 };
 const SortableList = _ref2 => {
