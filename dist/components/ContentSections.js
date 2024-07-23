@@ -730,7 +730,7 @@ const CTAForm = _ref25 => {
       classes = "w-full h-64";
       break;
     case "form-email__horizontal":
-      classes = "w-full h-20";
+      classes = "w-full h-56 md:h-20";
       break;
     case "form-email-name__horizontal":
       classes = "w-full h-20";
