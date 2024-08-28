@@ -5,7 +5,7 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.DoContentSections = exports.ContentSections = exports.CONTENT_TYPE_TEXT_RIGHT = exports.CONTENT_TYPE_TEXT_LEFT = exports.CONTENT_TYPE_TEXT_IMAGE_RIGHT = exports.CONTENT_TYPE_TEXT_IMAGE_LEFT = exports.CONTENT_TYPE_TEXT_CENTER = exports.CONTENT_TYPE_SIGN_UP = exports.CONTENT_TYPE_MUX_VIDEO = exports.CONTENT_TYPE_IMAGE_RIGHT = exports.CONTENT_TYPE_IMAGE_LEFT = exports.CONTENT_TYPE_IMAGE_FULL = exports.CONTENT_TYPE_IMAGE_CENTER = exports.CONTENT_TYPE_DIVIDER = void 0;
+exports.DoContentSections = exports.ContentSections = exports.CONTENT_TYPE_TEXT_RIGHT = exports.CONTENT_TYPE_TEXT_LEFT = exports.CONTENT_TYPE_TEXT_IMAGE_RIGHT = exports.CONTENT_TYPE_TEXT_IMAGE_LEFT = exports.CONTENT_TYPE_TEXT_CENTER = exports.CONTENT_TYPE_TESTIMONIAL = exports.CONTENT_TYPE_SIGN_UP = exports.CONTENT_TYPE_MUX_VIDEO = exports.CONTENT_TYPE_IMAGE_RIGHT = exports.CONTENT_TYPE_IMAGE_LEFT = exports.CONTENT_TYPE_IMAGE_FULL = exports.CONTENT_TYPE_IMAGE_CENTER = exports.CONTENT_TYPE_DIVIDER = void 0;
 var _extends2 = _interopRequireDefault(require("@babel/runtime/helpers/extends"));
 var _react = _interopRequireWildcard(require("react"));
 var _copyToClipboard = _interopRequireDefault(require("copy-to-clipboard"));
@@ -18,9 +18,6 @@ var _utilities = require("@dnd-kit/utilities");
 var _react2 = require("@headlessui/react");
 function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
 function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && {}.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
-// import MuxPlayer from "@mux/mux-player-react";
-// import "@mux/mux-player/themes/microvideo";
-
 const CONTENT_TYPE_TEXT_LEFT = exports.CONTENT_TYPE_TEXT_LEFT = "text-only-left";
 const CONTENT_TYPE_TEXT_RIGHT = exports.CONTENT_TYPE_TEXT_RIGHT = "text-only-right";
 const CONTENT_TYPE_TEXT_CENTER = exports.CONTENT_TYPE_TEXT_CENTER = "text-only-center";
@@ -33,6 +30,7 @@ const CONTENT_TYPE_IMAGE_FULL = exports.CONTENT_TYPE_IMAGE_FULL = "image-only-fu
 const CONTENT_TYPE_DIVIDER = exports.CONTENT_TYPE_DIVIDER = "divider";
 const CONTENT_TYPE_SIGN_UP = exports.CONTENT_TYPE_SIGN_UP = "sign-up";
 const CONTENT_TYPE_MUX_VIDEO = exports.CONTENT_TYPE_MUX_VIDEO = "mux-video";
+const CONTENT_TYPE_TESTIMONIAL = exports.CONTENT_TYPE_TESTIMONIAL = "testimonial";
 
 /*
 Theme colors:
@@ -157,40 +155,211 @@ const arrayMoveImmutable = (array, fromIndex, toIndex) => {
 const VideoItem = _ref => {
   let {
     muxPlaybackId,
-    muxPosterOffset
+    muxPosterOffset,
+    borderClasses = "border-gray-100",
+    content,
+    textColorTheme = {},
+    muxAccentColor = "indigo"
   } = _ref;
+  const colorThemes = {
+    ["none"]: {
+      border: "border-indigo-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-indigo-600",
+      background: "bg-indigo-800",
+      fill: "fill-indigo-50"
+    },
+    ["black"]: "bg-black border p-4 mb-6 rounded",
+    ["white"]: {
+      border: "border-indigo-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-indigo-600",
+      background: "bg-indigo-800",
+      fill: "fill-indigo-50"
+    },
+    ["rose"]: {
+      border: "border-rose-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-rose-600",
+      background: "bg-rose-800",
+      fill: "fill-rose-50"
+    },
+    ["pink"]: {
+      border: "border-pink-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-pink-600",
+      background: "bg-pink-800",
+      fill: "fill-pink-50"
+    },
+    ["fuchsia"]: {
+      border: "border-fuchsia-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-fuchsia-600",
+      background: "bg-fuchsia-800",
+      fill: "fill-fuchsia-50"
+    },
+    ["purple"]: {
+      border: "border-purple-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-purple-600",
+      background: "bg-purple-800",
+      fill: "fill-purple-50"
+    },
+    ["violet"]: {
+      border: "border-violet-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-violet-600",
+      background: "bg-violet-800",
+      fill: "fill-violet-50"
+    },
+    ["indigo"]: {
+      border: "border-indigo-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-indigo-600",
+      background: "bg-indigo-800",
+      fill: "fill-indigo-50"
+    },
+    ["blue"]: {
+      border: "border-blue-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-blue-600",
+      background: "bg-blue-800",
+      fill: "fill-blue-50"
+    },
+    ["sky"]: {
+      border: "border-sky-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-sky-600",
+      background: "bg-sky-800",
+      fill: "fill-sky-50"
+    },
+    ["cyan"]: {
+      border: "border-cyan-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-cyan-600",
+      background: "bg-cyan-800",
+      fill: "fill-cyan-50"
+    },
+    ["teal"]: {
+      border: "border-teal-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-teal-600",
+      background: "bg-teal-800",
+      fill: "fill-teal-50"
+    },
+    ["emerald"]: {
+      border: "border-emerald-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-emerald-600",
+      background: "bg-emerald-800",
+      fill: "fill-emerald-50"
+    },
+    ["green"]: {
+      border: "border-green-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-green-600",
+      background: "bg-green-800",
+      fill: "fill-green-50"
+    },
+    ["lime"]: {
+      border: "border-lime-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-lime-600",
+      background: "bg-lime-800",
+      fill: "fill-lime-50"
+    },
+    ["yellow"]: {
+      border: "border-yellow-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-yellow-600",
+      background: "bg-yellow-800",
+      fill: "fill-yellow-50"
+    },
+    ["amber"]: {
+      border: "border-amber-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-amber-600",
+      background: "bg-amber-800",
+      fill: "fill-amber-50"
+    },
+    ["orange"]: {
+      border: "border-orange-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-orange-600",
+      background: "bg-orange-800",
+      fill: "fill-orange-50"
+    },
+    ["red"]: {
+      border: "border-red-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-red-600",
+      background: "bg-red-800",
+      fill: "fill-red-50"
+    },
+    ["stone"]: {
+      border: "border-stone-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-stone-600",
+      background: "bg-stone-800",
+      fill: "fill-stone-50"
+    },
+    ["neutral"]: {
+      border: "border-neutral-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-neutral-600"
+    },
+    ["gray"]: {
+      border: "border-gray-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-gray-600",
+      background: "bg-gray-800",
+      fill: "fill-gray-50"
+    },
+    ["slate"]: {
+      border: "border-slate-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-slate-600",
+      background: "bg-slate-800",
+      fill: "fill-slate-50"
+    }
+  };
+  if (!(muxAccentColor in colorThemes)) muxAccentColor = "indigo";
   const [showVideo, setShowVideo] = (0, _react.useState)(false);
-  if (showVideo) return /*#__PURE__*/_react.default.createElement("mux-video", {
+  if (content) borderClasses = `${backgroundColorThemes} mb-4`;
+  const videoOut = showVideo ? /*#__PURE__*/_react.default.createElement("mux-video", {
     style: {
       width: "100%",
       aspectRatio: "16/9",
       objectFit: "contain"
     },
-    className: "flex",
+    className: `flex ${borderClasses}`,
     "playback-id": muxPlaybackId,
     "metadata-video-title": "About FirstWho",
     "disable-tracking": true,
     "disable-cookies": true,
     controls: true,
     autoplay: true
-  });
-  if (!showVideo) return /*#__PURE__*/_react.default.createElement("div", {
+  }) : /*#__PURE__*/_react.default.createElement("div", {
     onClick: () => {
       setShowVideo(true);
     },
-    className: "group/item cursor-pointer aspect-video rounded-lg border-gray-100 shadow grid"
+    className: `group/item cursor-pointer aspect-video rounded-lg ${borderClasses} grid`
   }, /*#__PURE__*/_react.default.createElement("img", {
     className: "object-cover col-start-1 row-start-1",
     src: `https://image.mux.com/${muxPlaybackId}/thumbnail.jpg?width=1920&height=1080&time=${muxPosterOffset || 1}`
   }), /*#__PURE__*/_react.default.createElement("div", {
-    className: "border-indigo-600 border-2 x-group-hover/item:border-gray-900 group-hover/item:bg-indigo-600 col-start-1 row-start-1 grid h-24 w-32 place-self-center rounded-full bg-indigo-800"
+    className: `${colorThemes[muxAccentColor]["border"]} border-2 x-group-hover/item:${colorThemes[muxAccentColor]["borderHover"]} group-hover/item:${colorThemes[muxAccentColor]["backgroundHover"]} col-start-1 row-start-1 grid h-24 w-32 place-self-center rounded-full ${colorThemes[muxAccentColor]["background"]}`
   }, /*#__PURE__*/_react.default.createElement("svg", {
-    className: "mt-3 h-20 w-20 place-self-center",
+    className: "mt-3 h-8 w-8 md:h-20 md:w-20 place-self-center",
     viewBox: "0 0 100 125"
   }, /*#__PURE__*/_react.default.createElement("path", {
-    className: "fill-indigo-50 group-hover/item:fill-white",
+    className: `${colorThemes[muxAccentColor]["fill"]} group-hover/item:fill-white`,
     d: "m77.6 54.3-46 26.6c-2 1.2-4.6-.3-4.6-2.7V25c0-2.4 2.6-3.8 4.6-2.7l46 26.6c2 1.3 2 4.2 0 5.4z"
   }))));
+  return /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, videoOut, content && /*#__PURE__*/_react.default.createElement(TextLeft, {
+    content: content,
+    textColorTheme: textColorTheme
+  }));
 };
 const SortableList = _ref2 => {
   let {
@@ -820,7 +989,16 @@ const CTASection = _ref26 => {
   });
   return /*#__PURE__*/_react.default.createElement("div", null, ctaContent);
 };
-const ContentSections = _ref28 => {
+const BaseTestimonialSection = _ref28 => {
+  let {
+    heading,
+    id,
+    testimonials,
+    showHeading
+  } = _ref28;
+  return /*#__PURE__*/_react.default.createElement("div", null, "Testimonials");
+};
+const ContentSections = _ref29 => {
   let {
     showCopyLink = true,
     sections,
@@ -830,9 +1008,10 @@ const ContentSections = _ref28 => {
     headingFont,
     contentFont,
     headingClasses,
-    setActiveHeader = () => {}
-  } = _ref28;
-  return sections.map(_ref29 => {
+    setActiveHeader = () => {},
+    TestimonialComponent = BaseTestimonialSection
+  } = _ref29;
+  return sections.map(_ref30 => {
     let {
       content,
       content_type: contentType,
@@ -849,8 +1028,10 @@ const ContentSections = _ref28 => {
       buttonColorTheme,
       muxPlaybackId,
       muxPosterOffset,
-      muxAccentColor
-    } = _ref29;
+      muxAccentColor,
+      borderClasses,
+      testimonials
+    } = _ref30;
     const imageUrl = image && "url" in image ? image["url"] : null;
     const imageHeight = image && "height" in image ? image["height"] : null;
     const imageWidth = image && "width" in image ? image["width"] : null;
@@ -940,7 +1121,18 @@ const ContentSections = _ref28 => {
         sectionOut = /*#__PURE__*/_react.default.createElement(VideoItem, {
           muxPlaybackId: muxPlaybackId,
           muxAccentColor: muxAccentColor,
-          muxPosterOffset: muxPosterOffset
+          muxPosterOffset: muxPosterOffset,
+          content: content,
+          textColorTheme: textColorTheme || "none",
+          borderClasses: borderClasses || "border-gray-100"
+        });
+        break;
+      case CONTENT_TYPE_TESTIMONIAL:
+        sectionOut = /*#__PURE__*/_react.default.createElement(TestimonialComponent, {
+          heading: heading,
+          id: id,
+          testimonials: testimonials,
+          showHeading: showHeading
         });
         break;
       case CONTENT_TYPE_SIGN_UP:
@@ -971,7 +1163,7 @@ const ContentSections = _ref28 => {
   });
 };
 exports.ContentSections = ContentSections;
-const DoContentSections = _ref30 => {
+const DoContentSections = _ref31 => {
   let {
     sections,
     localFont,
@@ -990,8 +1182,9 @@ const DoContentSections = _ref30 => {
     mainGridClasses = "col-span-4 md:col-span-3",
     tocItemClasses,
     tocItemMatchedClasses,
-    headingClasses = "text-2xl font-semibold xl:mb-2 xl:text-3xl"
-  } = _ref30;
+    headingClasses = "text-2xl font-semibold xl:mb-2 xl:text-3xl",
+    TestimonialComponent = BaseTestimonialSection
+  } = _ref31;
   const [activeHeader, setActiveHeader] = (0, _react.useState)(null);
   return /*#__PURE__*/_react.default.createElement("div", {
     className: outerGridClasses
@@ -1017,7 +1210,8 @@ const DoContentSections = _ref30 => {
     localFont: localFont,
     headingFont: headingFont,
     contentFont: contentFont,
-    headingClasses: headingClasses
+    headingClasses: headingClasses,
+    TestimonialComponent: TestimonialComponent || BaseTestimonialSection
   })));
 };
 exports.DoContentSections = DoContentSections;
