@@ -13,8 +13,6 @@ import {
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
 import { CSS } from "@dnd-kit/utilities";
 import { Transition } from "@headlessui/react";
-// import MuxPlayer from "@mux/mux-player-react";
-// import "@mux/mux-player/themes/microvideo";
 
 export const CONTENT_TYPE_TEXT_LEFT = "text-only-left";
 export const CONTENT_TYPE_TEXT_RIGHT = "text-only-right";
@@ -28,6 +26,7 @@ export const CONTENT_TYPE_IMAGE_FULL = "image-only-full";
 export const CONTENT_TYPE_DIVIDER = "divider";
 export const CONTENT_TYPE_SIGN_UP = "sign-up";
 export const CONTENT_TYPE_MUX_VIDEO = "mux-video";
+export const CONTENT_TYPE_TESTIMONIAL = "testimonial";
 
 /*
 Theme colors:
@@ -178,50 +177,231 @@ const arrayMoveImmutable = (array, fromIndex, toIndex) => {
   return array;
 };
 
-const VideoItem = ({ muxPlaybackId, muxPosterOffset }) => {
+const VideoItem = ({
+  muxPlaybackId,
+  muxPosterOffset,
+  borderClasses = "border-gray-100",
+  content,
+  textColorTheme = {},
+  muxAccentColor = "indigo"
+}) => {
+  const colorThemes = {
+    ["none"]: {
+      border: "border-indigo-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-indigo-600",
+      background: "bg-indigo-800",
+      fill: "fill-indigo-50"
+    },
+    ["black"]: "bg-black border p-4 mb-6 rounded",
+    ["white"]: {
+      border: "border-indigo-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-indigo-600",
+      background: "bg-indigo-800",
+      fill: "fill-indigo-50"
+    },
+    ["rose"]: {
+      border: "border-rose-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-rose-600",
+      background: "bg-rose-800",
+      fill: "fill-rose-50"
+    },
+    ["pink"]: {
+      border: "border-pink-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-pink-600",
+      background: "bg-pink-800",
+      fill: "fill-pink-50"
+    },
+    ["fuchsia"]: {
+      border: "border-fuchsia-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-fuchsia-600",
+      background: "bg-fuchsia-800",
+      fill: "fill-fuchsia-50"
+    },
+    ["purple"]: {
+      border: "border-purple-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-purple-600",
+      background: "bg-purple-800",
+      fill: "fill-purple-50"
+    },
+    ["violet"]: {
+      border: "border-violet-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-violet-600",
+      background: "bg-violet-800",
+      fill: "fill-violet-50"
+    },
+    ["indigo"]: {
+      border: "border-indigo-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-indigo-600",
+      background: "bg-indigo-800",
+      fill: "fill-indigo-50"
+    },
+    ["blue"]: {
+      border: "border-blue-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-blue-600",
+      background: "bg-blue-800",
+      fill: "fill-blue-50"
+    },
+    ["sky"]: {
+      border: "border-sky-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-sky-600",
+      background: "bg-sky-800",
+      fill: "fill-sky-50"
+    },
+    ["cyan"]: {
+      border: "border-cyan-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-cyan-600",
+      background: "bg-cyan-800",
+      fill: "fill-cyan-50"
+    },
+    ["teal"]: {
+      border: "border-teal-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-teal-600",
+      background: "bg-teal-800",
+      fill: "fill-teal-50"
+    },
+    ["emerald"]: {
+      border: "border-emerald-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-emerald-600",
+      background: "bg-emerald-800",
+      fill: "fill-emerald-50"
+    },
+    ["green"]: {
+      border: "border-green-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-green-600",
+      background: "bg-green-800",
+      fill: "fill-green-50"
+    },
+    ["lime"]: {
+      border: "border-lime-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-lime-600",
+      background: "bg-lime-800",
+      fill: "fill-lime-50"
+    },
+    ["yellow"]: {
+      border: "border-yellow-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-yellow-600",
+      background: "bg-yellow-800",
+      fill: "fill-yellow-50"
+    },
+    ["amber"]: {
+      border: "border-amber-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-amber-600",
+      background: "bg-amber-800",
+      fill: "fill-amber-50"
+    },
+    ["orange"]: {
+      border: "border-orange-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-orange-600",
+      background: "bg-orange-800",
+      fill: "fill-orange-50"
+    },
+    ["red"]: {
+      border: "border-red-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-red-600",
+      background: "bg-red-800",
+      fill: "fill-red-50"
+    },
+    ["stone"]: {
+      border: "border-stone-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-stone-600",
+      background: "bg-stone-800",
+      fill: "fill-stone-50"
+    },
+    ["neutral"]: {
+      border: "border-neutral-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-neutral-600"
+    },
+    ["gray"]: {
+      border: "border-gray-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-gray-600",
+      background: "bg-gray-800",
+      fill: "fill-gray-50"
+    },
+    ["slate"]: {
+      border: "border-slate-600",
+      borderHover: "border-gray-900",
+      backgroundHover: "bg-slate-600",
+      background: "bg-slate-800",
+      fill: "fill-slate-50"
+    }
+  };
+
+  if (!(muxAccentColor in colorThemes)) muxAccentColor = "indigo";
+
   const [showVideo, setShowVideo] = useState(false);
 
-  if (showVideo)
-    return (
-      <mux-video
-        style={{ width: "100%", aspectRatio: "16/9", objectFit: "contain" }}
-        className="flex"
-        playback-id={muxPlaybackId}
-        metadata-video-title="About FirstWho"
-        disable-tracking
-        disable-cookies
-        controls
-        autoplay
-      ></mux-video>
-    );
+  if (content) borderClasses = `${backgroundColorThemes} mb-4`;
 
-  if (!showVideo)
-    return (
+  const videoOut = showVideo ? (
+    <mux-video
+      style={{ width: "100%", aspectRatio: "16/9", objectFit: "contain" }}
+      className={`flex ${borderClasses}`}
+      playback-id={muxPlaybackId}
+      metadata-video-title="About FirstWho"
+      disable-tracking
+      disable-cookies
+      controls
+      autoplay
+    ></mux-video>
+  ) : (
+    <div
+      onClick={() => {
+        setShowVideo(true);
+      }}
+      className={`group/item cursor-pointer aspect-video rounded-lg ${borderClasses} grid`}
+    >
+      <img
+        className="object-cover col-start-1 row-start-1"
+        src={`https://image.mux.com/${muxPlaybackId}/thumbnail.jpg?width=1920&height=1080&time=${
+          muxPosterOffset || 1
+        }`}
+      />
       <div
-        onClick={() => {
-          setShowVideo(true);
-        }}
-        className="group/item cursor-pointer aspect-video rounded-lg border-gray-100 shadow grid"
+        className={`${colorThemes[muxAccentColor]["border"]} border-2 x-group-hover/item:${colorThemes[muxAccentColor]["borderHover"]} group-hover/item:${colorThemes[muxAccentColor]["backgroundHover"]} col-start-1 row-start-1 grid h-24 w-32 place-self-center rounded-full ${colorThemes[muxAccentColor]["background"]}`}
       >
-        <img
-          className="object-cover col-start-1 row-start-1"
-          src={`https://image.mux.com/${muxPlaybackId}/thumbnail.jpg?width=1920&height=1080&time=${
-            muxPosterOffset || 1
-          }`}
-        />
-        <div className="border-indigo-600 border-2 x-group-hover/item:border-gray-900 group-hover/item:bg-indigo-600 col-start-1 row-start-1 grid h-24 w-32 place-self-center rounded-full bg-indigo-800">
-          <svg
-            className="mt-3 h-20 w-20 place-self-center"
-            viewBox="0 0 100 125"
-          >
-            <path
-              className="fill-indigo-50 group-hover/item:fill-white"
-              d="m77.6 54.3-46 26.6c-2 1.2-4.6-.3-4.6-2.7V25c0-2.4 2.6-3.8 4.6-2.7l46 26.6c2 1.3 2 4.2 0 5.4z"
-            />
-          </svg>
-        </div>
+        <svg
+          className="mt-3 h-8 w-8 md:h-20 md:w-20 place-self-center"
+          viewBox="0 0 100 125"
+        >
+          <path
+            className={`${colorThemes[muxAccentColor]["fill"]} group-hover/item:fill-white`}
+            d="m77.6 54.3-46 26.6c-2 1.2-4.6-.3-4.6-2.7V25c0-2.4 2.6-3.8 4.6-2.7l46 26.6c2 1.3 2 4.2 0 5.4z"
+          />
+        </svg>
       </div>
-    );
+    </div>
+  );
+
+  return (
+    <>
+      {videoOut}
+      {content && (
+        <TextLeft content={content} textColorTheme={textColorTheme} />
+      )}
+    </>
+  );
 };
 
 const SortableList = ({
@@ -946,6 +1126,10 @@ const CTASection = ({
   return <div>{ctaContent}</div>;
 };
 
+const BaseTestimonialSection = ({ heading, id, testimonials, showHeading }) => {
+  return <div>Testimonials</div>;
+};
+
 export const ContentSections = ({
   showCopyLink = true,
   sections,
@@ -955,7 +1139,8 @@ export const ContentSections = ({
   headingFont,
   contentFont,
   headingClasses,
-  setActiveHeader = () => {}
+  setActiveHeader = () => {},
+  TestimonialComponent = BaseTestimonialSection
 }) =>
   sections.map(
     ({
@@ -974,7 +1159,9 @@ export const ContentSections = ({
       buttonColorTheme,
       muxPlaybackId,
       muxPosterOffset,
-      muxAccentColor
+      muxAccentColor,
+      borderClasses,
+      testimonials
     }) => {
       const imageUrl = image && "url" in image ? image["url"] : null;
       const imageHeight = image && "height" in image ? image["height"] : null;
@@ -1087,9 +1274,22 @@ export const ContentSections = ({
               muxPlaybackId={muxPlaybackId}
               muxAccentColor={muxAccentColor}
               muxPosterOffset={muxPosterOffset}
+              content={content}
+              textColorTheme={textColorTheme || "none"}
+              borderClasses={borderClasses || "border-gray-100"}
             />
           );
+          break;
 
+        case CONTENT_TYPE_TESTIMONIAL:
+          sectionOut = (
+            <TestimonialComponent
+              heading={heading}
+              id={id}
+              testimonials={testimonials}
+              showHeading={showHeading}
+            />
+          );
           break;
 
         case CONTENT_TYPE_SIGN_UP:
@@ -1144,7 +1344,8 @@ export const DoContentSections = ({
   mainGridClasses = "col-span-4 md:col-span-3",
   tocItemClasses,
   tocItemMatchedClasses,
-  headingClasses = "text-2xl font-semibold xl:mb-2 xl:text-3xl"
+  headingClasses = "text-2xl font-semibold xl:mb-2 xl:text-3xl",
+  TestimonialComponent = BaseTestimonialSection
 }) => {
   const [activeHeader, setActiveHeader] = useState(null);
 
@@ -1173,6 +1374,7 @@ export const DoContentSections = ({
           headingFont={headingFont}
           contentFont={contentFont}
           headingClasses={headingClasses}
+          TestimonialComponent={TestimonialComponent || BaseTestimonialSection}
         />
       </div>
     </div>
