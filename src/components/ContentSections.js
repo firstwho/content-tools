@@ -379,14 +379,14 @@ const VideoItem = ({
         }`}
       />
       <div
-        className={`${colorThemes[muxAccentColor]["border"]} border-2 x-group-hover/item:${colorThemes[muxAccentColor]["borderHover"]} group-hover/item:${colorThemes[muxAccentColor]["backgroundHover"]} col-start-1 row-start-1 grid h-24 w-32 place-self-center rounded-full ${colorThemes[muxAccentColor]["background"]}`}
+        className={`${colorThemes[muxAccentColor]["border"]} opacity-80 border-2 x-group-hover/item:${colorThemes[muxAccentColor]["borderHover"]} group-hover/item:${colorThemes[muxAccentColor]["backgroundHover"]} col-start-1 row-start-1 grid h-12 w-16 md:h-24 md:w-32 place-self-center rounded-full ${colorThemes[muxAccentColor]["background"]}`}
       >
         <svg
-          className="mt-3 h-8 w-8 md:h-20 md:w-20 place-self-center"
+          className="mt-2 md:mt-3 h-8 w-8 md:h-20 md:w-20 place-self-center"
           viewBox="0 0 100 125"
         >
           <path
-            className={`${colorThemes[muxAccentColor]["fill"]} group-hover/item:fill-white`}
+            className={`${colorThemes[muxAccentColor]["fill"]} group-hover/item:fill-indigo-800`}
             d="m77.6 54.3-46 26.6c-2 1.2-4.6-.3-4.6-2.7V25c0-2.4 2.6-3.8 4.6-2.7l46 26.6c2 1.3 2 4.2 0 5.4z"
           />
         </svg>
@@ -705,7 +705,9 @@ const TableOfContents = ({
       >
         {tocHeading && (
           <h3
-            className={`${localFont.className} -ml-1 mb-3 text-xl font-semibold text-slate-700`}
+            className={`${
+              (localFont && localFont?.className) || ""
+            } -ml-1 mb-3 text-xl font-semibold text-slate-700`}
           >
             {tocHeading}
           </h3>
@@ -782,7 +784,9 @@ const Heading = ({
     return (
       <h1
         ref={ref}
-        className={`${localFont.className} ${textColorThemes[textColorTheme]} mb-2 text-base font-semibold xl:mb-4 xl:text-4xl`}
+        className={`${(localFont && localFont?.className) || ""} ${
+          textColorThemes[textColorTheme]
+        } mb-2 text-base font-semibold xl:mb-4 xl:text-4xl`}
       >
         {title}
       </h1>
@@ -800,7 +804,11 @@ const Heading = ({
           });
         }}
         ref={ref}
-        className={`${localFont.className} cursor-pointer ${headingClasses} flex items-center ${textColorThemes[textColorTheme]}`}
+        className={`${
+          (localFont && localFont?.className) || ""
+        } cursor-pointer ${headingClasses} flex items-center ${
+          textColorThemes[textColorTheme]
+        }`}
       >
         <div>{title}</div>
         {showCopyLink && (
@@ -959,12 +967,16 @@ const Section = ({
   id,
   headingOut,
   scripts,
-  backgroundColorTheme = "none"
+  backgroundColorTheme = "none",
+  emptyContent = false
 }) => {
   useScript(scripts?.[0] || false);
 
+  let className = backgroundColorThemes[backgroundColorTheme];
+  if (emptyContent) className = className.replace("mb-6", "mb-2");
+
   return (
-    <section key={id} className={backgroundColorThemes[backgroundColorTheme]}>
+    <section key={id} className={className}>
       <div className="relative">
         <a
           className="absolute -top-10"
@@ -1166,6 +1178,17 @@ export const ContentSections = ({
       const imageUrl = image && "url" in image ? image["url"] : null;
       const imageHeight = image && "height" in image ? image["height"] : null;
       const imageWidth = image && "width" in image ? image["width"] : null;
+      const emptyContent =
+        ([
+          CONTENT_TYPE_TEXT_LEFT,
+          CONTENT_TYPE_TEXT_RIGHT,
+          CONTENT_TYPE_TEXT_CENTER
+        ].includes(contentType) &&
+          (content === null ||
+            content === "" ||
+            content === "<div></div>" ||
+            content === "<p></p>")) ||
+        false;
 
       const headingOut =
         showHeading === false || contentType === CONTENT_TYPE_DIVIDER ? null : (
@@ -1183,7 +1206,7 @@ export const ContentSections = ({
       let sectionOut;
       switch (contentType) {
         case CONTENT_TYPE_TEXT_LEFT:
-          sectionOut = (
+          sectionOut = emptyContent ? null : (
             <TextLeft
               content={content}
               textColorTheme={textColorTheme || "none"}
@@ -1192,7 +1215,7 @@ export const ContentSections = ({
           );
           break;
         case CONTENT_TYPE_TEXT_RIGHT:
-          sectionOut = (
+          sectionOut = emptyContent ? null : (
             <TextRight
               content={content}
               textColorTheme={textColorTheme || "none"}
@@ -1201,7 +1224,7 @@ export const ContentSections = ({
           );
           break;
         case CONTENT_TYPE_TEXT_CENTER:
-          sectionOut = (
+          sectionOut = emptyContent ? null : (
             <TextCenter
               content={content}
               textColorTheme={textColorTheme || "none"}
@@ -1321,6 +1344,7 @@ export const ContentSections = ({
           headingOut={headingOut}
           scripts={scripts}
           backgroundColorTheme={backgroundColorTheme || "none"}
+          emptyContent={emptyContent}
         />
       );
     }
