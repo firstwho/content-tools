@@ -355,6 +355,8 @@ const VideoItem = ({
     }
   };
 
+  console.log("muxAccentColor", muxAccentColor);
+
   if (!(muxAccentColor in colorThemes)) muxAccentColor = "indigo";
 
   const [showVideo, setShowVideo] = useState(false);
@@ -393,7 +395,7 @@ const VideoItem = ({
           viewBox="0 0 100 125"
         >
           <path
-            className={`${colorThemes[muxAccentColor]["fill"]} group-hover/item:fill-indigo-800`}
+            className={`${colorThemes[muxAccentColor]["fill"]}`}
             d="m77.6 54.3-46 26.6c-2 1.2-4.6-.3-4.6-2.7V25c0-2.4 2.6-3.8 4.6-2.7l46 26.6c2 1.3 2 4.2 0 5.4z"
           />
         </svg>
