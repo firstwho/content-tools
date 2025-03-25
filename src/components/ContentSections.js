@@ -243,6 +243,13 @@ const VideoItem = ({
       background: "bg-indigo-800",
       fill: "fill-indigo-50"
     },
+    ["indigo-inverted"]: {
+      border: "border-indigo-200",
+      borderHover: "border-indigo-300",
+      backgroundHover: "bg-indigo-50",
+      background: "bg-white",
+      fill: "fill-indigo-700"
+    },
     ["blue"]: {
       border: "border-blue-600",
       borderHover: "border-gray-900",
@@ -973,7 +980,7 @@ const Section = ({
   useScript(scripts?.[0] || false);
 
   let className = backgroundColorThemes[backgroundColorTheme];
-  if (emptyContent) className = className.replace("mb-6", "mb-2");
+  if (emptyContent) className = className.replace("mb-6", "mb-0");
 
   return (
     <section key={id} className={className}>
