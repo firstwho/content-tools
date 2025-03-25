@@ -348,12 +348,12 @@ const VideoItem = _ref => {
     className: "object-cover col-start-1 row-start-1",
     src: `https://image.mux.com/${muxPlaybackId}/thumbnail.jpg?width=1920&height=1080&time=${muxPosterOffset || 1}`
   }), /*#__PURE__*/_react.default.createElement("div", {
-    className: `${colorThemes[muxAccentColor]["border"]} border-2 x-group-hover/item:${colorThemes[muxAccentColor]["borderHover"]} group-hover/item:${colorThemes[muxAccentColor]["backgroundHover"]} col-start-1 row-start-1 grid h-24 w-32 place-self-center rounded-full ${colorThemes[muxAccentColor]["background"]}`
+    className: `${colorThemes[muxAccentColor]["border"]} opacity-80 border-2 x-group-hover/item:${colorThemes[muxAccentColor]["borderHover"]} group-hover/item:${colorThemes[muxAccentColor]["backgroundHover"]} col-start-1 row-start-1 grid h-12 w-16 md:h-24 md:w-32 place-self-center rounded-full ${colorThemes[muxAccentColor]["background"]}`
   }, /*#__PURE__*/_react.default.createElement("svg", {
-    className: "mt-3 h-8 w-8 md:h-20 md:w-20 place-self-center",
+    className: "mt-2 md:mt-3 h-8 w-8 md:h-20 md:w-20 place-self-center",
     viewBox: "0 0 100 125"
   }, /*#__PURE__*/_react.default.createElement("path", {
-    className: `${colorThemes[muxAccentColor]["fill"]} group-hover/item:fill-white`,
+    className: `${colorThemes[muxAccentColor]["fill"]} group-hover/item:fill-indigo-800`,
     d: "m77.6 54.3-46 26.6c-2 1.2-4.6-.3-4.6-2.7V25c0-2.4 2.6-3.8 4.6-2.7l46 26.6c2 1.3 2 4.2 0 5.4z"
   }))));
   return /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, videoOut, content && /*#__PURE__*/_react.default.createElement(TextLeft, {
@@ -609,7 +609,7 @@ const TableOfContents = _ref7 => {
   }, /*#__PURE__*/_react.default.createElement("div", {
     className: `sticky ${sortCollection ? "top-0" : "top-[95px]"} hidden lg:block`
   }, tocHeading && /*#__PURE__*/_react.default.createElement("h3", {
-    className: `${localFont.className} -ml-1 mb-3 text-xl font-semibold text-slate-700`
+    className: `${localFont && localFont?.className || ""} -ml-1 mb-3 text-xl font-semibold text-slate-700`
   }, tocHeading), /*#__PURE__*/_react.default.createElement("ul", {
     className: `${sortCollection ? "" : "mt-2"} ${tocHeading ? "lg:mt-4" : ""} ${sortCollection ? "lg:space-y-2 grid grid-cols-1 divide-y" : "lg:space-y-4"} ${showMeter ? "border-l-2 border-slate-700" : ""}`
   }, /*#__PURE__*/_react.default.createElement(SortableList, {
@@ -664,7 +664,7 @@ const Heading = _ref12 => {
   useOnScreen(ref, setActiveHeader, anchor);
   if (level === 1) return /*#__PURE__*/_react.default.createElement("h1", {
     ref: ref,
-    className: `${localFont.className} ${textColorThemes[textColorTheme]} mb-2 text-base font-semibold xl:mb-4 xl:text-4xl`
+    className: `${localFont && localFont?.className || ""} ${textColorThemes[textColorTheme]} mb-2 text-base font-semibold xl:mb-4 xl:text-4xl`
   }, title);
   if (level === 2) return /*#__PURE__*/_react.default.createElement("h2", {
     onClick: () => {
@@ -675,7 +675,7 @@ const Heading = _ref12 => {
       });
     },
     ref: ref,
-    className: `${localFont.className} cursor-pointer ${headingClasses} flex items-center ${textColorThemes[textColorTheme]}`
+    className: `${localFont && localFont?.className || ""} cursor-pointer ${headingClasses} flex items-center ${textColorThemes[textColorTheme]}`
   }, /*#__PURE__*/_react.default.createElement("div", null, title), showCopyLink && /*#__PURE__*/_react.default.createElement("div", {
     className: "p-1 ml-2"
   }, /*#__PURE__*/_react.default.createElement("svg", {
@@ -846,12 +846,15 @@ const Section = _ref22 => {
     id,
     headingOut,
     scripts,
-    backgroundColorTheme = "none"
+    backgroundColorTheme = "none",
+    emptyContent = false
   } = _ref22;
   useScript(scripts?.[0] || false);
+  let className = backgroundColorThemes[backgroundColorTheme];
+  if (emptyContent) className = className.replace("mb-6", "mb-2");
   return /*#__PURE__*/_react.default.createElement("section", {
     key: id,
-    className: backgroundColorThemes[backgroundColorTheme]
+    className: className
   }, /*#__PURE__*/_react.default.createElement("div", {
     className: "relative"
   }, /*#__PURE__*/_react.default.createElement("a", {
@@ -1035,6 +1038,7 @@ const ContentSections = _ref29 => {
     const imageUrl = image && "url" in image ? image["url"] : null;
     const imageHeight = image && "height" in image ? image["height"] : null;
     const imageWidth = image && "width" in image ? image["width"] : null;
+    const emptyContent = [CONTENT_TYPE_TEXT_LEFT, CONTENT_TYPE_TEXT_RIGHT, CONTENT_TYPE_TEXT_CENTER].includes(contentType) && (content === null || content === "" || content === "<div></div>" || content === "<p></p>") || false;
     const headingOut = showHeading === false || contentType === CONTENT_TYPE_DIVIDER ? null : /*#__PURE__*/_react.default.createElement(Heading, {
       title: heading,
       level: headingLevel,
@@ -1048,21 +1052,21 @@ const ContentSections = _ref29 => {
     let sectionOut;
     switch (contentType) {
       case CONTENT_TYPE_TEXT_LEFT:
-        sectionOut = /*#__PURE__*/_react.default.createElement(TextLeft, {
+        sectionOut = emptyContent ? null : /*#__PURE__*/_react.default.createElement(TextLeft, {
           content: content,
           textColorTheme: textColorTheme || "none",
           contentFont: contentFont || localFont
         });
         break;
       case CONTENT_TYPE_TEXT_RIGHT:
-        sectionOut = /*#__PURE__*/_react.default.createElement(TextRight, {
+        sectionOut = emptyContent ? null : /*#__PURE__*/_react.default.createElement(TextRight, {
           content: content,
           textColorTheme: textColorTheme || "none",
           contentFont: contentFont || localFont
         });
         break;
       case CONTENT_TYPE_TEXT_CENTER:
-        sectionOut = /*#__PURE__*/_react.default.createElement(TextCenter, {
+        sectionOut = emptyContent ? null : /*#__PURE__*/_react.default.createElement(TextCenter, {
           content: content,
           textColorTheme: textColorTheme || "none",
           contentFont: contentFont || localFont
@@ -1158,7 +1162,8 @@ const ContentSections = _ref29 => {
       id: id,
       headingOut: headingOut,
       scripts: scripts,
-      backgroundColorTheme: backgroundColorTheme || "none"
+      backgroundColorTheme: backgroundColorTheme || "none",
+      emptyContent: emptyContent
     });
   });
 };
