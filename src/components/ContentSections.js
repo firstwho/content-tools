@@ -59,29 +59,29 @@ Theme colors:
 
 const backgroundColorThemes = {
   ["none"]: "pt-0 mb-6",
-  ["black"]: "bg-black border p-4 mb-6 rounded",
-  ["white"]: "bg-white border border-gray-50 p-4 mb-6 rounded",
-  ["rose"]: "bg-rose-50 border border-rose-200 p-4 mb-6 rounded",
-  ["pink"]: "bg-pink-50 border border-pink-200 p-4 mb-6 rounded",
-  ["fuchsia"]: "bg-fuchsia-50 border border-fuchsia-200 p-4 mb-6 rounded",
-  ["purple"]: "bg-purple-50 border border-purple-200 p-4 mb-6 rounded",
-  ["violet"]: "bg-violet-50 border border-violet-200 p-4 mb-6 rounded",
-  ["indigo"]: "bg-indigo-50 border border-indigo-200 p-4 mb-6 rounded",
-  ["blue"]: "bg-blue-50 border border-blue-200 p-4 mb-6 rounded",
-  ["sky"]: "bg-sky-50 border border-sky-200 p-4 mb-6 rounded",
-  ["cyan"]: "bg-cyan-50 border border-cyan-200 p-4 mb-6 rounded",
-  ["teal"]: "bg-teal-50 border border-teal-200 p-4 mb-6 rounded",
-  ["emerald"]: "bg-emerald-50 border border-emerald-200 p-4 mb-6 rounded",
-  ["green"]: "bg-green-50 border border-green-200 p-4 mb-6 rounded",
-  ["lime"]: "bg-lime-50 border border-lime-200 p-4 mb-6 rounded",
-  ["yellow"]: "bg-yellow-50 border border-yellow-200 p-4 mb-6 rounded",
-  ["amber"]: "bg-amber-50 border border-amber-200 p-4 mb-6 rounded",
-  ["orange"]: "bg-orange-50 border border-orange-200 p-4 mb-6 rounded",
-  ["red"]: "bg-red-50 border border-red-200 p-4 mb-6 rounded",
-  ["stone"]: "bg-stone-50 border border-stone-200 p-4 mb-6 rounded",
-  ["neutral"]: "bg-neutral-50 border border-neutral-200 p-4 mb-6 rounded",
-  ["gray"]: "bg-gray-50 border border-gray-200 p-4 mb-6 rounded",
-  ["slate"]: "bg-slate-50 border border-slate-200 p-4 mb-6 rounded"
+  ["black"]: "bg-black border p-2 mb-6 rounded",
+  ["white"]: "bg-white border border-gray-50 p-2 mb-6 rounded",
+  ["rose"]: "bg-rose-50 p-2 mb-6 rounded",
+  ["pink"]: "bg-pink-50 p-2 mb-6 rounded",
+  ["fuchsia"]: "bg-fuchsia-50 p-2 mb-6 rounded",
+  ["purple"]: "bg-purple-50 p-2 mb-6 rounded",
+  ["violet"]: "bg-violet-50 p-2 mb-6 rounded",
+  ["indigo"]: "bg-indigo-50 p-2 mb-6 rounded",
+  ["blue"]: "bg-blue-50 p-2 mb-6 rounded",
+  ["sky"]: "bg-sky-50 p-2 mb-6 rounded",
+  ["cyan"]: "bg-cyan-50 p-2 mb-6 rounded",
+  ["teal"]: "bg-teal-50 p-2 mb-6 rounded",
+  ["emerald"]: "bg-emerald-50 p-2 mb-6 rounded",
+  ["green"]: "bg-green-50 p-2 mb-6 rounded",
+  ["lime"]: "bg-lime-50 p-2 mb-6 rounded",
+  ["yellow"]: "bg-yellow-50 p-2 mb-6 rounded",
+  ["amber"]: "bg-amber-50 p-2 mb-6 rounded",
+  ["orange"]: "bg-orange-50 p-2 mb-6 rounded",
+  ["red"]: "bg-red-50 p-2 mb-6 rounded",
+  ["stone"]: "bg-stone-50 p-2 mb-6 rounded",
+  ["neutral"]: "bg-neutral-50 p-2 mb-6 rounded",
+  ["gray"]: "bg-gray-50 p-2 mb-6 rounded",
+  ["slate"]: "bg-slate-50 p-2 mb-6 rounded"
 };
 
 const textColorThemes = {
@@ -873,7 +873,7 @@ const TextLeft = ({ content, textColorTheme = "none", contentFont = {} }) => (
   <div
     className={`${
       contentFont?.className || ""
-    } leading-loose prose lg:prose-lg max-w-none ${
+    } leading-normal prose lg:prose-lg max-w-none ${
       textColorThemes[textColorTheme]
     }`}
     dangerouslySetInnerHTML={{ __html: content }}
@@ -884,7 +884,7 @@ const TextRight = ({ content, textColorTheme = "none", contentFont = {} }) => (
   <div
     className={`${
       contentFont?.className || ""
-    } text-right leading-loose prose lg:prose-lg max-w-none ${
+    } text-right leading-normal prose lg:prose-lg max-w-none ${
       textColorThemes[textColorTheme]
     }`}
     dangerouslySetInnerHTML={{ __html: content }}
@@ -895,7 +895,7 @@ const TextCenter = ({ content, textColorTheme = "none", contentFont = {} }) => (
   <div
     className={`${
       contentFont?.className || ""
-    } text-center leading-loose prose lg:prose-lg max-w-none ${
+    } text-center leading-normal prose lg:prose-lg max-w-none ${
       textColorThemes[textColorTheme]
     }`}
     dangerouslySetInnerHTML={{ __html: content }}
@@ -916,7 +916,7 @@ const ImageOnLeft = ({
     <div
       className={`${colSpanContent} ${
         contentFont?.className || ""
-      } leading-loose prose lg:prose-lg max-w-none`}
+      } leading-normal prose lg:prose-lg max-w-none`}
       dangerouslySetInnerHTML={{ __html: content }}
     />
   </div>
@@ -939,7 +939,7 @@ const ImageOnRight = ({
     <div
       className={`${colSpanContent} ${
         contentFont?.className || ""
-      } leading-loose prose lg:prose-lg max-w-none`}
+      } leading-normal prose lg:prose-lg max-w-none`}
       dangerouslySetInnerHTML={{ __html: content }}
     />
     {ctaContent}
