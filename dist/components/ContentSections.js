@@ -9,7 +9,7 @@ exports.DoContentSections = exports.ContentSections = exports.CONTENT_TYPE_TEXT_
 var _extends2 = _interopRequireDefault(require("@babel/runtime/helpers/extends"));
 var _react = _interopRequireWildcard(require("react"));
 var _copyToClipboard = _interopRequireDefault(require("copy-to-clipboard"));
-var _reactHotToast = _interopRequireDefault(require("react-hot-toast"));
+var _reactHotToast = _interopRequireWildcard(require("react-hot-toast"));
 var _reactScrollIntoView = _interopRequireDefault(require("react-scroll-into-view"));
 var _core = require("@dnd-kit/core");
 var _sortable = require("@dnd-kit/sortable");
@@ -330,7 +330,6 @@ const VideoItem = _ref => {
       fill: "fill-slate-50"
     }
   };
-  console.log("muxAccentColor", muxAccentColor);
   if (!(muxAccentColor in colorThemes)) muxAccentColor = "indigo";
   const [showVideo, setShowVideo] = (0, _react.useState)(false);
   if (content) borderClasses = `${backgroundColorThemes} mb-4`;
@@ -594,7 +593,8 @@ const TableOfContents = _ref7 => {
     sortCollection,
     tocGridClasses = "col-span-12 md:col-span-1",
     tocItemClasses,
-    tocItemMatchedClasses
+    tocItemMatchedClasses,
+    topStickyOffset = "top-[95px]"
   } = _ref7;
   const [isSorting, setIsSorting] = (0, _react.useState)(null);
   const visibleSections = showInvisibleHeaders ? sections : sections.filter(_ref8 => {
@@ -615,7 +615,7 @@ const TableOfContents = _ref7 => {
   return /*#__PURE__*/_react.default.createElement("div", {
     className: tocGridClasses
   }, /*#__PURE__*/_react.default.createElement("div", {
-    className: `sticky ${sortCollection ? "top-0" : "top-[95px]"} hidden lg:block`
+    className: `sticky ${sortCollection ? "top-0" : topStickyOffset} hidden lg:block`
   }, tocHeading && /*#__PURE__*/_react.default.createElement("h3", {
     className: `${localFont && localFont?.className || ""} -ml-1 mb-3 text-xl font-semibold text-slate-700`
   }, tocHeading), /*#__PURE__*/_react.default.createElement("ul", {
@@ -1195,6 +1195,7 @@ const DoContentSections = _ref31 => {
     mainGridClasses = "col-span-4 md:col-span-3",
     tocItemClasses,
     tocItemMatchedClasses,
+    topStickyOffset = "top-[95px]",
     headingClasses = "text-2xl font-semibold xl:mb-2 xl:text-3xl",
     TestimonialComponent = BaseTestimonialSection
   } = _ref31;
@@ -1213,7 +1214,8 @@ const DoContentSections = _ref31 => {
     sortCollection: sortCollection,
     tocGridClasses: tocGridClasses,
     tocItemClasses: tocItemClasses,
-    tocItemMatchedClasses: tocItemMatchedClasses
+    tocItemMatchedClasses: tocItemMatchedClasses,
+    topStickyOffset: topStickyOffset
   }), /*#__PURE__*/_react.default.createElement("div", {
     className: mainGridClasses
   }, /*#__PURE__*/_react.default.createElement(ContentSections, {
@@ -1225,6 +1227,6 @@ const DoContentSections = _ref31 => {
     contentFont: contentFont,
     headingClasses: headingClasses,
     TestimonialComponent: TestimonialComponent || BaseTestimonialSection
-  })));
+  })), /*#__PURE__*/_react.default.createElement(_reactHotToast.Toaster, null));
 };
 exports.DoContentSections = DoContentSections;
