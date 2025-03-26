@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState } from "react";
 import copy from "copy-to-clipboard";
-import toast from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import ScrollTo from "react-scroll-into-view";
 import { DndContext } from "@dnd-kit/core";
 import {
@@ -355,8 +355,6 @@ const VideoItem = ({
     }
   };
 
-  console.log("muxAccentColor", muxAccentColor);
-
   if (!(muxAccentColor in colorThemes)) muxAccentColor = "indigo";
 
   const [showVideo, setShowVideo] = useState(false);
@@ -686,7 +684,8 @@ const TableOfContents = ({
   sortCollection,
   tocGridClasses = "col-span-12 md:col-span-1",
   tocItemClasses,
-  tocItemMatchedClasses
+  tocItemMatchedClasses,
+  topStickyOffset = "top-[95px]"
 }) => {
   const [isSorting, setIsSorting] = useState(null);
 
@@ -709,7 +708,7 @@ const TableOfContents = ({
     <div className={tocGridClasses}>
       <div
         className={`sticky ${
-          sortCollection ? "top-0" : "top-[95px]"
+          sortCollection ? "top-0" : topStickyOffset
         } hidden lg:block`}
       >
         {tocHeading && (
@@ -1377,6 +1376,7 @@ export const DoContentSections = ({
   mainGridClasses = "col-span-4 md:col-span-3",
   tocItemClasses,
   tocItemMatchedClasses,
+  topStickyOffset = "top-[95px]",
   headingClasses = "text-2xl font-semibold xl:mb-2 xl:text-3xl",
   TestimonialComponent = BaseTestimonialSection
 }) => {
@@ -1397,6 +1397,7 @@ export const DoContentSections = ({
         tocGridClasses={tocGridClasses}
         tocItemClasses={tocItemClasses}
         tocItemMatchedClasses={tocItemMatchedClasses}
+        topStickyOffset={topStickyOffset}
       />
       <div className={mainGridClasses}>
         <ContentSections
@@ -1410,6 +1411,7 @@ export const DoContentSections = ({
           TestimonialComponent={TestimonialComponent || BaseTestimonialSection}
         />
       </div>
+      <Toaster />
     </div>
   );
 };
