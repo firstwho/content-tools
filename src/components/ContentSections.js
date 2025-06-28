@@ -24,9 +24,9 @@ export const CONTENT_TYPE_IMAGE_RIGHT = "image-only-right";
 export const CONTENT_TYPE_IMAGE_CENTER = "image-only-center";
 export const CONTENT_TYPE_IMAGE_FULL = "image-only-full";
 export const CONTENT_TYPE_DIVIDER = "divider";
-export const CONTENT_TYPE_SIGN_UP = "sign-up";
 export const CONTENT_TYPE_MUX_VIDEO = "mux-video";
 export const CONTENT_TYPE_TESTIMONIAL = "testimonial";
+export const CONTENT_TYPE_FORM = "form";
 
 /*
 Theme colors:
@@ -175,6 +175,325 @@ const arrayMoveImmutable = (array, fromIndex, toIndex) => {
   array = [...array];
   arrayMoveMutable(array, fromIndex, toIndex);
   return array;
+};
+
+const DynamicForm = ({
+  formData,
+  localFont,
+  backgroundColorTheme = null,
+  showHeading,
+  heading,
+  id
+}) => {
+  const [formValues, setFormValues] = useState({});
+  const [errors, setErrors] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null);
+
+  // Initialize form values and sort fields by sort_key
+  const sortedFields =
+    formData?.fields?.sort((a, b) => a.sort_key - b.sort_key) || [];
+
+  const validateField = (field, value) => {
+    if (field.required && (!value || value.trim() === "")) {
+      return `${field.name} is required`;
+    }
+
+    if (field.display_type === "email" && value) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(value)) {
+        return "Please enter a valid email address";
+      }
+    }
+
+    return null;
+  };
+
+  const handleInputChange = (field, value) => {
+    setFormValues((prev) => ({
+      ...prev,
+      [field.data_name]: value
+    }));
+
+    // Clear error when user starts typing
+    if (errors[field.data_name]) {
+      setErrors((prev) => ({
+        ...prev,
+        [field.data_name]: null
+      }));
+    }
+  };
+
+  const handleBlur = (field) => {
+    const value = formValues[field.data_name] || "";
+    const error = validateField(field, value);
+
+    if (error) {
+      setErrors((prev) => ({
+        ...prev,
+        [field.data_name]: error
+      }));
+    }
+  };
+
+  const validateForm = () => {
+    const newErrors = {};
+    let isValid = true;
+
+    sortedFields.forEach((field) => {
+      const value = formValues[field.data_name] || "";
+      const error = validateField(field, value);
+
+      if (error) {
+        newErrors[field.data_name] = error;
+        isValid = false;
+      }
+    });
+
+    setErrors(newErrors);
+    return isValid;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!validateForm()) {
+      // Focus on first error field
+      const firstErrorField = Object.keys(errors)[0];
+      if (firstErrorField) {
+        const errorElement = document.getElementById(firstErrorField);
+        errorElement?.focus();
+      }
+      return;
+    }
+
+    setIsSubmitting(true);
+    setSubmitStatus(null);
+
+    try {
+      const response = await fetch("/api/form", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          form_id: formData.id,
+          ...formValues
+        })
+      });
+
+      if (response.ok) {
+        setSubmitStatus("success");
+        setFormValues({});
+      } else {
+        const errorData = await response.json();
+        setSubmitStatus("error");
+        console.error("Form submission error:", errorData);
+      }
+    } catch (error) {
+      setSubmitStatus("error");
+      console.error("Network error:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const renderField = (field) => {
+    const value = formValues[field.data_name] || "";
+    const hasError = errors[field.data_name];
+    const fieldId = field.data_name;
+
+    const baseInputClasses = `
+      w-full px-3 py-2 border rounded-md shadow-sm transition-colors duration-200
+      focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+      disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed
+      ${
+        hasError
+          ? "border-red-300 focus:border-red-500 focus:ring-red-500"
+          : "border-gray-300 hover:border-gray-400"
+      }
+    `;
+
+    return (
+      <div key={field.id} className="space-y-2">
+        <label
+          htmlFor={fieldId}
+          className="block text-sm font-medium text-gray-700"
+        >
+          {field.name}
+          {field.required && (
+            <span className="text-red-500 ml-1" aria-label="required">
+              *
+            </span>
+          )}
+        </label>
+
+        {field.description && (
+          <p className="text-sm text-gray-600" id={`${fieldId}-description`}>
+            {field.description}
+          </p>
+        )}
+
+        <input
+          id={fieldId}
+          name={field.data_name}
+          type={field.display_type === "email" ? "email" : "text"}
+          value={value}
+          onChange={(e) => handleInputChange(field, e.target.value)}
+          onBlur={() => handleBlur(field)}
+          required={field.required}
+          disabled={isSubmitting}
+          aria-invalid={hasError ? "true" : "false"}
+          aria-describedby={`${hasError ? `${fieldId}-error` : ""} ${
+            field.description ? `${fieldId}-description` : ""
+          }`.trim()}
+          className={baseInputClasses}
+          placeholder={field.display_type === "email" ? "you@example.com" : ""}
+        />
+
+        {hasError && (
+          <p
+            id={`${fieldId}-error`}
+            className="text-sm text-red-600 flex items-center"
+            role="alert"
+            aria-live="polite"
+          >
+            <svg
+              className="w-4 h-4 mr-1 flex-shrink-0"
+              fill="currentColor"
+              viewBox="0 0 20 20"
+            >
+              <path
+                fillRule="evenodd"
+                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+                clipRule="evenodd"
+              />
+            </svg>
+            {hasError}
+          </p>
+        )}
+      </div>
+    );
+  };
+
+  if (!formData || !formData.fields) {
+    return (
+      <div className="max-w-md mx-auto p-6 bg-white rounded-lg shadow-md">
+        <p className="text-gray-500">No form data available</p>
+      </div>
+    );
+  }
+
+  let className = backgroundColorThemes[backgroundColorTheme];
+
+  return (
+    <form
+      className={`max-w-2xl mx-auto p-6 ${className ? className : "bg-white"} ${
+        localFont && localFont?.className ? localFont.className : ""
+      } rounded-lg shadow-md`}
+    >
+      {showHeading && (
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-gray-900 mb-2">{heading}</h2>
+          {formData.description && (
+            <p className="text-gray-600">{formData.description}</p>
+          )}
+        </div>
+      )}
+
+      <div onSubmit={handleSubmit} className="space-y-6">
+        {sortedFields.map(renderField)}
+
+        {submitStatus === "success" && (
+          <div className="p-4 bg-green-50 border border-green-200 rounded-md">
+            <div className="flex items-center">
+              <svg
+                className="w-5 h-5 text-green-400 mr-2"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <p className="text-green-800 font-medium">
+                Form submitted successfully!
+              </p>
+            </div>
+          </div>
+        )}
+
+        {submitStatus === "error" && (
+          <div className="p-4 bg-red-50 border border-red-200 rounded-md">
+            <div className="flex items-center">
+              <svg
+                className="w-5 h-5 text-red-400 mr-2"
+                fill="currentColor"
+                viewBox="0 0 20 20"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                  clipRule="evenodd"
+                />
+              </svg>
+              <p className="text-red-800 font-medium">
+                There was an error submitting the form. Please try again.
+              </p>
+            </div>
+          </div>
+        )}
+
+        <div className="pt-4">
+          <button
+            type="button"
+            onClick={handleSubmit}
+            disabled={isSubmitting}
+            className={`
+              w-full flex justify-center items-center px-4 py-2 border border-transparent 
+              rounded-md shadow-sm text-sm font-medium text-white transition-colors duration-200
+              focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
+              ${
+                isSubmitting
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-700 active:bg-blue-800"
+              }
+            `}
+          >
+            {isSubmitting ? (
+              <>
+                <svg
+                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                Submitting...
+              </>
+            ) : (
+              `Submit ${formData.name}`
+            )}
+          </button>
+        </div>
+      </div>
+    </form>
+  );
 };
 
 const VideoItem = ({
@@ -999,153 +1318,6 @@ const Section = ({
   );
 };
 
-const CTAButton = ({ label, url, buttonColorTheme = "indigo" }) => (
-  <a
-    href={url}
-    className={`${buttonColorThemes[buttonColorTheme]} rounded-md px-3.5 py-2.5 text-base font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2`}
-  >
-    {label}
-  </a>
-);
-
-const CTALink = ({ label, url }) => (
-  <a
-    href={url}
-    className="text-base font-semibold leading-6 text-gray-900 hover:underline"
-  >
-    {label}
-  </a>
-);
-
-const CTAForm = ({ iframeUrl, type, formOrientation }) => {
-  let classes = "";
-  switch (`${type}__${formOrientation}`) {
-    case "form-email__vertical":
-      classes = "w-full h-36";
-      break;
-    case "form-email-name__vertical":
-      classes = "w-full h-64";
-      break;
-    case "form-scheduling__vertical":
-      classes = "w-full h-64";
-      break;
-    case "form-email__horizontal":
-      classes = "w-full h-44 md:h-20";
-      break;
-    case "form-email-name__horizontal":
-      classes = "w-full h-56 md:h-20";
-      break;
-    case "form-scheduling__horizontal":
-      classes = "w-full h-56 md:h-20";
-      break;
-  }
-
-  return (
-    <iframe
-      src={iframeUrl}
-      className={classes}
-      sandbox="allow-top-navigation allow-scripts allow-forms allow-same-origin"
-    />
-  );
-};
-
-const CTASection = ({
-  id,
-  image,
-  ctaData = {},
-  content,
-  buttonColorTheme,
-  textColorTheme
-}) => {
-  const {
-    cta_primary: primaryLabel,
-    cta_primary_type: primaryType,
-    cta_primary_url: primaryUrl,
-    cta_secondary: secondaryLabel,
-    cta_secondary_type: secondaryType,
-    cta_secondary_url: secondaryUrl,
-    job_id: jobId,
-    workflow_step_id: workflowStepId,
-    url: iframeUrl,
-    cta_form_orientation: formOrientation
-  } = ctaData;
-
-  const imageUrl = image && image?.url ? image.url : null;
-
-  const ctas = [
-    {
-      id: `id-${id}-cta-primary`,
-      type: primaryType,
-      label: primaryLabel,
-      url: primaryUrl
-    }
-  ].concat(
-    secondaryLabel
-      ? [
-          {
-            id: `id-${id}-cta-secondary`,
-            type: secondaryType,
-            label: secondaryLabel,
-            url: secondaryUrl
-          }
-        ]
-      : []
-  );
-
-  const ctaContent = (
-    <>
-      {content && (
-        <TextLeft content={content} textColorTheme={textColorTheme} />
-      )}
-      <div className="mt-4 flex items-center gap-x-6 rounded-lg">
-        {ctas.map(({ id, type, label, url }) => {
-          if (type === "button")
-            return (
-              <CTAButton
-                key={id}
-                label={label}
-                url={url}
-                buttonColorTheme={buttonColorTheme}
-              />
-            );
-          if (type === "link")
-            return (
-              <CTALink
-                key={id}
-                label={label}
-                url={url}
-                textColorTheme={textColorTheme}
-              />
-            );
-          return (
-            <CTAForm
-              type={type}
-              formOrientation={formOrientation}
-              key={id}
-              label={label}
-              url={url}
-              jobId={jobId}
-              workflowStepId={workflowStepId}
-              iframeUrl={iframeUrl}
-            />
-          );
-        })}
-      </div>
-    </>
-  );
-
-  if (imageUrl)
-    return (
-      <ImageOnRight
-        content={content}
-        imageUrl={imageUrl}
-        ctaContent={ctaContent}
-      />
-    );
-
-  return <div>{ctaContent}</div>;
-};
-
 const BaseTestimonialSection = ({ heading, id, testimonials, showHeading }) => {
   return <div>Testimonials</div>;
 };
@@ -1171,7 +1343,6 @@ export const ContentSections = ({
       id,
       image,
       show_heading: showHeading,
-      ctaData,
       scripts,
       backgroundColorTheme,
       textColorTheme,
@@ -1181,7 +1352,8 @@ export const ContentSections = ({
       muxPosterOffset,
       muxAccentColor,
       borderClasses,
-      testimonials
+      testimonials,
+      form
     }) => {
       const imageUrl = image && "url" in image ? image["url"] : null;
       const imageHeight = image && "height" in image ? image["height"] : null;
@@ -1323,18 +1495,15 @@ export const ContentSections = ({
           );
           break;
 
-        case CONTENT_TYPE_SIGN_UP:
+        case CONTENT_TYPE_FORM:
           sectionOut = (
-            <CTASection
+            <DynamicForm
+              formData={form}
+              localFont={localFont}
+              backgroundColorTheme={backgroundColorTheme}
+              showHeading={showHeading}
               heading={heading}
               id={id}
-              image={image}
-              showHeading={showHeading}
-              ctaData={ctaData}
-              content={content}
-              buttonColorTheme={buttonColorTheme}
-              textColorTheme={textColorTheme}
-              contentFont={contentFont || localFont}
             />
           );
           break;

@@ -5,7 +5,7 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.DoContentSections = exports.ContentSections = exports.CONTENT_TYPE_TEXT_RIGHT = exports.CONTENT_TYPE_TEXT_LEFT = exports.CONTENT_TYPE_TEXT_IMAGE_RIGHT = exports.CONTENT_TYPE_TEXT_IMAGE_LEFT = exports.CONTENT_TYPE_TEXT_CENTER = exports.CONTENT_TYPE_TESTIMONIAL = exports.CONTENT_TYPE_SIGN_UP = exports.CONTENT_TYPE_MUX_VIDEO = exports.CONTENT_TYPE_IMAGE_RIGHT = exports.CONTENT_TYPE_IMAGE_LEFT = exports.CONTENT_TYPE_IMAGE_FULL = exports.CONTENT_TYPE_IMAGE_CENTER = exports.CONTENT_TYPE_DIVIDER = void 0;
+exports.DoContentSections = exports.ContentSections = exports.CONTENT_TYPE_TEXT_RIGHT = exports.CONTENT_TYPE_TEXT_LEFT = exports.CONTENT_TYPE_TEXT_IMAGE_RIGHT = exports.CONTENT_TYPE_TEXT_IMAGE_LEFT = exports.CONTENT_TYPE_TEXT_CENTER = exports.CONTENT_TYPE_TESTIMONIAL = exports.CONTENT_TYPE_MUX_VIDEO = exports.CONTENT_TYPE_IMAGE_RIGHT = exports.CONTENT_TYPE_IMAGE_LEFT = exports.CONTENT_TYPE_IMAGE_FULL = exports.CONTENT_TYPE_IMAGE_CENTER = exports.CONTENT_TYPE_FORM = exports.CONTENT_TYPE_DIVIDER = void 0;
 var _extends2 = _interopRequireDefault(require("@babel/runtime/helpers/extends"));
 var _react = _interopRequireWildcard(require("react"));
 var _copyToClipboard = _interopRequireDefault(require("copy-to-clipboard"));
@@ -16,8 +16,7 @@ var _sortable = require("@dnd-kit/sortable");
 var _modifiers = require("@dnd-kit/modifiers");
 var _utilities = require("@dnd-kit/utilities");
 var _react2 = require("@headlessui/react");
-function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function (e) { return e ? t : r; })(e); }
-function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != typeof e && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && {}.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
+function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function (e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
 const CONTENT_TYPE_TEXT_LEFT = exports.CONTENT_TYPE_TEXT_LEFT = "text-only-left";
 const CONTENT_TYPE_TEXT_RIGHT = exports.CONTENT_TYPE_TEXT_RIGHT = "text-only-right";
 const CONTENT_TYPE_TEXT_CENTER = exports.CONTENT_TYPE_TEXT_CENTER = "text-only-center";
@@ -28,9 +27,9 @@ const CONTENT_TYPE_IMAGE_RIGHT = exports.CONTENT_TYPE_IMAGE_RIGHT = "image-only-
 const CONTENT_TYPE_IMAGE_CENTER = exports.CONTENT_TYPE_IMAGE_CENTER = "image-only-center";
 const CONTENT_TYPE_IMAGE_FULL = exports.CONTENT_TYPE_IMAGE_FULL = "image-only-full";
 const CONTENT_TYPE_DIVIDER = exports.CONTENT_TYPE_DIVIDER = "divider";
-const CONTENT_TYPE_SIGN_UP = exports.CONTENT_TYPE_SIGN_UP = "sign-up";
 const CONTENT_TYPE_MUX_VIDEO = exports.CONTENT_TYPE_MUX_VIDEO = "mux-video";
 const CONTENT_TYPE_TESTIMONIAL = exports.CONTENT_TYPE_TESTIMONIAL = "testimonial";
+const CONTENT_TYPE_FORM = exports.CONTENT_TYPE_FORM = "form";
 
 /*
 Theme colors:
@@ -152,7 +151,239 @@ const arrayMoveImmutable = (array, fromIndex, toIndex) => {
   arrayMoveMutable(array, fromIndex, toIndex);
   return array;
 };
-const VideoItem = _ref => {
+const DynamicForm = _ref => {
+  let {
+    formData,
+    localFont,
+    backgroundColorTheme = null,
+    showHeading,
+    heading,
+    id
+  } = _ref;
+  const [formValues, setFormValues] = (0, _react.useState)({});
+  const [errors, setErrors] = (0, _react.useState)({});
+  const [isSubmitting, setIsSubmitting] = (0, _react.useState)(false);
+  const [submitStatus, setSubmitStatus] = (0, _react.useState)(null);
+
+  // Initialize form values and sort fields by sort_key
+  const sortedFields = formData?.fields?.sort((a, b) => a.sort_key - b.sort_key) || [];
+  const validateField = (field, value) => {
+    if (field.required && (!value || value.trim() === "")) {
+      return `${field.name} is required`;
+    }
+    if (field.display_type === "email" && value) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(value)) {
+        return "Please enter a valid email address";
+      }
+    }
+    return null;
+  };
+  const handleInputChange = (field, value) => {
+    setFormValues(prev => ({
+      ...prev,
+      [field.data_name]: value
+    }));
+
+    // Clear error when user starts typing
+    if (errors[field.data_name]) {
+      setErrors(prev => ({
+        ...prev,
+        [field.data_name]: null
+      }));
+    }
+  };
+  const handleBlur = field => {
+    const value = formValues[field.data_name] || "";
+    const error = validateField(field, value);
+    if (error) {
+      setErrors(prev => ({
+        ...prev,
+        [field.data_name]: error
+      }));
+    }
+  };
+  const validateForm = () => {
+    const newErrors = {};
+    let isValid = true;
+    sortedFields.forEach(field => {
+      const value = formValues[field.data_name] || "";
+      const error = validateField(field, value);
+      if (error) {
+        newErrors[field.data_name] = error;
+        isValid = false;
+      }
+    });
+    setErrors(newErrors);
+    return isValid;
+  };
+  const handleSubmit = async e => {
+    e.preventDefault();
+    if (!validateForm()) {
+      // Focus on first error field
+      const firstErrorField = Object.keys(errors)[0];
+      if (firstErrorField) {
+        const errorElement = document.getElementById(firstErrorField);
+        errorElement?.focus();
+      }
+      return;
+    }
+    setIsSubmitting(true);
+    setSubmitStatus(null);
+    try {
+      const response = await fetch("/api/form", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          form_id: formData.id,
+          ...formValues
+        })
+      });
+      if (response.ok) {
+        setSubmitStatus("success");
+        setFormValues({});
+      } else {
+        const errorData = await response.json();
+        setSubmitStatus("error");
+        console.error("Form submission error:", errorData);
+      }
+    } catch (error) {
+      setSubmitStatus("error");
+      console.error("Network error:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+  const renderField = field => {
+    const value = formValues[field.data_name] || "";
+    const hasError = errors[field.data_name];
+    const fieldId = field.data_name;
+    const baseInputClasses = `
+      w-full px-3 py-2 border rounded-md shadow-sm transition-colors duration-200
+      focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
+      disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed
+      ${hasError ? "border-red-300 focus:border-red-500 focus:ring-red-500" : "border-gray-300 hover:border-gray-400"}
+    `;
+    return /*#__PURE__*/_react.default.createElement("div", {
+      key: field.id,
+      className: "space-y-2"
+    }, /*#__PURE__*/_react.default.createElement("label", {
+      htmlFor: fieldId,
+      className: "block text-sm font-medium text-gray-700"
+    }, field.name, field.required && /*#__PURE__*/_react.default.createElement("span", {
+      className: "text-red-500 ml-1",
+      "aria-label": "required"
+    }, "*")), field.description && /*#__PURE__*/_react.default.createElement("p", {
+      className: "text-sm text-gray-600",
+      id: `${fieldId}-description`
+    }, field.description), /*#__PURE__*/_react.default.createElement("input", {
+      id: fieldId,
+      name: field.data_name,
+      type: field.display_type === "email" ? "email" : "text",
+      value: value,
+      onChange: e => handleInputChange(field, e.target.value),
+      onBlur: () => handleBlur(field),
+      required: field.required,
+      disabled: isSubmitting,
+      "aria-invalid": hasError ? "true" : "false",
+      "aria-describedby": `${hasError ? `${fieldId}-error` : ""} ${field.description ? `${fieldId}-description` : ""}`.trim(),
+      className: baseInputClasses,
+      placeholder: field.display_type === "email" ? "you@example.com" : ""
+    }), hasError && /*#__PURE__*/_react.default.createElement("p", {
+      id: `${fieldId}-error`,
+      className: "text-sm text-red-600 flex items-center",
+      role: "alert",
+      "aria-live": "polite"
+    }, /*#__PURE__*/_react.default.createElement("svg", {
+      className: "w-4 h-4 mr-1 flex-shrink-0",
+      fill: "currentColor",
+      viewBox: "0 0 20 20"
+    }, /*#__PURE__*/_react.default.createElement("path", {
+      fillRule: "evenodd",
+      d: "M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z",
+      clipRule: "evenodd"
+    })), hasError));
+  };
+  if (!formData || !formData.fields) {
+    return /*#__PURE__*/_react.default.createElement("div", {
+      className: "max-w-md mx-auto p-6 bg-white rounded-lg shadow-md"
+    }, /*#__PURE__*/_react.default.createElement("p", {
+      className: "text-gray-500"
+    }, "No form data available"));
+  }
+  let className = backgroundColorThemes[backgroundColorTheme];
+  return /*#__PURE__*/_react.default.createElement("form", {
+    className: `max-w-2xl mx-auto p-6 ${className ? className : "bg-white"} ${localFont && localFont?.className ? localFont.className : ""} rounded-lg shadow-md`
+  }, showHeading && /*#__PURE__*/_react.default.createElement("div", {
+    className: "mb-6"
+  }, /*#__PURE__*/_react.default.createElement("h2", {
+    className: "text-2xl font-bold text-gray-900 mb-2"
+  }, heading), formData.description && /*#__PURE__*/_react.default.createElement("p", {
+    className: "text-gray-600"
+  }, formData.description)), /*#__PURE__*/_react.default.createElement("div", {
+    onSubmit: handleSubmit,
+    className: "space-y-6"
+  }, sortedFields.map(renderField), submitStatus === "success" && /*#__PURE__*/_react.default.createElement("div", {
+    className: "p-4 bg-green-50 border border-green-200 rounded-md"
+  }, /*#__PURE__*/_react.default.createElement("div", {
+    className: "flex items-center"
+  }, /*#__PURE__*/_react.default.createElement("svg", {
+    className: "w-5 h-5 text-green-400 mr-2",
+    fill: "currentColor",
+    viewBox: "0 0 20 20"
+  }, /*#__PURE__*/_react.default.createElement("path", {
+    fillRule: "evenodd",
+    d: "M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z",
+    clipRule: "evenodd"
+  })), /*#__PURE__*/_react.default.createElement("p", {
+    className: "text-green-800 font-medium"
+  }, "Form submitted successfully!"))), submitStatus === "error" && /*#__PURE__*/_react.default.createElement("div", {
+    className: "p-4 bg-red-50 border border-red-200 rounded-md"
+  }, /*#__PURE__*/_react.default.createElement("div", {
+    className: "flex items-center"
+  }, /*#__PURE__*/_react.default.createElement("svg", {
+    className: "w-5 h-5 text-red-400 mr-2",
+    fill: "currentColor",
+    viewBox: "0 0 20 20"
+  }, /*#__PURE__*/_react.default.createElement("path", {
+    fillRule: "evenodd",
+    d: "M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z",
+    clipRule: "evenodd"
+  })), /*#__PURE__*/_react.default.createElement("p", {
+    className: "text-red-800 font-medium"
+  }, "There was an error submitting the form. Please try again."))), /*#__PURE__*/_react.default.createElement("div", {
+    className: "pt-4"
+  }, /*#__PURE__*/_react.default.createElement("button", {
+    type: "button",
+    onClick: handleSubmit,
+    disabled: isSubmitting,
+    className: `
+              w-full flex justify-center items-center px-4 py-2 border border-transparent 
+              rounded-md shadow-sm text-sm font-medium text-white transition-colors duration-200
+              focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
+              ${isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 active:bg-blue-800"}
+            `
+  }, isSubmitting ? /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, /*#__PURE__*/_react.default.createElement("svg", {
+    className: "animate-spin -ml-1 mr-3 h-5 w-5 text-white",
+    xmlns: "http://www.w3.org/2000/svg",
+    fill: "none",
+    viewBox: "0 0 24 24"
+  }, /*#__PURE__*/_react.default.createElement("circle", {
+    className: "opacity-25",
+    cx: "12",
+    cy: "12",
+    r: "10",
+    stroke: "currentColor",
+    strokeWidth: "4"
+  }), /*#__PURE__*/_react.default.createElement("path", {
+    className: "opacity-75",
+    fill: "currentColor",
+    d: "M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+  })), "Submitting...") : `Submit ${formData.name}`))));
+};
+const VideoItem = _ref2 => {
   let {
     muxPlaybackId,
     muxPosterOffset,
@@ -160,7 +391,7 @@ const VideoItem = _ref => {
     content,
     textColorTheme = {},
     muxAccentColor = "indigo"
-  } = _ref;
+  } = _ref2;
   const colorThemes = {
     ["none"]: {
       border: "border-indigo-600",
@@ -368,7 +599,7 @@ const VideoItem = _ref => {
     textColorTheme: textColorTheme
   }));
 };
-const SortableList = _ref2 => {
+const SortableList = _ref3 => {
   let {
     rows,
     dispatch,
@@ -377,22 +608,22 @@ const SortableList = _ref2 => {
     idField = "id",
     sortableItems = [],
     setIsSorting
-  } = _ref2;
+  } = _ref3;
   return /*#__PURE__*/_react.default.createElement(_core.DndContext, {
     id: collection,
     modifiers: [_modifiers.restrictToVerticalAxis],
-    onDragStart: _ref3 => {
+    onDragStart: _ref4 => {
       let {
         active: {
           id
         }
-      } = _ref3;
+      } = _ref4;
       setIsSorting(id);
     },
     onDragCancel: () => {
       setIsSorting(null);
     },
-    onDragEnd: async _ref4 => {
+    onDragEnd: async _ref5 => {
       let {
         active: {
           id: activeId
@@ -400,7 +631,7 @@ const SortableList = _ref2 => {
         over: {
           id: overId
         }
-      } = _ref4;
+      } = _ref5;
       const oldIndex = rows.findIndex(row => row[idField] === activeId);
       const newIndex = rows.findIndex(row => row[idField] === overId);
       let sortedRows = arrayMoveImmutable(rows, oldIndex, newIndex);
@@ -445,8 +676,8 @@ const useScript = url => {
 };
 const useOnScreen = (ref, setActiveHeader, anchor) => {
   (0, _react.useEffect)(() => {
-    const observer = new IntersectionObserver(_ref5 => {
-      let [entry] = _ref5;
+    const observer = new IntersectionObserver(_ref6 => {
+      let [entry] = _ref6;
       if (!(typeof entry === "object" && entry !== null)) return;
       if (entry.isIntersecting === true) setActiveHeader(anchor);
     }, {
@@ -459,7 +690,7 @@ const useOnScreen = (ref, setActiveHeader, anchor) => {
     };
   }, [ref, anchor, setActiveHeader]);
 };
-const TocItem = _ref6 => {
+const TocItem = _ref7 => {
   let {
     id,
     heading,
@@ -477,7 +708,7 @@ const TocItem = _ref6 => {
     isSorting,
     tocItemClasses,
     tocItemMatchedClasses
-  } = _ref6;
+  } = _ref7;
   const {
     attributes,
     listeners,
@@ -580,7 +811,7 @@ const TocItem = _ref6 => {
     className: "cursor-pointer rounded-md bg-red-600 px-2.5 py-1.5 text-base font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
   }, "Delete"))))))));
 };
-const TableOfContents = _ref7 => {
+const TableOfContents = _ref8 => {
   let {
     sections,
     activeHeader,
@@ -595,19 +826,19 @@ const TableOfContents = _ref7 => {
     tocItemClasses,
     tocItemMatchedClasses,
     topStickyOffset = "top-[95px]"
-  } = _ref7;
+  } = _ref8;
   const [isSorting, setIsSorting] = (0, _react.useState)(null);
-  const visibleSections = showInvisibleHeaders ? sections : sections.filter(_ref8 => {
+  const visibleSections = showInvisibleHeaders ? sections : sections.filter(_ref9 => {
     let {
       show_heading: showHeading
-    } = _ref8;
+    } = _ref9;
     return showHeading === true;
   });
-  const [matched, activeUntil] = activeHeader === null ? [false, -1] : visibleSections.reduce((_ref9, _ref10, offset) => {
-    let [isMatched, matchedOffset] = _ref9;
+  const [matched, activeUntil] = activeHeader === null ? [false, -1] : visibleSections.reduce((_ref0, _ref1, offset) => {
+    let [isMatched, matchedOffset] = _ref0;
     let {
       id
-    } = _ref10;
+    } = _ref1;
     if (isMatched) return [isMatched, matchedOffset];
     if (`heading-${id}` === activeHeader) return [true, offset];
     return [false, -1];
@@ -623,7 +854,7 @@ const TableOfContents = _ref7 => {
   }, /*#__PURE__*/_react.default.createElement(SortableList, {
     setIsSorting: setIsSorting,
     rows: visibleSections,
-    sortableItems: visibleSections.map((_ref11, offset) => {
+    sortableItems: visibleSections.map((_ref10, offset) => {
       let {
         id,
         heading,
@@ -631,7 +862,7 @@ const TableOfContents = _ref7 => {
         editCallback,
         deleteCallback,
         buttonClasses
-      } = _ref11;
+      } = _ref10;
       return /*#__PURE__*/_react.default.createElement(TocItem, {
         matched: matched,
         activeUntil: activeUntil,
@@ -657,7 +888,7 @@ const TableOfContents = _ref7 => {
     sortApi: sortApi
   }))));
 };
-const Heading = _ref12 => {
+const Heading = _ref11 => {
   let {
     title,
     level = 2,
@@ -667,7 +898,7 @@ const Heading = _ref12 => {
     textColorTheme = "none",
     showCopyLink = true,
     headingClasses = "text-2xl font-semibold xl:mb-2 xl:text-3xl"
-  } = _ref12;
+  } = _ref11;
   const ref = (0, _react.useRef)();
   useOnScreen(ref, setActiveHeader, anchor);
   if (level === 1) return /*#__PURE__*/_react.default.createElement("h1", {
@@ -712,12 +943,12 @@ const Heading = _ref12 => {
   }, title);
   return null;
 };
-const TextLeft = _ref13 => {
+const TextLeft = _ref12 => {
   let {
     content,
     textColorTheme = "none",
     contentFont = {}
-  } = _ref13;
+  } = _ref12;
   return /*#__PURE__*/_react.default.createElement("div", {
     className: `${contentFont?.className || ""} leading-normal prose lg:prose-lg max-w-none ${textColorThemes[textColorTheme]}`,
     dangerouslySetInnerHTML: {
@@ -725,12 +956,12 @@ const TextLeft = _ref13 => {
     }
   });
 };
-const TextRight = _ref14 => {
+const TextRight = _ref13 => {
   let {
     content,
     textColorTheme = "none",
     contentFont = {}
-  } = _ref14;
+  } = _ref13;
   return /*#__PURE__*/_react.default.createElement("div", {
     className: `${contentFont?.className || ""} text-right leading-normal prose lg:prose-lg max-w-none ${textColorThemes[textColorTheme]}`,
     dangerouslySetInnerHTML: {
@@ -738,12 +969,12 @@ const TextRight = _ref14 => {
     }
   });
 };
-const TextCenter = _ref15 => {
+const TextCenter = _ref14 => {
   let {
     content,
     textColorTheme = "none",
     contentFont = {}
-  } = _ref15;
+  } = _ref14;
   return /*#__PURE__*/_react.default.createElement("div", {
     className: `${contentFont?.className || ""} text-center leading-normal prose lg:prose-lg max-w-none ${textColorThemes[textColorTheme]}`,
     dangerouslySetInnerHTML: {
@@ -751,14 +982,14 @@ const TextCenter = _ref15 => {
     }
   });
 };
-const ImageOnLeft = _ref16 => {
+const ImageOnLeft = _ref15 => {
   let {
     content,
     imageUrl,
     colSpanContent = "col-span-12 md:col-span-6",
     colSpanImage = "col-span-12 md:col-span-6",
     contentFont = {}
-  } = _ref16;
+  } = _ref15;
   return /*#__PURE__*/_react.default.createElement("div", {
     className: "grid grid-cols-12 gap-4"
   }, /*#__PURE__*/_react.default.createElement("div", {
@@ -773,7 +1004,7 @@ const ImageOnLeft = _ref16 => {
     }
   }));
 };
-const ImageOnRight = _ref17 => {
+const ImageOnRight = _ref16 => {
   let {
     content,
     imageUrl,
@@ -781,7 +1012,7 @@ const ImageOnRight = _ref17 => {
     colSpanImage = "w-full md:w-1/2",
     ctaContent = null,
     contentFont = {}
-  } = _ref17;
+  } = _ref16;
   return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("img", {
     src: imageUrl,
     alt: "",
@@ -793,12 +1024,12 @@ const ImageOnRight = _ref17 => {
     }
   }), ctaContent);
 };
-const ImageCenter = _ref18 => {
+const ImageCenter = _ref17 => {
   let {
     imageUrl,
     height,
     width
-  } = _ref18;
+  } = _ref17;
   return /*#__PURE__*/_react.default.createElement("div", {
     className: "flex justify-center"
   }, /*#__PURE__*/_react.default.createElement("img", {
@@ -808,22 +1039,22 @@ const ImageCenter = _ref18 => {
     alt: ""
   }));
 };
-const ImageCenterFull = _ref19 => {
+const ImageCenterFull = _ref18 => {
   let {
     imageUrl
-  } = _ref19;
+  } = _ref18;
   return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("img", {
     className: "object-fill",
     src: imageUrl,
     alt: ""
   }));
 };
-const ImageLeft = _ref20 => {
+const ImageLeft = _ref19 => {
   let {
     imageUrl,
     height,
     width
-  } = _ref20;
+  } = _ref19;
   return /*#__PURE__*/_react.default.createElement("div", {
     className: "flex justify-start"
   }, /*#__PURE__*/_react.default.createElement("img", {
@@ -833,12 +1064,12 @@ const ImageLeft = _ref20 => {
     alt: ""
   }));
 };
-const ImageRight = _ref21 => {
+const ImageRight = _ref20 => {
   let {
     imageUrl,
     height,
     width
-  } = _ref21;
+  } = _ref20;
   return /*#__PURE__*/_react.default.createElement("div", {
     className: "flex justify-end"
   }, /*#__PURE__*/_react.default.createElement("img", {
@@ -848,7 +1079,7 @@ const ImageRight = _ref21 => {
     alt: ""
   }));
 };
-const Section = _ref22 => {
+const Section = _ref21 => {
   let {
     sectionOut,
     id,
@@ -856,7 +1087,7 @@ const Section = _ref22 => {
     scripts,
     backgroundColorTheme = "none",
     emptyContent = false
-  } = _ref22;
+  } = _ref21;
   useScript(scripts?.[0] || false);
   let className = backgroundColorThemes[backgroundColorTheme];
   if (emptyContent) className = className.replace("mb-6", "mb-0");
@@ -871,145 +1102,16 @@ const Section = _ref22 => {
     name: `heading-${id}`
   })), headingOut, sectionOut);
 };
-const CTAButton = _ref23 => {
-  let {
-    label,
-    url,
-    buttonColorTheme = "indigo"
-  } = _ref23;
-  return /*#__PURE__*/_react.default.createElement("a", {
-    href: url,
-    className: `${buttonColorThemes[buttonColorTheme]} rounded-md px-3.5 py-2.5 text-base font-semibold shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2`
-  }, label);
-};
-const CTALink = _ref24 => {
-  let {
-    label,
-    url
-  } = _ref24;
-  return /*#__PURE__*/_react.default.createElement("a", {
-    href: url,
-    className: "text-base font-semibold leading-6 text-gray-900 hover:underline"
-  }, label);
-};
-const CTAForm = _ref25 => {
-  let {
-    iframeUrl,
-    type,
-    formOrientation
-  } = _ref25;
-  let classes = "";
-  switch (`${type}__${formOrientation}`) {
-    case "form-email__vertical":
-      classes = "w-full h-36";
-      break;
-    case "form-email-name__vertical":
-      classes = "w-full h-64";
-      break;
-    case "form-scheduling__vertical":
-      classes = "w-full h-64";
-      break;
-    case "form-email__horizontal":
-      classes = "w-full h-44 md:h-20";
-      break;
-    case "form-email-name__horizontal":
-      classes = "w-full h-56 md:h-20";
-      break;
-    case "form-scheduling__horizontal":
-      classes = "w-full h-56 md:h-20";
-      break;
-  }
-  return /*#__PURE__*/_react.default.createElement("iframe", {
-    src: iframeUrl,
-    className: classes,
-    sandbox: "allow-top-navigation allow-scripts allow-forms allow-same-origin"
-  });
-};
-const CTASection = _ref26 => {
-  let {
-    id,
-    image,
-    ctaData = {},
-    content,
-    buttonColorTheme,
-    textColorTheme
-  } = _ref26;
-  const {
-    cta_primary: primaryLabel,
-    cta_primary_type: primaryType,
-    cta_primary_url: primaryUrl,
-    cta_secondary: secondaryLabel,
-    cta_secondary_type: secondaryType,
-    cta_secondary_url: secondaryUrl,
-    job_id: jobId,
-    workflow_step_id: workflowStepId,
-    url: iframeUrl,
-    cta_form_orientation: formOrientation
-  } = ctaData;
-  const imageUrl = image && image?.url ? image.url : null;
-  const ctas = [{
-    id: `id-${id}-cta-primary`,
-    type: primaryType,
-    label: primaryLabel,
-    url: primaryUrl
-  }].concat(secondaryLabel ? [{
-    id: `id-${id}-cta-secondary`,
-    type: secondaryType,
-    label: secondaryLabel,
-    url: secondaryUrl
-  }] : []);
-  const ctaContent = /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, content && /*#__PURE__*/_react.default.createElement(TextLeft, {
-    content: content,
-    textColorTheme: textColorTheme
-  }), /*#__PURE__*/_react.default.createElement("div", {
-    className: "mt-4 flex items-center gap-x-6 rounded-lg"
-  }, ctas.map(_ref27 => {
-    let {
-      id,
-      type,
-      label,
-      url
-    } = _ref27;
-    if (type === "button") return /*#__PURE__*/_react.default.createElement(CTAButton, {
-      key: id,
-      label: label,
-      url: url,
-      buttonColorTheme: buttonColorTheme
-    });
-    if (type === "link") return /*#__PURE__*/_react.default.createElement(CTALink, {
-      key: id,
-      label: label,
-      url: url,
-      textColorTheme: textColorTheme
-    });
-    return /*#__PURE__*/_react.default.createElement(CTAForm, {
-      type: type,
-      formOrientation: formOrientation,
-      key: id,
-      label: label,
-      url: url,
-      jobId: jobId,
-      workflowStepId: workflowStepId,
-      iframeUrl: iframeUrl
-    });
-  })));
-  if (imageUrl) return /*#__PURE__*/_react.default.createElement(ImageOnRight, {
-    content: content,
-    imageUrl: imageUrl,
-    ctaContent: ctaContent
-  });
-  return /*#__PURE__*/_react.default.createElement("div", null, ctaContent);
-};
-const BaseTestimonialSection = _ref28 => {
+const BaseTestimonialSection = _ref22 => {
   let {
     heading,
     id,
     testimonials,
     showHeading
-  } = _ref28;
+  } = _ref22;
   return /*#__PURE__*/_react.default.createElement("div", null, "Testimonials");
 };
-const ContentSections = _ref29 => {
+const ContentSections = _ref23 => {
   let {
     showCopyLink = true,
     sections,
@@ -1021,8 +1123,8 @@ const ContentSections = _ref29 => {
     headingClasses,
     setActiveHeader = () => {},
     TestimonialComponent = BaseTestimonialSection
-  } = _ref29;
-  return sections.map(_ref30 => {
+  } = _ref23;
+  return sections.map(_ref24 => {
     let {
       content,
       content_type: contentType,
@@ -1031,7 +1133,6 @@ const ContentSections = _ref29 => {
       id,
       image,
       show_heading: showHeading,
-      ctaData,
       scripts,
       backgroundColorTheme,
       textColorTheme,
@@ -1041,8 +1142,9 @@ const ContentSections = _ref29 => {
       muxPosterOffset,
       muxAccentColor,
       borderClasses,
-      testimonials
-    } = _ref30;
+      testimonials,
+      form
+    } = _ref24;
     const imageUrl = image && "url" in image ? image["url"] : null;
     const imageHeight = image && "height" in image ? image["height"] : null;
     const imageWidth = image && "width" in image ? image["width"] : null;
@@ -1147,17 +1249,14 @@ const ContentSections = _ref29 => {
           showHeading: showHeading
         });
         break;
-      case CONTENT_TYPE_SIGN_UP:
-        sectionOut = /*#__PURE__*/_react.default.createElement(CTASection, {
-          heading: heading,
-          id: id,
-          image: image,
+      case CONTENT_TYPE_FORM:
+        sectionOut = /*#__PURE__*/_react.default.createElement(DynamicForm, {
+          formData: form,
+          localFont: localFont,
+          backgroundColorTheme: backgroundColorTheme,
           showHeading: showHeading,
-          ctaData: ctaData,
-          content: content,
-          buttonColorTheme: buttonColorTheme,
-          textColorTheme: textColorTheme,
-          contentFont: contentFont || localFont
+          heading: heading,
+          id: id
         });
         break;
       default:
@@ -1176,7 +1275,7 @@ const ContentSections = _ref29 => {
   });
 };
 exports.ContentSections = ContentSections;
-const DoContentSections = _ref31 => {
+const DoContentSections = _ref25 => {
   let {
     sections,
     localFont,
@@ -1198,7 +1297,7 @@ const DoContentSections = _ref31 => {
     topStickyOffset = "top-[95px]",
     headingClasses = "text-2xl font-semibold xl:mb-2 xl:text-3xl",
     TestimonialComponent = BaseTestimonialSection
-  } = _ref31;
+  } = _ref25;
   const [activeHeader, setActiveHeader] = (0, _react.useState)(null);
   return /*#__PURE__*/_react.default.createElement("div", {
     className: outerGridClasses
