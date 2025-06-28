@@ -271,7 +271,7 @@ const DynamicForm = ({
     setSubmitStatus(null);
 
     try {
-      const response = await fetch("/api/form", {
+      const response = await fetch("/api/community/form", {
         method: "POST",
         headers: {
           "Content-Type": "application/json"
@@ -1323,7 +1323,7 @@ const BaseTestimonialSection = ({ heading, id, testimonials, showHeading }) => {
 };
 
 export const ContentSections = ({
-  showCopyLink = true,
+  showCopyLink = false,
   sections,
   colSpanContent,
   colSpanImage,
@@ -1383,6 +1383,7 @@ export const ContentSections = ({
             headingClasses={headingClasses}
           />
         );
+
       let sectionOut;
       switch (contentType) {
         case CONTENT_TYPE_TEXT_LEFT:
@@ -1518,7 +1519,7 @@ export const ContentSections = ({
           key={id}
           sectionOut={sectionOut}
           id={id}
-          headingOut={headingOut}
+          headingOut={contentType != CONTENT_TYPE_FORM ? headingOut : null}
           scripts={scripts}
           backgroundColorTheme={backgroundColorTheme || "none"}
           emptyContent={emptyContent}
