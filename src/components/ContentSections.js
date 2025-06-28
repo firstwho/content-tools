@@ -314,26 +314,115 @@ const DynamicForm = ({
       }
     `;
 
+    // Common label rendering
+    const renderLabel = () => (
+      <label
+        htmlFor={fieldId}
+        className="block text-sm font-medium text-gray-700"
+      >
+        {field.name}
+        {field.required && (
+          <span className="text-red-500 ml-1" aria-label="required">
+            *
+          </span>
+        )}
+      </label>
+    );
+
+    // Common description rendering
+    const renderDescription = () =>
+      field.description && (
+        <p className="text-sm text-gray-600" id={`${fieldId}-description`}>
+          {field.description}
+        </p>
+      );
+
+    // Common error rendering
+    const renderError = () =>
+      hasError && (
+        <p
+          id={`${fieldId}-error`}
+          className="text-sm text-red-600 flex items-center"
+          role="alert"
+          aria-live="polite"
+        >
+          <svg
+            className="w-4 h-4 mr-1 flex-shrink-0"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path
+              fillRule="evenodd"
+              d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
+              clipRule="evenodd"
+            />
+          </svg>
+          {hasError}
+        </p>
+      );
+
+    // Handle textarea case - return early
+    if (field.display_type === "textarea") {
+      return (
+        <div key={field.id} className="space-y-2">
+          {renderLabel()}
+          {renderDescription()}
+          <textarea
+            id={fieldId}
+            name={field.data_name}
+            value={value}
+            onChange={(e) => handleInputChange(field, e.target.value)}
+            onBlur={() => handleBlur(field)}
+            required={field.required}
+            disabled={isSubmitting}
+            rows={4}
+            className={baseInputClasses}
+            aria-invalid={hasError ? "true" : "false"}
+            aria-describedby={`${hasError ? `${fieldId}-error` : ""} ${
+              field.description ? `${fieldId}-description` : ""
+            }`.trim()}
+            placeholder="Enter your message here..."
+          />
+          {renderError()}
+        </div>
+      );
+    }
+
+    // Handle radio case - return early
+    if (field.display_type === "radio" && field.options) {
+      return (
+        <div key={field.id} className="space-y-2">
+          {renderLabel()}
+          {renderDescription()}
+          <div className="space-y-2">
+            {field.options.map((option, index) => (
+              <label key={index} className="flex items-center">
+                <input
+                  type="radio"
+                  name={field.data_name}
+                  value={option.value}
+                  checked={value === option.value}
+                  onChange={(e) => handleInputChange(field, e.target.value)}
+                  onBlur={() => handleBlur(field)}
+                  required={field.required}
+                  disabled={isSubmitting}
+                  className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300"
+                  aria-invalid={hasError ? "true" : "false"}
+                />
+                <span className="text-sm text-gray-700">{option.label}</span>
+              </label>
+            ))}
+          </div>
+          {renderError()}
+        </div>
+      );
+    }
+
+    // Default case for text/email inputs
     return (
       <div key={field.id} className="space-y-2">
-        <label
-          htmlFor={fieldId}
-          className="block text-sm font-medium text-gray-700"
-        >
-          {field.name}
-          {field.required && (
-            <span className="text-red-500 ml-1" aria-label="required">
-              *
-            </span>
-          )}
-        </label>
-
-        {field.description && (
-          <p className="text-sm text-gray-600" id={`${fieldId}-description`}>
-            {field.description}
-          </p>
-        )}
-
+        {renderLabel()}
+        {renderDescription()}
         <input
           id={fieldId}
           name={field.data_name}
@@ -350,28 +439,7 @@ const DynamicForm = ({
           className={baseInputClasses}
           placeholder={field.display_type === "email" ? "you@example.com" : ""}
         />
-
-        {hasError && (
-          <p
-            id={`${fieldId}-error`}
-            className="text-sm text-red-600 flex items-center"
-            role="alert"
-            aria-live="polite"
-          >
-            <svg
-              className="w-4 h-4 mr-1 flex-shrink-0"
-              fill="currentColor"
-              viewBox="0 0 20 20"
-            >
-              <path
-                fillRule="evenodd"
-                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z"
-                clipRule="evenodd"
-              />
-            </svg>
-            {hasError}
-          </p>
-        )}
+        {renderError()}
       </div>
     );
   };
@@ -457,7 +525,7 @@ const DynamicForm = ({
               focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
               ${
                 isSubmitting
-                  ? "bg-gray-400 cursor-not-allowed"
+                  ? "bg-gray-600 cursor-not-allowed"
                   : "bg-blue-600 hover:bg-blue-700 active:bg-blue-800"
               }
             `}
@@ -656,7 +724,9 @@ const VideoItem = ({
     ["neutral"]: {
       border: "border-neutral-600",
       borderHover: "border-gray-900",
-      backgroundHover: "bg-neutral-600"
+      backgroundHover: "bg-neutral-600",
+      background: "bg-neutral-800",
+      fill: "fill-neutral-50"
     },
     ["gray"]: {
       border: "border-gray-600",
@@ -705,7 +775,7 @@ const VideoItem = ({
         }`}
       />
       <div
-        className={`${colorThemes[muxAccentColor]["border"]} opacity-80 border-2 x-group-hover/item:${colorThemes[muxAccentColor]["borderHover"]} group-hover/item:${colorThemes[muxAccentColor]["backgroundHover"]} col-start-1 row-start-1 grid h-12 w-16 md:h-24 md:w-32 place-self-center rounded-full ${colorThemes[muxAccentColor]["background"]}`}
+        className={`${colorThemes[muxAccentColor]["border"]} opacity-80 border-2 group-hover/item:${colorThemes[muxAccentColor]["borderHover"]} group-hover/item:${colorThemes[muxAccentColor]["backgroundHover"]} col-start-1 row-start-1 grid h-12 w-16 md:h-24 md:w-32 place-self-center rounded-full ${colorThemes[muxAccentColor]["background"]}`}
       >
         <svg
           className="mt-2 md:mt-3 h-8 w-8 md:h-20 md:w-20 place-self-center"
@@ -1162,7 +1232,11 @@ const Heading = ({
     return (
       <h3
         ref={ref}
-        className={`${localFont.className} text-md font-semibold xl:mb-2 xl:text-2xl ${textColorThemes[textColorTheme]}`}
+        className={`${
+          (localFont && localFont?.className) || ""
+        } text-md font-semibold xl:mb-2 xl:text-2xl ${
+          textColorThemes[textColorTheme]
+        }`}
       >
         {title}
       </h3>
@@ -1171,7 +1245,11 @@ const Heading = ({
     return (
       <h4
         ref={ref}
-        className={`${localFont.className} text-base font-semibold xl:mb-2 xl:text-xl ${textColorThemes[textColorTheme]}`}
+        className={`${
+          (localFont && localFont?.className) || ""
+        } text-base font-semibold xl:mb-2 xl:text-xl ${
+          textColorThemes[textColorTheme]
+        }`}
       >
         {title}
       </h4>
@@ -1180,7 +1258,9 @@ const Heading = ({
     return (
       <h5
         ref={ref}
-        className={`${localFont.className} text-base font-semibold xl:mb-2 ${textColorThemes[textColorTheme]}`}
+        className={`${
+          (localFont && localFont?.className) || ""
+        } text-base font-semibold xl:mb-2 ${textColorThemes[textColorTheme]}`}
       >
         {title}
       </h5>
