@@ -5,18 +5,18 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.DoContentSections = exports.ContentSections = exports.CONTENT_TYPE_TEXT_RIGHT = exports.CONTENT_TYPE_TEXT_LEFT = exports.CONTENT_TYPE_TEXT_IMAGE_RIGHT = exports.CONTENT_TYPE_TEXT_IMAGE_LEFT = exports.CONTENT_TYPE_TEXT_CENTER = exports.CONTENT_TYPE_TESTIMONIAL = exports.CONTENT_TYPE_MUX_VIDEO = exports.CONTENT_TYPE_IMAGE_RIGHT = exports.CONTENT_TYPE_IMAGE_LEFT = exports.CONTENT_TYPE_IMAGE_FULL = exports.CONTENT_TYPE_IMAGE_CENTER = exports.CONTENT_TYPE_FORM = exports.CONTENT_TYPE_DIVIDER = void 0;
-var _extends2 = _interopRequireDefault(require("@babel/runtime/helpers/extends"));
+exports.VideoItem = exports.SortableList = exports.DynamicForm = exports.DoContentSections = exports.ContentSections = exports.CONTENT_TYPE_TEXT_RIGHT = exports.CONTENT_TYPE_TEXT_LEFT = exports.CONTENT_TYPE_TEXT_IMAGE_RIGHT = exports.CONTENT_TYPE_TEXT_IMAGE_LEFT = exports.CONTENT_TYPE_TEXT_CENTER = exports.CONTENT_TYPE_TESTIMONIAL = exports.CONTENT_TYPE_MUX_VIDEO = exports.CONTENT_TYPE_IMAGE_RIGHT = exports.CONTENT_TYPE_IMAGE_LEFT = exports.CONTENT_TYPE_IMAGE_FULL = exports.CONTENT_TYPE_IMAGE_CENTER = exports.CONTENT_TYPE_FORM = exports.CONTENT_TYPE_DIVIDER = void 0;
+var _defineProperty2 = _interopRequireDefault(require("@babel/runtime/helpers/defineProperty"));
 var _react = _interopRequireWildcard(require("react"));
 var _copyToClipboard = _interopRequireDefault(require("copy-to-clipboard"));
 var _reactHotToast = _interopRequireWildcard(require("react-hot-toast"));
 var _reactScrollIntoView = _interopRequireDefault(require("react-scroll-into-view"));
-var _core = require("@dnd-kit/core");
-var _sortable = require("@dnd-kit/sortable");
-var _modifiers = require("@dnd-kit/modifiers");
-var _utilities = require("@dnd-kit/utilities");
+var _adapter = require("@atlaskit/pragmatic-drag-and-drop/element/adapter");
+var _closestEdge = require("@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge");
 var _react2 = require("@headlessui/react");
 function _interopRequireWildcard(e, t) { if ("function" == typeof WeakMap) var r = new WeakMap(), n = new WeakMap(); return (_interopRequireWildcard = function (e, t) { if (!t && e && e.__esModule) return e; var o, i, f = { __proto__: null, default: e }; if (null === e || "object" != typeof e && "function" != typeof e) return f; if (o = t ? n : r) { if (o.has(e)) return o.get(e); o.set(e, f); } for (const t in e) "default" !== t && {}.hasOwnProperty.call(e, t) && ((i = (o = Object.defineProperty) && Object.getOwnPropertyDescriptor(e, t)) && (i.get || i.set) ? o(f, t, i) : f[t] = e[t]); return f; })(e, t); }
+function ownKeys(e, r) { var t = Object.keys(e); if (Object.getOwnPropertySymbols) { var o = Object.getOwnPropertySymbols(e); r && (o = o.filter(function (r) { return Object.getOwnPropertyDescriptor(e, r).enumerable; })), t.push.apply(t, o); } return t; }
+function _objectSpread(e) { for (var r = 1; r < arguments.length; r++) { var t = null != arguments[r] ? arguments[r] : {}; r % 2 ? ownKeys(Object(t), !0).forEach(function (r) { (0, _defineProperty2.default)(e, r, t[r]); }) : Object.getOwnPropertyDescriptors ? Object.defineProperties(e, Object.getOwnPropertyDescriptors(t)) : ownKeys(Object(t)).forEach(function (r) { Object.defineProperty(e, r, Object.getOwnPropertyDescriptor(t, r)); }); } return e; }
 const CONTENT_TYPE_TEXT_LEFT = exports.CONTENT_TYPE_TEXT_LEFT = "text-only-left";
 const CONTENT_TYPE_TEXT_RIGHT = exports.CONTENT_TYPE_TEXT_RIGHT = "text-only-right";
 const CONTENT_TYPE_TEXT_CENTER = exports.CONTENT_TYPE_TEXT_CENTER = "text-only-center";
@@ -166,10 +166,10 @@ const DynamicForm = _ref => {
   const [submitStatus, setSubmitStatus] = (0, _react.useState)(null);
 
   // Initialize form values and sort fields by sort_key
-  const sortedFields = formData?.fields?.sort((a, b) => a.sort_key - b.sort_key) || [];
+  const sortedFields = formData !== null && formData !== void 0 && formData.fields ? [...formData.fields].sort((a, b) => a.sort_key - b.sort_key) : [];
   const validateField = (field, value) => {
     if (field.required && (!value || value.trim() === "")) {
-      return `${field.name} is required`;
+      return "".concat(field.name, " is required");
     }
     if (field.display_type === "email" && value) {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -180,15 +180,13 @@ const DynamicForm = _ref => {
     return null;
   };
   const handleInputChange = (field, value) => {
-    setFormValues(prev => ({
-      ...prev,
+    setFormValues(prev => _objectSpread(_objectSpread({}, prev), {}, {
       [field.data_name]: value
     }));
 
     // Clear error when user starts typing
     if (errors[field.data_name]) {
-      setErrors(prev => ({
-        ...prev,
+      setErrors(prev => _objectSpread(_objectSpread({}, prev), {}, {
         [field.data_name]: null
       }));
     }
@@ -197,8 +195,7 @@ const DynamicForm = _ref => {
     const value = formValues[field.data_name] || "";
     const error = validateField(field, value);
     if (error) {
-      setErrors(prev => ({
-        ...prev,
+      setErrors(prev => _objectSpread(_objectSpread({}, prev), {}, {
         [field.data_name]: error
       }));
     }
@@ -214,17 +211,23 @@ const DynamicForm = _ref => {
         isValid = false;
       }
     });
-    setErrors(newErrors);
-    return isValid;
+    return {
+      isValid,
+      newErrors
+    };
   };
   const handleSubmit = async e => {
     e.preventDefault();
-    if (!validateForm()) {
-      // Focus on first error field
-      const firstErrorField = Object.keys(errors)[0];
+    const {
+      isValid,
+      newErrors
+    } = validateForm();
+    setErrors(newErrors);
+    if (!isValid) {
+      const firstErrorField = Object.keys(newErrors)[0];
       if (firstErrorField) {
-        const errorElement = document.getElementById(firstErrorField);
-        errorElement?.focus();
+        var _document$getElementB;
+        (_document$getElementB = document.getElementById(firstErrorField)) === null || _document$getElementB === void 0 || _document$getElementB.focus();
       }
       return;
     }
@@ -236,10 +239,9 @@ const DynamicForm = _ref => {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({
-          form_id: formData.id,
-          ...formValues
-        })
+        body: JSON.stringify(_objectSpread({
+          form_id: formData.id
+        }, formValues))
       });
       if (response.ok) {
         setSubmitStatus("success");
@@ -260,12 +262,7 @@ const DynamicForm = _ref => {
     const value = formValues[field.data_name] || "";
     const hasError = errors[field.data_name];
     const fieldId = field.data_name;
-    const baseInputClasses = `
-      w-full px-3 py-2 border rounded-md shadow-sm transition-colors duration-200
-      focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500
-      disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed
-      ${hasError ? "border-red-300 focus:border-red-500 focus:ring-red-500" : "border-gray-300 hover:border-gray-400"}
-    `;
+    const baseInputClasses = "\n      w-full px-3 py-2 border rounded-md shadow-sm transition-colors duration-200\n      focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500\n      disabled:bg-gray-50 disabled:text-gray-500 disabled:cursor-not-allowed\n      ".concat(hasError ? "border-red-300 focus:border-red-500 focus:ring-red-500" : "border-gray-300 hover:border-gray-400", "\n    ");
 
     // Common label rendering
     const renderLabel = () => /*#__PURE__*/_react.default.createElement("label", {
@@ -279,12 +276,12 @@ const DynamicForm = _ref => {
     // Common description rendering
     const renderDescription = () => field.description && /*#__PURE__*/_react.default.createElement("p", {
       className: "text-sm text-gray-600",
-      id: `${fieldId}-description`
+      id: "".concat(fieldId, "-description")
     }, field.description);
 
     // Common error rendering
     const renderError = () => hasError && /*#__PURE__*/_react.default.createElement("p", {
-      id: `${fieldId}-error`,
+      id: "".concat(fieldId, "-error"),
       className: "text-sm text-red-600 flex items-center",
       role: "alert",
       "aria-live": "polite"
@@ -314,7 +311,7 @@ const DynamicForm = _ref => {
         rows: 4,
         className: baseInputClasses,
         "aria-invalid": hasError ? "true" : "false",
-        "aria-describedby": `${hasError ? `${fieldId}-error` : ""} ${field.description ? `${fieldId}-description` : ""}`.trim(),
+        "aria-describedby": "".concat(hasError ? "".concat(fieldId, "-error") : "", " ").concat(field.description ? "".concat(fieldId, "-description") : "").trim(),
         placeholder: "Enter your message here..."
       }), renderError());
     }
@@ -359,7 +356,7 @@ const DynamicForm = _ref => {
       required: field.required,
       disabled: isSubmitting,
       "aria-invalid": hasError ? "true" : "false",
-      "aria-describedby": `${hasError ? `${fieldId}-error` : ""} ${field.description ? `${fieldId}-description` : ""}`.trim(),
+      "aria-describedby": "".concat(hasError ? "".concat(fieldId, "-error") : "", " ").concat(field.description ? "".concat(fieldId, "-description") : "").trim(),
       className: baseInputClasses,
       placeholder: field.display_type === "email" ? "you@example.com" : ""
     }), renderError());
@@ -373,7 +370,8 @@ const DynamicForm = _ref => {
   }
   let className = backgroundColorThemes[backgroundColorTheme];
   return /*#__PURE__*/_react.default.createElement("form", {
-    className: `max-w-2xl mx-auto p-6 ${className ? className : "bg-white"} ${localFont && localFont?.className ? localFont.className : ""} rounded-lg shadow-md`
+    onSubmit: handleSubmit,
+    className: "max-w-2xl mx-auto p-6 ".concat(className ? className : "bg-white", " ").concat(localFont && localFont !== null && localFont !== void 0 && localFont.className ? localFont.className : "", " rounded-lg shadow-md")
   }, showHeading && /*#__PURE__*/_react.default.createElement("div", {
     className: "mb-6"
   }, /*#__PURE__*/_react.default.createElement("h2", {
@@ -381,7 +379,6 @@ const DynamicForm = _ref => {
   }, heading), formData.description && /*#__PURE__*/_react.default.createElement("p", {
     className: "text-gray-600"
   }, formData.description)), /*#__PURE__*/_react.default.createElement("div", {
-    onSubmit: handleSubmit,
     className: "space-y-6"
   }, sortedFields.map(renderField), submitStatus === "success" && /*#__PURE__*/_react.default.createElement("div", {
     className: "p-4 bg-green-50 border border-green-200 rounded-md"
@@ -414,15 +411,9 @@ const DynamicForm = _ref => {
   }, "There was an error submitting the form. Please try again."))), /*#__PURE__*/_react.default.createElement("div", {
     className: "pt-4"
   }, /*#__PURE__*/_react.default.createElement("button", {
-    type: "button",
-    onClick: handleSubmit,
+    type: "submit",
     disabled: isSubmitting,
-    className: `
-              w-full flex justify-center items-center px-4 py-2 border border-transparent 
-              rounded-md shadow-sm text-sm font-medium text-white transition-colors duration-200
-              focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500
-              ${isSubmitting ? "bg-gray-600 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 active:bg-blue-800"}
-            `
+    className: "\n              w-full flex justify-center items-center px-4 py-2 border border-transparent \n              rounded-md shadow-sm text-sm font-medium text-white transition-colors duration-200\n              focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500\n              ".concat(isSubmitting ? "bg-gray-600 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700 active:bg-blue-800", "\n            ")
   }, isSubmitting ? /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, /*#__PURE__*/_react.default.createElement("svg", {
     className: "animate-spin -ml-1 mr-3 h-5 w-5 text-white",
     xmlns: "http://www.w3.org/2000/svg",
@@ -439,8 +430,9 @@ const DynamicForm = _ref => {
     className: "opacity-75",
     fill: "currentColor",
     d: "M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-  })), "Submitting...") : `Submit ${formData.name}`))));
+  })), "Submitting...") : "Submit ".concat(formData.name)))));
 };
+exports.DynamicForm = DynamicForm;
 const VideoItem = _ref2 => {
   let {
     muxPlaybackId,
@@ -623,14 +615,14 @@ const VideoItem = _ref2 => {
   };
   if (!(muxAccentColor in colorThemes)) muxAccentColor = "indigo";
   const [showVideo, setShowVideo] = (0, _react.useState)(false);
-  if (content) borderClasses = `${backgroundColorThemes} mb-4`;
+  if (content) borderClasses = "".concat(backgroundColorThemes["none"], " mb-4");
   const videoOut = showVideo ? /*#__PURE__*/_react.default.createElement("mux-video", {
     style: {
       width: "100%",
       aspectRatio: "16/9",
       objectFit: "contain"
     },
-    className: `flex ${borderClasses}`,
+    className: "flex ".concat(borderClasses),
     "playback-id": muxPlaybackId,
     "metadata-video-title": "About FirstWho",
     "disable-tracking": true,
@@ -641,17 +633,17 @@ const VideoItem = _ref2 => {
     onClick: () => {
       setShowVideo(true);
     },
-    className: `group/item cursor-pointer aspect-video rounded-lg ${borderClasses} grid`
+    className: "group/item cursor-pointer aspect-video rounded-lg ".concat(borderClasses, " grid")
   }, /*#__PURE__*/_react.default.createElement("img", {
     className: "object-cover col-start-1 row-start-1",
-    src: `https://image.mux.com/${muxPlaybackId}/thumbnail.jpg?width=1920&height=1080&time=${muxPosterOffset || 1}`
+    src: "https://image.mux.com/".concat(muxPlaybackId, "/thumbnail.jpg?width=1920&height=1080&time=").concat(muxPosterOffset || 1)
   }), /*#__PURE__*/_react.default.createElement("div", {
-    className: `${colorThemes[muxAccentColor]["border"]} opacity-80 border-2 group-hover/item:${colorThemes[muxAccentColor]["borderHover"]} group-hover/item:${colorThemes[muxAccentColor]["backgroundHover"]} col-start-1 row-start-1 grid h-12 w-16 md:h-24 md:w-32 place-self-center rounded-full ${colorThemes[muxAccentColor]["background"]}`
+    className: "".concat(colorThemes[muxAccentColor]["border"], " opacity-80 border-2 group-hover/item:").concat(colorThemes[muxAccentColor]["borderHover"], " group-hover/item:").concat(colorThemes[muxAccentColor]["backgroundHover"], " col-start-1 row-start-1 grid h-12 w-16 md:h-24 md:w-32 place-self-center rounded-full ").concat(colorThemes[muxAccentColor]["background"])
   }, /*#__PURE__*/_react.default.createElement("svg", {
     className: "mt-2 md:mt-3 h-8 w-8 md:h-20 md:w-20 place-self-center",
     viewBox: "0 0 100 125"
   }, /*#__PURE__*/_react.default.createElement("path", {
-    className: `${colorThemes[muxAccentColor]["fill"]}`,
+    className: "".concat(colorThemes[muxAccentColor]["fill"]),
     d: "m77.6 54.3-46 26.6c-2 1.2-4.6-.3-4.6-2.7V25c0-2.4 2.6-3.8 4.6-2.7l46 26.6c2 1.3 2 4.2 0 5.4z"
   }))));
   return /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, videoOut, content && /*#__PURE__*/_react.default.createElement(TextLeft, {
@@ -659,6 +651,7 @@ const VideoItem = _ref2 => {
     textColorTheme: textColorTheme
   }));
 };
+exports.VideoItem = VideoItem;
 const SortableList = _ref3 => {
   let {
     rows,
@@ -669,62 +662,78 @@ const SortableList = _ref3 => {
     sortableItems = [],
     setIsSorting
   } = _ref3;
-  return /*#__PURE__*/_react.default.createElement(_core.DndContext, {
-    id: collection,
-    modifiers: [_modifiers.restrictToVerticalAxis],
-    onDragStart: _ref4 => {
-      let {
-        active: {
-          id
+  (0, _react.useEffect)(() => {
+    return (0, _adapter.monitorForElements)({
+      canMonitor: _ref4 => {
+        let {
+          source
+        } = _ref4;
+        return source.data.collection === collection;
+      },
+      onDragStart: _ref5 => {
+        let {
+          source
+        } = _ref5;
+        setIsSorting(source.data.id);
+      },
+      onDrop: async _ref6 => {
+        let {
+          source,
+          location
+        } = _ref6;
+        if (!location.current.dropTargets.length) {
+          setIsSorting(null);
+          return;
         }
-      } = _ref4;
-      setIsSorting(id);
-    },
-    onDragCancel: () => {
-      setIsSorting(null);
-    },
-    onDragEnd: async _ref5 => {
-      let {
-        active: {
-          id: activeId
-        },
-        over: {
-          id: overId
+        const sourceId = source.data.id;
+        const targetData = location.current.dropTargets[0].data;
+        const targetId = targetData.id;
+        const closestEdge = (0, _closestEdge.extractClosestEdge)(targetData);
+        const oldIndex = rows.findIndex(r => r[idField] === sourceId);
+        const targetIndex = rows.findIndex(r => r[idField] === targetId);
+        if (oldIndex === -1 || targetIndex === -1) {
+          setIsSorting(null);
+          return;
         }
-      } = _ref5;
-      const oldIndex = rows.findIndex(row => row[idField] === activeId);
-      const newIndex = rows.findIndex(row => row[idField] === overId);
-      let sortedRows = arrayMoveImmutable(rows, oldIndex, newIndex);
-      let ids = sortedRows.map(row => row[idField]);
-      dispatch({
-        type: "SORT_ROWS",
-        data: {
-          collection: collection || null,
-          oldIndex: oldIndex,
-          newIndex: newIndex,
-          sortedRows,
-          ids,
-          idField
+        const edgeOffset = closestEdge === "bottom" ? 1 : 0;
+        const resolvedNewIndex = targetIndex + edgeOffset - (oldIndex < targetIndex + edgeOffset ? 1 : 0);
+        if (oldIndex === resolvedNewIndex) {
+          setIsSorting(null);
+          return;
         }
-      });
-
-      // api
-      if (sortApi) await sortApi({
-        ids
-      });
-      setIsSorting(null);
-    }
-  }, /*#__PURE__*/_react.default.createElement(_sortable.SortableContext, {
-    items: rows,
-    strategy: _sortable.verticalListSortingStrategy
-  }, sortableItems));
+        try {
+          const sortedRows = arrayMoveImmutable(rows, oldIndex, resolvedNewIndex);
+          const ids = sortedRows.map(row => row[idField]);
+          dispatch({
+            type: "SORT_ROWS",
+            data: {
+              collection: collection || null,
+              oldIndex,
+              newIndex: resolvedNewIndex,
+              sortedRows,
+              ids,
+              idField
+            }
+          });
+          if (sortApi) await sortApi({
+            ids
+          });
+        } finally {
+          setIsSorting(null);
+        }
+      }
+    });
+  }, [rows, dispatch, collection, sortApi, idField, setIsSorting]);
+  return /*#__PURE__*/_react.default.createElement(_react.default.Fragment, null, sortableItems);
 };
 
 // NOTE localFont is NextJS font object
-
+exports.SortableList = SortableList;
 const useScript = url => {
   (0, _react.useEffect)(() => {
     if (!url) return;
+    const existing = document.querySelector("script[src=\"".concat(url, "\"]"));
+    if (existing) return;
     const script = document.createElement("script");
     script.src = url;
     script.async = true;
@@ -736,8 +745,8 @@ const useScript = url => {
 };
 const useOnScreen = (ref, setActiveHeader, anchor) => {
   (0, _react.useEffect)(() => {
-    const observer = new IntersectionObserver(_ref6 => {
-      let [entry] = _ref6;
+    const observer = new IntersectionObserver(_ref7 => {
+      let [entry] = _ref7;
       if (!(typeof entry === "object" && entry !== null)) return;
       if (entry.isIntersecting === true) setActiveHeader(anchor);
     }, {
@@ -750,7 +759,25 @@ const useOnScreen = (ref, setActiveHeader, anchor) => {
     };
   }, [ref, anchor, setActiveHeader]);
 };
-const TocItem = _ref7 => {
+const DropIndicator = _ref8 => {
+  let {
+    edge
+  } = _ref8;
+  return /*#__PURE__*/_react.default.createElement("div", {
+    style: _objectSpread({
+      position: "absolute",
+      left: 0,
+      right: 0,
+      height: "2px",
+      background: "#2563eb"
+    }, edge === "top" ? {
+      top: 0
+    } : {
+      bottom: 0
+    })
+  });
+};
+const TocItem = _ref9 => {
   let {
     id,
     heading,
@@ -768,43 +795,95 @@ const TocItem = _ref7 => {
     isSorting,
     tocItemClasses,
     tocItemMatchedClasses
-  } = _ref7;
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition
-  } = sortCollection ? (0, _sortable.useSortable)({
-    id
-  }) : {
-    attributes: {},
-    listeners: {},
-    setNodeRef: null,
-    transform: "",
-    transition: ""
-  };
-  const style = sortCollection ? {
-    transform: _utilities.CSS.Translate.toString(transform),
-    transition
-  } : {};
+  } = _ref9;
+  const itemRef = (0, _react.useRef)(null);
+  const handleRef = (0, _react.useRef)(null);
+  const [isDragging, setIsDragging] = (0, _react.useState)(false);
+  const [isDraggedOver, setIsDraggedOver] = (0, _react.useState)(false);
+  const [closestEdge, setClosestEdge] = (0, _react.useState)(null);
   const [isDeleting, setIsDeleting] = (0, _react.useState)(false);
   const [isHovering, setIsHovering] = (0, _react.useState)(false);
+  (0, _react.useEffect)(() => {
+    if (!sortCollection) return;
+    const el = itemRef.current;
+    const handle = handleRef.current;
+    const cleanupDraggable = (0, _adapter.draggable)({
+      element: el,
+      dragHandle: handle,
+      getInitialData: () => ({
+        id,
+        collection: sortCollection
+      }),
+      onDragStart: () => setIsDragging(true),
+      onDrop: () => setIsDragging(false)
+    });
+    const cleanupDropTarget = (0, _adapter.dropTargetForElements)({
+      element: el,
+      getData: _ref0 => {
+        let {
+          input,
+          element
+        } = _ref0;
+        return (0, _closestEdge.attachClosestEdge)({
+          id,
+          collection: sortCollection
+        }, {
+          input,
+          element,
+          allowedEdges: ["top", "bottom"]
+        });
+      },
+      canDrop: _ref1 => {
+        let {
+          source
+        } = _ref1;
+        return source.data.collection === sortCollection;
+      },
+      onDragEnter: _ref10 => {
+        let {
+          self
+        } = _ref10;
+        setIsDraggedOver(true);
+        setClosestEdge((0, _closestEdge.extractClosestEdge)(self.data));
+      },
+      onDrag: _ref11 => {
+        let {
+          self
+        } = _ref11;
+        setClosestEdge((0, _closestEdge.extractClosestEdge)(self.data));
+      },
+      onDragLeave: () => {
+        setIsDraggedOver(false);
+        setClosestEdge(null);
+      },
+      onDrop: () => {
+        setIsDraggedOver(false);
+        setClosestEdge(null);
+      }
+    });
+    return () => {
+      cleanupDraggable();
+      cleanupDropTarget();
+    };
+  }, [id, sortCollection]);
   const showStuff = editCallback && (isHovering && !isSorting || isSorting);
-  const itemClasses = tocItemClasses ? `${localFont.className} grow space-x-2 cursor-pointer ${tocItemClasses} ${matched && offset <= activeUntil ? tocItemMatchedClasses : "text-gray-500"}` : `${editCallback ? "hover:underline" : ""} ${matched && offset <= activeUntil ? "text-slate-800" : editCallback ? "text-slate-800" : "text-gray-500"} ${localFont.className} grow ${showMeter ? "pl-4" : ""} pr-2 space-x-2 hover:text-gray-900 text-lg cursor-pointer ${showHeading ? "" : "opacity-50"}`;
-  return /*#__PURE__*/_react.default.createElement("li", (0, _extends2.default)({
+  const itemClasses = tocItemClasses ? "".concat(localFont.className, " grow space-x-2 cursor-pointer ").concat(tocItemClasses, " ").concat(matched && offset <= activeUntil ? tocItemMatchedClasses : "text-gray-500") : "".concat(editCallback ? "hover:underline" : "", " ").concat(matched && offset <= activeUntil ? "text-slate-800" : editCallback ? "text-slate-800" : "text-gray-500", " ").concat(localFont.className, " grow ").concat(showMeter ? "pl-4" : "", " pr-2 space-x-2 hover:text-gray-900 text-lg cursor-pointer ").concat(showHeading ? "" : "opacity-50");
+  return /*#__PURE__*/_react.default.createElement("li", {
     onMouseEnter: () => setIsHovering(true),
     onMouseLeave: () => setIsHovering(false),
-    ref: setNodeRef,
-    style: style
-  }, attributes, {
-    className: `${isSorting ? "bg-gray-50 z-index-50" : ""} flex items-center relative ${editCallback ? "pt-2 first:pt-0 pl-4" : ""}`
+    ref: itemRef,
+    style: {
+      opacity: isDragging ? 0.5 : 1
+    },
+    className: "".concat(isSorting ? "bg-gray-50 z-index-50" : "", " flex items-center relative ").concat(editCallback ? "pt-2 first:pt-0 pl-4" : "")
+  }, isDraggedOver && closestEdge && /*#__PURE__*/_react.default.createElement(DropIndicator, {
+    edge: closestEdge
   }), showMeter && offset === 0 && /*#__PURE__*/_react.default.createElement("div", {
     className: "absolute h-1/2 w-4 top-0 -left-2 bg-white z-10"
   }), showMeter && offset === visibleSections.length - 1 && /*#__PURE__*/_react.default.createElement("div", {
     className: "absolute h-1/2 w-4 bottom-0 -left-2 bg-white z-10"
   }), showMeter && /*#__PURE__*/_react.default.createElement("div", {
-    className: `${matched && offset <= activeUntil ? "bg-slate-700" : "bg-white"} shrink-0 rounded-full w-3 h-3 border-slate-800 border-2 -ml-[7px] z-20`
+    className: "".concat(matched && offset <= activeUntil ? "bg-slate-700" : "bg-white", " shrink-0 rounded-full w-3 h-3 border-slate-800 border-2 -ml-[7px] z-20")
   }), /*#__PURE__*/_react.default.createElement("div", {
     className: "flex grow"
   }, /*#__PURE__*/_react.default.createElement(_react2.Transition, {
@@ -814,13 +893,14 @@ const TocItem = _ref7 => {
     enterTo: "transform scale-100 opacity-100 max-h-96",
     leaveFrom: "transform scale-100 opacity-100 max-h-96",
     leaveTo: "transform scale-95 opacity-0 max-h-0"
-  }, /*#__PURE__*/_react.default.createElement("div", (0, _extends2.default)({}, listeners, {
+  }, /*#__PURE__*/_react.default.createElement("div", {
+    ref: handleRef,
     className: "h-6 w-6 inline-block text-slate-500 -ml-1 mr-1 shrink",
     "aria-hidden": "true",
     style: {
       marginTop: "2px"
     }
-  }), /*#__PURE__*/_react.default.createElement("svg", {
+  }, /*#__PURE__*/_react.default.createElement("svg", {
     width: "24",
     height: "24",
     viewBox: "0 0 15 15",
@@ -834,7 +914,7 @@ const TocItem = _ref7 => {
   })))), /*#__PURE__*/_react.default.createElement("div", {
     className: "grow flex flex-col"
   }, /*#__PURE__*/_react.default.createElement(_reactScrollIntoView.default, {
-    selector: `#heading-${id}`,
+    selector: "#heading-".concat(id),
     className: "flex"
   }, /*#__PURE__*/_react.default.createElement("span", {
     className: itemClasses
@@ -846,7 +926,7 @@ const TocItem = _ref7 => {
     leaveFrom: "transform scale-100 opacity-100 max-h-96",
     leaveTo: "transform scale-95 opacity-0 max-h-0"
   }, /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("div", {
-    className: `${showMeter ? "pl-4" : ""} flex gap-x-2`
+    className: "".concat(showMeter ? "pl-4" : "", " flex gap-x-2")
   }, /*#__PURE__*/_react.default.createElement("span", {
     onClick: () => editCallback(id),
     className: buttonClasses
@@ -871,7 +951,7 @@ const TocItem = _ref7 => {
     className: "cursor-pointer rounded-md bg-red-600 px-2.5 py-1.5 text-base font-semibold text-white shadow-sm hover:bg-red-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
   }, "Delete"))))))));
 };
-const TableOfContents = _ref8 => {
+const TableOfContents = _ref12 => {
   let {
     sections,
     activeHeader,
@@ -886,35 +966,35 @@ const TableOfContents = _ref8 => {
     tocItemClasses,
     tocItemMatchedClasses,
     topStickyOffset = "top-[95px]"
-  } = _ref8;
+  } = _ref12;
   const [isSorting, setIsSorting] = (0, _react.useState)(null);
-  const visibleSections = showInvisibleHeaders ? sections : sections.filter(_ref9 => {
+  const visibleSections = showInvisibleHeaders ? sections : sections.filter(_ref13 => {
     let {
       show_heading: showHeading
-    } = _ref9;
+    } = _ref13;
     return showHeading === true;
   });
-  const [matched, activeUntil] = activeHeader === null ? [false, -1] : visibleSections.reduce((_ref0, _ref1, offset) => {
-    let [isMatched, matchedOffset] = _ref0;
+  const [matched, activeUntil] = activeHeader === null ? [false, -1] : visibleSections.reduce((_ref14, _ref15, offset) => {
+    let [isMatched, matchedOffset] = _ref14;
     let {
       id
-    } = _ref1;
+    } = _ref15;
     if (isMatched) return [isMatched, matchedOffset];
-    if (`heading-${id}` === activeHeader) return [true, offset];
+    if ("heading-".concat(id) === activeHeader) return [true, offset];
     return [false, -1];
   }, [false, -1]);
   return /*#__PURE__*/_react.default.createElement("div", {
     className: tocGridClasses
   }, /*#__PURE__*/_react.default.createElement("div", {
-    className: `sticky ${sortCollection ? "top-0" : topStickyOffset} hidden lg:block`
+    className: "sticky ".concat(sortCollection ? "top-0" : topStickyOffset, " hidden lg:block")
   }, tocHeading && /*#__PURE__*/_react.default.createElement("h3", {
-    className: `${localFont && localFont?.className || ""} -ml-1 mb-3 text-xl font-semibold text-slate-700`
+    className: "".concat(localFont && (localFont === null || localFont === void 0 ? void 0 : localFont.className) || "", " -ml-1 mb-3 text-xl font-semibold text-slate-700")
   }, tocHeading), /*#__PURE__*/_react.default.createElement("ul", {
-    className: `${sortCollection ? "" : "mt-2"} ${tocHeading ? "lg:mt-4" : ""} ${sortCollection ? "lg:space-y-2 grid grid-cols-1 divide-y" : "lg:space-y-4"} ${showMeter ? "border-l-2 border-slate-700" : ""}`
+    className: "".concat(sortCollection ? "" : "mt-2", " ").concat(tocHeading ? "lg:mt-4" : "", " ").concat(sortCollection ? "lg:space-y-2 grid grid-cols-1 divide-y" : "lg:space-y-4", " ").concat(showMeter ? "border-l-2 border-slate-700" : "")
   }, /*#__PURE__*/_react.default.createElement(SortableList, {
     setIsSorting: setIsSorting,
     rows: visibleSections,
-    sortableItems: visibleSections.map((_ref10, offset) => {
+    sortableItems: visibleSections.map((_ref16, offset) => {
       let {
         id,
         heading,
@@ -922,7 +1002,7 @@ const TableOfContents = _ref8 => {
         editCallback,
         deleteCallback,
         buttonClasses
-      } = _ref10;
+      } = _ref16;
       return /*#__PURE__*/_react.default.createElement(TocItem, {
         matched: matched,
         activeUntil: activeUntil,
@@ -948,7 +1028,7 @@ const TableOfContents = _ref8 => {
     sortApi: sortApi
   }))));
 };
-const Heading = _ref11 => {
+const Heading = _ref17 => {
   let {
     title,
     level = 2,
@@ -958,23 +1038,23 @@ const Heading = _ref11 => {
     textColorTheme = "none",
     showCopyLink = true,
     headingClasses = "text-2xl font-semibold xl:mb-2 xl:text-3xl"
-  } = _ref11;
+  } = _ref17;
   const ref = (0, _react.useRef)();
   useOnScreen(ref, setActiveHeader, anchor);
   if (level === 1) return /*#__PURE__*/_react.default.createElement("h1", {
     ref: ref,
-    className: `${localFont && localFont?.className || ""} ${textColorThemes[textColorTheme]} mb-2 text-base font-semibold xl:mb-4 xl:text-4xl`
+    className: "".concat(localFont && (localFont === null || localFont === void 0 ? void 0 : localFont.className) || "", " ").concat(textColorThemes[textColorTheme], " mb-2 text-base font-semibold xl:mb-4 xl:text-4xl")
   }, title);
   if (level === 2) return /*#__PURE__*/_react.default.createElement("h2", {
     onClick: () => {
       if (!showCopyLink) return;
-      (0, _copyToClipboard.default)(window.location.origin + window.location.pathname + `#${anchor}`);
+      (0, _copyToClipboard.default)(window.location.origin + window.location.pathname + "#".concat(anchor));
       _reactHotToast.default.success("Link copied to clipboard", {
         position: "bottom-center"
       });
     },
     ref: ref,
-    className: `${localFont && localFont?.className || ""} cursor-pointer ${headingClasses} flex items-center ${textColorThemes[textColorTheme]}`
+    className: "".concat(localFont && (localFont === null || localFont === void 0 ? void 0 : localFont.className) || "", " cursor-pointer ").concat(headingClasses, " flex items-center ").concat(textColorThemes[textColorTheme])
   }, /*#__PURE__*/_react.default.createElement("div", null, title), showCopyLink && /*#__PURE__*/_react.default.createElement("div", {
     className: "p-1 ml-2"
   }, /*#__PURE__*/_react.default.createElement("svg", {
@@ -991,65 +1071,65 @@ const Heading = _ref11 => {
   }))));
   if (level === 3) return /*#__PURE__*/_react.default.createElement("h3", {
     ref: ref,
-    className: `${localFont && localFont?.className || ""} text-md font-semibold xl:mb-2 xl:text-2xl ${textColorThemes[textColorTheme]}`
+    className: "".concat(localFont && (localFont === null || localFont === void 0 ? void 0 : localFont.className) || "", " text-md font-semibold xl:mb-2 xl:text-2xl ").concat(textColorThemes[textColorTheme])
   }, title);
   if (level === 4) return /*#__PURE__*/_react.default.createElement("h4", {
     ref: ref,
-    className: `${localFont && localFont?.className || ""} text-base font-semibold xl:mb-2 xl:text-xl ${textColorThemes[textColorTheme]}`
+    className: "".concat(localFont && (localFont === null || localFont === void 0 ? void 0 : localFont.className) || "", " text-base font-semibold xl:mb-2 xl:text-xl ").concat(textColorThemes[textColorTheme])
   }, title);
   if (level === 5) return /*#__PURE__*/_react.default.createElement("h5", {
     ref: ref,
-    className: `${localFont && localFont?.className || ""} text-base font-semibold xl:mb-2 ${textColorThemes[textColorTheme]}`
+    className: "".concat(localFont && (localFont === null || localFont === void 0 ? void 0 : localFont.className) || "", " text-base font-semibold xl:mb-2 ").concat(textColorThemes[textColorTheme])
   }, title);
   return null;
 };
-const TextLeft = _ref12 => {
+const TextLeft = _ref18 => {
   let {
     content,
     textColorTheme = "none",
     contentFont = {}
-  } = _ref12;
+  } = _ref18;
   return /*#__PURE__*/_react.default.createElement("div", {
-    className: `${contentFont?.className || ""} leading-normal prose lg:prose-lg max-w-none ${textColorThemes[textColorTheme]}`,
+    className: "".concat((contentFont === null || contentFont === void 0 ? void 0 : contentFont.className) || "", " leading-normal prose lg:prose-lg max-w-none ").concat(textColorThemes[textColorTheme]),
     dangerouslySetInnerHTML: {
       __html: content
     }
   });
 };
-const TextRight = _ref13 => {
+const TextRight = _ref19 => {
   let {
     content,
     textColorTheme = "none",
     contentFont = {}
-  } = _ref13;
+  } = _ref19;
   return /*#__PURE__*/_react.default.createElement("div", {
-    className: `${contentFont?.className || ""} text-right leading-normal prose lg:prose-lg max-w-none ${textColorThemes[textColorTheme]}`,
+    className: "".concat((contentFont === null || contentFont === void 0 ? void 0 : contentFont.className) || "", " text-right leading-normal prose lg:prose-lg max-w-none ").concat(textColorThemes[textColorTheme]),
     dangerouslySetInnerHTML: {
       __html: content
     }
   });
 };
-const TextCenter = _ref14 => {
+const TextCenter = _ref20 => {
   let {
     content,
     textColorTheme = "none",
     contentFont = {}
-  } = _ref14;
+  } = _ref20;
   return /*#__PURE__*/_react.default.createElement("div", {
-    className: `${contentFont?.className || ""} text-center leading-normal prose lg:prose-lg max-w-none ${textColorThemes[textColorTheme]}`,
+    className: "".concat((contentFont === null || contentFont === void 0 ? void 0 : contentFont.className) || "", " text-center leading-normal prose lg:prose-lg max-w-none ").concat(textColorThemes[textColorTheme]),
     dangerouslySetInnerHTML: {
       __html: content
     }
   });
 };
-const ImageOnLeft = _ref15 => {
+const ImageOnLeft = _ref21 => {
   let {
     content,
     imageUrl,
     colSpanContent = "col-span-12 md:col-span-6",
     colSpanImage = "col-span-12 md:col-span-6",
     contentFont = {}
-  } = _ref15;
+  } = _ref21;
   return /*#__PURE__*/_react.default.createElement("div", {
     className: "grid grid-cols-12 gap-4"
   }, /*#__PURE__*/_react.default.createElement("div", {
@@ -1058,13 +1138,13 @@ const ImageOnLeft = _ref15 => {
     src: imageUrl,
     alt: ""
   })), /*#__PURE__*/_react.default.createElement("div", {
-    className: `${colSpanContent} ${contentFont?.className || ""} leading-normal prose lg:prose-lg max-w-none`,
+    className: "".concat(colSpanContent, " ").concat((contentFont === null || contentFont === void 0 ? void 0 : contentFont.className) || "", " leading-normal prose lg:prose-lg max-w-none"),
     dangerouslySetInnerHTML: {
       __html: content
     }
   }));
 };
-const ImageOnRight = _ref16 => {
+const ImageOnRight = _ref22 => {
   let {
     content,
     imageUrl,
@@ -1072,24 +1152,24 @@ const ImageOnRight = _ref16 => {
     colSpanImage = "w-full md:w-1/2",
     ctaContent = null,
     contentFont = {}
-  } = _ref16;
+  } = _ref22;
   return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("img", {
     src: imageUrl,
     alt: "",
-    className: `${colSpanImage} float-none md:float-right ml-0 md:ml-8 mb-4`
+    className: "".concat(colSpanImage, " float-none md:float-right ml-0 md:ml-8 mb-4")
   }), /*#__PURE__*/_react.default.createElement("div", {
-    className: `${colSpanContent} ${contentFont?.className || ""} leading-normal prose lg:prose-lg max-w-none`,
+    className: "".concat(colSpanContent, " ").concat((contentFont === null || contentFont === void 0 ? void 0 : contentFont.className) || "", " leading-normal prose lg:prose-lg max-w-none"),
     dangerouslySetInnerHTML: {
       __html: content
     }
   }), ctaContent);
 };
-const ImageCenter = _ref17 => {
+const ImageCenter = _ref23 => {
   let {
     imageUrl,
     height,
     width
-  } = _ref17;
+  } = _ref23;
   return /*#__PURE__*/_react.default.createElement("div", {
     className: "flex justify-center"
   }, /*#__PURE__*/_react.default.createElement("img", {
@@ -1099,22 +1179,22 @@ const ImageCenter = _ref17 => {
     alt: ""
   }));
 };
-const ImageCenterFull = _ref18 => {
+const ImageCenterFull = _ref24 => {
   let {
     imageUrl
-  } = _ref18;
+  } = _ref24;
   return /*#__PURE__*/_react.default.createElement("div", null, /*#__PURE__*/_react.default.createElement("img", {
     className: "object-fill",
     src: imageUrl,
     alt: ""
   }));
 };
-const ImageLeft = _ref19 => {
+const ImageLeft = _ref25 => {
   let {
     imageUrl,
     height,
     width
-  } = _ref19;
+  } = _ref25;
   return /*#__PURE__*/_react.default.createElement("div", {
     className: "flex justify-start"
   }, /*#__PURE__*/_react.default.createElement("img", {
@@ -1124,12 +1204,12 @@ const ImageLeft = _ref19 => {
     alt: ""
   }));
 };
-const ImageRight = _ref20 => {
+const ImageRight = _ref26 => {
   let {
     imageUrl,
     height,
     width
-  } = _ref20;
+  } = _ref26;
   return /*#__PURE__*/_react.default.createElement("div", {
     className: "flex justify-end"
   }, /*#__PURE__*/_react.default.createElement("img", {
@@ -1139,7 +1219,7 @@ const ImageRight = _ref20 => {
     alt: ""
   }));
 };
-const Section = _ref21 => {
+const Section = _ref27 => {
   let {
     sectionOut,
     id,
@@ -1147,8 +1227,8 @@ const Section = _ref21 => {
     scripts,
     backgroundColorTheme = "none",
     emptyContent = false
-  } = _ref21;
-  useScript(scripts?.[0] || false);
+  } = _ref27;
+  useScript((scripts === null || scripts === void 0 ? void 0 : scripts[0]) || false);
   let className = backgroundColorThemes[backgroundColorTheme];
   if (emptyContent) className = className.replace("mb-6", "mb-0");
   return /*#__PURE__*/_react.default.createElement("section", {
@@ -1158,20 +1238,20 @@ const Section = _ref21 => {
     className: "relative"
   }, /*#__PURE__*/_react.default.createElement("a", {
     className: "absolute -top-10",
-    id: `heading-${id}`,
-    name: `heading-${id}`
+    id: "heading-".concat(id),
+    name: "heading-".concat(id)
   })), headingOut, sectionOut);
 };
-const BaseTestimonialSection = _ref22 => {
+const BaseTestimonialSection = _ref28 => {
   let {
     heading,
     id,
     testimonials,
     showHeading
-  } = _ref22;
+  } = _ref28;
   return /*#__PURE__*/_react.default.createElement("div", null, "Testimonials");
 };
-const ContentSections = _ref23 => {
+const ContentSections = _ref29 => {
   let {
     showCopyLink = false,
     sections,
@@ -1183,8 +1263,8 @@ const ContentSections = _ref23 => {
     headingClasses,
     setActiveHeader = () => {},
     TestimonialComponent = BaseTestimonialSection
-  } = _ref23;
-  return sections.map(_ref24 => {
+  } = _ref29;
+  return sections.map(_ref30 => {
     let {
       content,
       content_type: contentType,
@@ -1204,7 +1284,7 @@ const ContentSections = _ref23 => {
       borderClasses,
       testimonials,
       form
-    } = _ref24;
+    } = _ref30;
     const imageUrl = image && "url" in image ? image["url"] : null;
     const imageHeight = image && "height" in image ? image["height"] : null;
     const imageWidth = image && "width" in image ? image["width"] : null;
@@ -1212,7 +1292,7 @@ const ContentSections = _ref23 => {
     const headingOut = showHeading === false || contentType === CONTENT_TYPE_DIVIDER ? null : /*#__PURE__*/_react.default.createElement(Heading, {
       title: heading,
       level: headingLevel,
-      anchor: `heading-${id}`,
+      anchor: "heading-".concat(id),
       setActiveHeader: setActiveHeader,
       localFont: headingFont || localFont,
       textColorTheme: headingColorTheme,
@@ -1335,7 +1415,7 @@ const ContentSections = _ref23 => {
   });
 };
 exports.ContentSections = ContentSections;
-const DoContentSections = _ref25 => {
+const DoContentSections = _ref31 => {
   let {
     sections,
     localFont,
@@ -1357,7 +1437,7 @@ const DoContentSections = _ref25 => {
     topStickyOffset = "top-[95px]",
     headingClasses = "text-2xl font-semibold xl:mb-2 xl:text-3xl",
     TestimonialComponent = BaseTestimonialSection
-  } = _ref25;
+  } = _ref31;
   const [activeHeader, setActiveHeader] = (0, _react.useState)(null);
   return /*#__PURE__*/_react.default.createElement("div", {
     className: outerGridClasses

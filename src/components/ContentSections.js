@@ -4,14 +4,8 @@ import React, { useEffect, useRef, useState } from "react";
 import copy from "copy-to-clipboard";
 import toast, { Toaster } from "react-hot-toast";
 import ScrollTo from "react-scroll-into-view";
-import { DndContext } from "@dnd-kit/core";
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-  useSortable
-} from "@dnd-kit/sortable";
-import { restrictToVerticalAxis } from "@dnd-kit/modifiers";
-import { CSS } from "@dnd-kit/utilities";
+import { draggable, dropTargetForElements, monitorForElements } from "@atlaskit/pragmatic-drag-and-drop/element/adapter";
+import { attachClosestEdge, extractClosestEdge } from "@atlaskit/pragmatic-drag-and-drop-hitbox/closest-edge";
 import { Transition } from "@headlessui/react";
 
 export const CONTENT_TYPE_TEXT_LEFT = "text-only-left";
@@ -192,7 +186,7 @@ const DynamicForm = ({
 
   // Initialize form values and sort fields by sort_key
   const sortedFields =
-    formData?.fields?.sort((a, b) => a.sort_key - b.sort_key) || [];
+    formData?.fields ? [...formData.fields].sort((a, b) => a.sort_key - b.sort_key) : [];
 
   const validateField = (field, value) => {
     if (field.required && (!value || value.trim() === "")) {
@@ -250,19 +244,19 @@ const DynamicForm = ({
       }
     });
 
-    setErrors(newErrors);
-    return isValid;
+    return { isValid, newErrors };
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!validateForm()) {
-      // Focus on first error field
-      const firstErrorField = Object.keys(errors)[0];
+    const { isValid, newErrors } = validateForm();
+    setErrors(newErrors);
+
+    if (!isValid) {
+      const firstErrorField = Object.keys(newErrors)[0];
       if (firstErrorField) {
-        const errorElement = document.getElementById(firstErrorField);
-        errorElement?.focus();
+        document.getElementById(firstErrorField)?.focus();
       }
       return;
     }
@@ -456,6 +450,7 @@ const DynamicForm = ({
 
   return (
     <form
+      onSubmit={handleSubmit}
       className={`max-w-2xl mx-auto p-6 ${className ? className : "bg-white"} ${
         localFont && localFont?.className ? localFont.className : ""
       } rounded-lg shadow-md`}
@@ -469,7 +464,7 @@ const DynamicForm = ({
         </div>
       )}
 
-      <div onSubmit={handleSubmit} className="space-y-6">
+      <div className="space-y-6">
         {sortedFields.map(renderField)}
 
         {submitStatus === "success" && (
@@ -516,8 +511,7 @@ const DynamicForm = ({
 
         <div className="pt-4">
           <button
-            type="button"
-            onClick={handleSubmit}
+            type="submit"
             disabled={isSubmitting}
             className={`
               w-full flex justify-center items-center px-4 py-2 border border-transparent 
@@ -748,7 +742,7 @@ const VideoItem = ({
 
   const [showVideo, setShowVideo] = useState(false);
 
-  if (content) borderClasses = `${backgroundColorThemes} mb-4`;
+  if (content) borderClasses = `${backgroundColorThemes["none"]} mb-4`;
 
   const videoOut = showVideo ? (
     <mux-video
@@ -808,56 +802,79 @@ const SortableList = ({
   idField = "id",
   sortableItems = [],
   setIsSorting
-}) => (
-  <DndContext
-    id={collection}
-    modifiers={[restrictToVerticalAxis]}
-    onDragStart={({ active: { id } }) => {
-      setIsSorting(id);
-    }}
-    onDragCancel={() => {
-      setIsSorting(null);
-    }}
-    onDragEnd={async ({ active: { id: activeId }, over: { id: overId } }) => {
-      const oldIndex = rows.findIndex((row) => row[idField] === activeId);
-      const newIndex = rows.findIndex((row) => row[idField] === overId);
-      let sortedRows = arrayMoveImmutable(rows, oldIndex, newIndex);
-      let ids = sortedRows.map((row) => row[idField]);
-
-      dispatch({
-        type: "SORT_ROWS",
-        data: {
-          collection: collection || null,
-          oldIndex: oldIndex,
-          newIndex: newIndex,
-          sortedRows,
-          ids,
-          idField
+}) => {
+  useEffect(() => {
+    return monitorForElements({
+      canMonitor: ({ source }) => source.data.collection === collection,
+      onDragStart: ({ source }) => {
+        setIsSorting(source.data.id);
+      },
+      onDrop: async ({ source, location }) => {
+        if (!location.current.dropTargets.length) {
+          setIsSorting(null);
+          return;
         }
-      });
 
-      // api
-      if (sortApi) await sortApi({ ids });
+        const sourceId = source.data.id;
+        const targetData = location.current.dropTargets[0].data;
+        const targetId = targetData.id;
+        const closestEdge = extractClosestEdge(targetData);
 
-      setIsSorting(null);
-    }}
-  >
-    <SortableContext items={rows} strategy={verticalListSortingStrategy}>
-      {sortableItems}
-    </SortableContext>
-  </DndContext>
-);
+        const oldIndex = rows.findIndex((r) => r[idField] === sourceId);
+        const targetIndex = rows.findIndex((r) => r[idField] === targetId);
+
+        if (oldIndex === -1 || targetIndex === -1) {
+          setIsSorting(null);
+          return;
+        }
+
+        const edgeOffset = closestEdge === "bottom" ? 1 : 0;
+        const resolvedNewIndex = targetIndex + edgeOffset - (oldIndex < targetIndex + edgeOffset ? 1 : 0);
+
+        if (oldIndex === resolvedNewIndex) {
+          setIsSorting(null);
+          return;
+        }
+
+        try {
+          const sortedRows = arrayMoveImmutable(rows, oldIndex, resolvedNewIndex);
+          const ids = sortedRows.map((row) => row[idField]);
+
+          dispatch({
+            type: "SORT_ROWS",
+            data: {
+              collection: collection || null,
+              oldIndex,
+              newIndex: resolvedNewIndex,
+              sortedRows,
+              ids,
+              idField
+            }
+          });
+
+          if (sortApi) await sortApi({ ids });
+        } finally {
+          setIsSorting(null);
+        }
+      }
+    });
+  }, [rows, dispatch, collection, sortApi, idField, setIsSorting]);
+
+  return <>{sortableItems}</>;
+};
 
 // NOTE localFont is NextJS font object
 
 const useScript = (url) => {
   useEffect(() => {
     if (!url) return;
-    const script = document.createElement("script");
 
+    const existing = document.querySelector(`script[src="${url}"]`);
+    if (existing) return;
+
+    const script = document.createElement("script");
     script.src = url;
     script.async = true;
-
     document.body.appendChild(script);
 
     return () => {
@@ -885,6 +902,19 @@ const useOnScreen = (ref, setActiveHeader, anchor) => {
   }, [ref, anchor, setActiveHeader]);
 };
 
+const DropIndicator = ({ edge }) => (
+  <div
+    style={{
+      position: "absolute",
+      left: 0,
+      right: 0,
+      height: "2px",
+      background: "#2563eb",
+      ...(edge === "top" ? { top: 0 } : { bottom: 0 })
+    }}
+  />
+);
+
 const TocItem = ({
   id,
   heading,
@@ -903,26 +933,59 @@ const TocItem = ({
   tocItemClasses,
   tocItemMatchedClasses
 }) => {
-  const { attributes, listeners, setNodeRef, transform, transition } =
-    sortCollection
-      ? useSortable({ id })
-      : {
-          attributes: {},
-          listeners: {},
-          setNodeRef: null,
-          transform: "",
-          transition: ""
-        };
+  const itemRef = useRef(null);
+  const handleRef = useRef(null);
 
-  const style = sortCollection
-    ? {
-        transform: CSS.Translate.toString(transform),
-        transition
-      }
-    : {};
-
+  const [isDragging, setIsDragging] = useState(false);
+  const [isDraggedOver, setIsDraggedOver] = useState(false);
+  const [closestEdge, setClosestEdge] = useState(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isHovering, setIsHovering] = useState(false);
+
+  useEffect(() => {
+    if (!sortCollection) return;
+    const el = itemRef.current;
+    const handle = handleRef.current;
+
+    const cleanupDraggable = draggable({
+      element: el,
+      dragHandle: handle,
+      getInitialData: () => ({ id, collection: sortCollection }),
+      onDragStart: () => setIsDragging(true),
+      onDrop: () => setIsDragging(false)
+    });
+
+    const cleanupDropTarget = dropTargetForElements({
+      element: el,
+      getData: ({ input, element }) =>
+        attachClosestEdge({ id, collection: sortCollection }, {
+          input,
+          element,
+          allowedEdges: ["top", "bottom"]
+        }),
+      canDrop: ({ source }) => source.data.collection === sortCollection,
+      onDragEnter: ({ self }) => {
+        setIsDraggedOver(true);
+        setClosestEdge(extractClosestEdge(self.data));
+      },
+      onDrag: ({ self }) => {
+        setClosestEdge(extractClosestEdge(self.data));
+      },
+      onDragLeave: () => {
+        setIsDraggedOver(false);
+        setClosestEdge(null);
+      },
+      onDrop: () => {
+        setIsDraggedOver(false);
+        setClosestEdge(null);
+      }
+    });
+
+    return () => {
+      cleanupDraggable();
+      cleanupDropTarget();
+    };
+  }, [id, sortCollection]);
 
   const showStuff = editCallback && ((isHovering && !isSorting) || isSorting);
 
@@ -948,15 +1011,15 @@ const TocItem = ({
     <li
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
+      ref={itemRef}
+      style={{ opacity: isDragging ? 0.5 : 1 }}
       className={`${
         isSorting ? "bg-gray-50 z-index-50" : ""
       } flex items-center relative ${
         editCallback ? "pt-2 first:pt-0 pl-4" : ""
       }`}
     >
+      {isDraggedOver && closestEdge && <DropIndicator edge={closestEdge} />}
       {showMeter && offset === 0 && (
         <div className="absolute h-1/2 w-4 top-0 -left-2 bg-white z-10"></div>
       )}
@@ -980,7 +1043,7 @@ const TocItem = ({
           leaveTo="transform scale-95 opacity-0 max-h-0"
         >
           <div
-            {...listeners}
+            ref={handleRef}
             className="h-6 w-6 inline-block text-slate-500 -ml-1 mr-1 shrink"
             aria-hidden="true"
             style={{ marginTop: "2px" }}
@@ -1665,3 +1728,5 @@ export const DoContentSections = ({
     </div>
   );
 };
+
+export { DynamicForm, SortableList, VideoItem };

@@ -15,7 +15,7 @@ const InternalLink = _ref => {
     tabIndex = 0,
     children
   } = _ref;
-  if (process.env.NEXT_PUBLIC_LIFECYCLE === "build") href = `${href}.html`;
+  if (process.env.NEXT_PUBLIC_LIFECYCLE === "build") href = "".concat(href, ".html");
   return /*#__PURE__*/_react.default.createElement("a", {
     href: href,
     target: target,
